@@ -194,8 +194,8 @@ namespace OpenQA.Selenium.Firefox
 
                 if (jValue.TryGetValue(out long longValue))
                 {
-                    this.preferences[key] = ((int)longValue).ToString(CultureInfo.InvariantCulture);
-                    Debug.Fail("Above cast should fail");
+                    this.preferences[key] = Convert.ToInt32(longValue, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                    Debug.Fail("Above conversion should fail");
                 }
             }
 
