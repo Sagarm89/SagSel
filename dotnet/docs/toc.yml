@@ -3,7 +3,7 @@
 
 - name: Modules
   items:
-  - name: Selenium.WebDriver
+  - name: WebDriver
     href: webdriver/OpenQA.Selenium.yml
-  - name: Selenium.Support
+  - name: Support
     href: support/OpenQA.Selenium.Support.yml
