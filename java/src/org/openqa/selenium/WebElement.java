@@ -166,6 +166,7 @@ public interface WebElement extends SearchContext, TakesScreenshot {
    * @param name The name of the attribute.
    * @return The attribute/property's current value or null if the value is not set.
    */
+  @Deprecated
   @Nullable String getAttribute(String name);
 
   /**
