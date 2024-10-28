@@ -136,9 +136,9 @@ namespace OpenQA.Selenium
                 {
                     foreach (object rawCookie in cookies)
                     {
-                        Dictionary<string, object> cookieDictionary = (Dictionary<string, object>)rawCookie;
                         if (rawCookie != null)
                         {
+                            Dictionary<string, object> cookieDictionary = (Dictionary<string, object>)rawCookie;
                             toReturn.Add(Cookie.FromDictionary(cookieDictionary));
                         }
                     }
