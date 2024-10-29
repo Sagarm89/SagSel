@@ -175,7 +175,7 @@ class WebElement(BaseWebElement):
         """
 
         warnings.warn(
-            "using WebElement.get_attribute() has been deprecated. Please use get_dom_attribute() instead."
+            "using WebElement.get_attribute() has been deprecated. Please use get_dom_attribute() instead.",
             DeprecationWarning,
             stacklevel=2,
         )
