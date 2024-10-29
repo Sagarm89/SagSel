@@ -21,10 +21,13 @@ using OpenQA.Selenium.Remote;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
+
+#nullable enable
 
 namespace OpenQA.Selenium.Firefox
 {
@@ -109,7 +112,7 @@ namespace OpenQA.Selenium.Firefox
             { GetFullPageScreenshotCommand, new HttpCommandInfo(HttpCommandInfo.GetCommand, "/session/{sessionId}/moz/screenshot/full") }
         };
 
-        private DevToolsSession devToolsSession;
+        private DevToolsSession? devToolsSession;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FirefoxDriver"/> class.
@@ -246,6 +249,7 @@ namespace OpenQA.Selenium.Firefox
         /// <summary>
         /// Gets a value indicating whether a DevTools session is active.
         /// </summary>
+        [MemberNotNullWhen(true, nameof(devToolsSession))]
         public bool HasActiveDevToolsSession
         {
             get { return this.devToolsSession != null; }
@@ -259,7 +263,7 @@ namespace OpenQA.Selenium.Firefox
         public FirefoxCommandContext GetContext()
         {
             FirefoxCommandContext output;
-            string response = this.Execute(GetContextCommand, null).Value.ToString();
+            string? response = this.Execute(GetContextCommand, null).Value.ToString();
 
             bool success = Enum.TryParse<FirefoxCommandContext>(response, true, out output);
             if (!success)
@@ -287,6 +291,12 @@ namespace OpenQA.Selenium.Firefox
         /// </summary>
         /// <param name="addOnDirectoryToInstall">Full path of the directory of the add-on to install.</param>
         /// <param name="temporary">Whether the add-on is temporary; required for unsigned add-ons.</param>
+        /// <returns>The add-on ID.</returns>
+        /// <exception cref="ArgumentException">
+        /// <para>If <paramref name="addOnDirectoryToInstall"/> is null or empty.</para>
+        /// or
+        /// <para>If the directory at <paramref name="addOnDirectoryToInstall"/> does not exist.</para>
+        /// </exception>
         public string InstallAddOnFromDirectory(string addOnDirectoryToInstall, bool temporary = false)
         {
             if (string.IsNullOrEmpty(addOnDirectoryToInstall))
@@ -310,6 +320,12 @@ namespace OpenQA.Selenium.Firefox
         /// </summary>
         /// <param name="addOnFileToInstall">Full path and file name of the add-on to install.</param>
         /// <param name="temporary">Whether the add-on is temporary; required for unsigned add-ons.</param>
+        /// <returns>The add-on ID.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <para>If <paramref name="addOnFileToInstall"/> is null or empty.</para>
+        /// or
+        /// <para>If the file at <paramref name="addOnFileToInstall"/> does not exist.</para>
+        /// </exception>
         public string InstallAddOnFromFile(string addOnFileToInstall, bool temporary = false)
         {
             if (string.IsNullOrEmpty(addOnFileToInstall))
@@ -333,6 +349,8 @@ namespace OpenQA.Selenium.Firefox
         /// </summary>
         /// <param name="base64EncodedAddOn">The base64-encoded string representation of the add-on binary.</param>
         /// <param name="temporary">Whether the add-on is temporary; required for unsigned add-ons.</param>
+        /// <returns>The add-on ID.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="base64EncodedAddOn"/> is null or empty.</exception>
         public string InstallAddOn(string base64EncodedAddOn, bool temporary = false)
         {
             if (string.IsNullOrEmpty(base64EncodedAddOn))
@@ -353,6 +371,7 @@ namespace OpenQA.Selenium.Firefox
         /// Uninstalls a Firefox add-on.
         /// </summary>
         /// <param name="addOnId">The ID of the add-on to uninstall.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="addOnId"/> is null or empty.</exception>
         public void UninstallAddOn(string addOnId)
         {
             if (string.IsNullOrEmpty(addOnId))
@@ -372,7 +391,7 @@ namespace OpenQA.Selenium.Firefox
         public Screenshot GetFullPageScreenshot()
         {
             Response screenshotResponse = this.Execute(GetFullPageScreenshotCommand, null);
-            string base64 = screenshotResponse.Value.ToString();
+            string base64 = screenshotResponse.Value.ToString()!;
             return new Screenshot(base64);
         }
 

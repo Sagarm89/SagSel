@@ -17,7 +17,8 @@
 // </copyright>
 
 using System;
-using System.Runtime.Serialization;
+
+#nullable enable
 
 namespace OpenQA.Selenium
 {

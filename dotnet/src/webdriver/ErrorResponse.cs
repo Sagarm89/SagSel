@@ -18,6 +18,8 @@
 
 using System.Collections.Generic;
 
+#nullable enable
+
 namespace OpenQA.Selenium
 {
     /// <summary>
@@ -25,7 +27,7 @@ namespace OpenQA.Selenium
     /// </summary>
     public class ErrorResponse
     {
-        private StackTraceElement[] stackTrace;
+        private StackTraceElement[]? stackTrace;
         private string message = string.Empty;
         private string className = string.Empty;
         private string screenshot = string.Empty;
@@ -42,7 +44,7 @@ namespace OpenQA.Selenium
         /// </summary>
         /// <param name="responseValue">A <see cref="Dictionary{K, V}"/> containing names and values of
         /// the properties of this <see cref="ErrorResponse"/>.</param>
-        public ErrorResponse(Dictionary<string, object> responseValue)
+        public ErrorResponse(Dictionary<string, object>? responseValue)
         {
             if (responseValue != null)
             {
@@ -50,7 +52,7 @@ namespace OpenQA.Selenium
                 {
                     if (responseValue["message"] != null)
                     {
-                        this.message = responseValue["message"].ToString();
+                        this.message = responseValue["message"].ToString() ?? "";
                     }
                     else
                     {
@@ -60,17 +62,17 @@ namespace OpenQA.Selenium
 
                 if (responseValue.ContainsKey("screen") && responseValue["screen"] != null)
                 {
-                    this.screenshot = responseValue["screen"].ToString();
+                    this.screenshot = responseValue["screen"].ToString() ?? "";
                 }
 
                 if (responseValue.ContainsKey("class") && responseValue["class"] != null)
                 {
-                    this.className = responseValue["class"].ToString();
+                    this.className = responseValue["class"].ToString() ?? "";
                 }
 
                 if (responseValue.ContainsKey("stackTrace") || responseValue.ContainsKey("stacktrace"))
                 {
-                    object[] stackTraceArray = null;
+                    object[]? stackTraceArray = null;
 
                     if (responseValue.ContainsKey("stackTrace"))
                     {
@@ -86,7 +88,7 @@ namespace OpenQA.Selenium
                         List<StackTraceElement> stackTraceList = new List<StackTraceElement>();
                         foreach (object rawStackTraceElement in stackTraceArray)
                         {
-                            Dictionary<string, object> elementAsDictionary = rawStackTraceElement as Dictionary<string, object>;
+                            Dictionary<string, object>? elementAsDictionary = rawStackTraceElement as Dictionary<string, object>;
                             if (elementAsDictionary != null)
                             {
                                 stackTraceList.Add(new StackTraceElement(elementAsDictionary));
@@ -130,7 +132,7 @@ namespace OpenQA.Selenium
         /// <summary>
         /// Gets or sets the stack trace of the error
         /// </summary>
-        public StackTraceElement[] StackTrace
+        public StackTraceElement[]? StackTrace
         {
             get { return this.stackTrace; }
             set { this.stackTrace = value; }

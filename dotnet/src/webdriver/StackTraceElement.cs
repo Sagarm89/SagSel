@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
+#nullable enable
+
 namespace OpenQA.Selenium
 {
     /// <summary>
@@ -43,18 +45,18 @@ namespace OpenQA.Selenium
         /// Initializes a new instance of the <see cref="StackTraceElement"/> class using the given property values.
         /// </summary>
         /// <param name="elementAttributes">A <see cref="Dictionary{K, V}"/> containing the names and values for the properties of this <see cref="StackTraceElement"/>.</param>
-        public StackTraceElement(Dictionary<string, object> elementAttributes)
+        public StackTraceElement(Dictionary<string, object>? elementAttributes)
         {
             if (elementAttributes != null)
             {
                 if (elementAttributes.ContainsKey("className") && elementAttributes["className"] != null)
                 {
-                    this.className = elementAttributes["className"].ToString();
+                    this.className = elementAttributes["className"].ToString() ?? "";
                 }
 
                 if (elementAttributes.ContainsKey("methodName") && elementAttributes["methodName"] != null)
                 {
-                    this.methodName = elementAttributes["methodName"].ToString();
+                    this.methodName = elementAttributes["methodName"].ToString() ?? "";
                 }
 
                 if (elementAttributes.ContainsKey("lineNumber"))
@@ -68,7 +70,7 @@ namespace OpenQA.Selenium
 
                 if (elementAttributes.ContainsKey("fileName") && elementAttributes["fileName"] != null)
                 {
-                    this.fileName = elementAttributes["fileName"].ToString();
+                    this.fileName = elementAttributes["fileName"].ToString() ?? "";
                 }
             }
         }

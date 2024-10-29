@@ -17,7 +17,8 @@
 // </copyright>
 
 using System;
-using System.Runtime.Serialization;
+
+#nullable enable
 
 namespace OpenQA.Selenium
 {
@@ -27,11 +28,10 @@ namespace OpenQA.Selenium
     [Serializable]
     public class UnhandledAlertException : WebDriverException
     {
-        private string alertText;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="UnhandledAlertException"/> class.
         /// </summary>
+        [Obsolete("Use a constructor overload that sets alertText")]
         public UnhandledAlertException()
             : base()
         {
@@ -42,6 +42,7 @@ namespace OpenQA.Selenium
         /// a specified error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
+        [Obsolete("Use a constructor overload that sets alertText")]
         public UnhandledAlertException(string message)
             : base(message)
         {
@@ -56,7 +57,7 @@ namespace OpenQA.Selenium
         public UnhandledAlertException(string message, string alertText)
             : base(message)
         {
-            this.alertText = alertText;
+            this.AlertText = alertText;
         }
 
         /// <summary>
@@ -67,6 +68,7 @@ namespace OpenQA.Selenium
         /// <param name="message">The error message that explains the reason for the exception.</param>
         /// <param name="innerException">The exception that is the cause of the current exception,
         /// or <see langword="null"/> if no inner exception is specified.</param>
+        [Obsolete("Use a constructor overload that sets alertText")]
         public UnhandledAlertException(string message, Exception innerException)
             : base(message, innerException)
         {
@@ -75,9 +77,6 @@ namespace OpenQA.Selenium
         /// <summary>
         /// Gets the text of the unhandled alert.
         /// </summary>
-        public string AlertText
-        {
-            get { return this.alertText; }
-        }
+        public string AlertText { get; } = string.Empty;
     }
 }
