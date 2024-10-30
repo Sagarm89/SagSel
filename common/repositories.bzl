@@ -165,8 +165,8 @@ js_library(
 
     http_archive(
         name = "linux_edgedriver",
-        url = "https://msedgedriver.azureedge.net/130.0.2849.56/edgedriver_linux64.zip",
-        sha256 = "c5aa82d87750a6f49b741790a432194ff91d0a232c54eb5507a526f45146f440",
+        url = "https://msedgedriver.azureedge.net/130.0.2849.46/edgedriver_linux64.zip",
+        sha256 = "6a62b28e9373776ae7d3f6611f5dd126c454d73264c2bb826659d3283da57f27",
         build_file_content = """
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 package(default_visibility = ["//visibility:public"])
@@ -182,8 +182,8 @@ js_library(
 
     http_archive(
         name = "mac_edgedriver",
-        url = "https://msedgedriver.azureedge.net/130.0.2849.56/edgedriver_mac64.zip",
-        sha256 = "97141db0a53b22356094ff4d7a806a19ab816499366539e633a32fc4af8da2a3",
+        url = "https://msedgedriver.azureedge.net/130.0.2849.61/edgedriver_mac64.zip",
+        sha256 = "82e761138b112bd57950f6b873d601cd4b1e9c8403663c0ffaad8e5b167efc17",
         build_file_content = """
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 package(default_visibility = ["//visibility:public"])
