@@ -51,7 +51,7 @@ class WebDriver(RemoteWebDriver):
         if not self.service.reuse_service:
             self.service.start()
 
-        client_config = ClientConfig(remote_server_addr=self.service.service_url, keep_alive=keep_alive)
+        client_config = ClientConfig(remote_server_addr=self.service.service_url, keep_alive=keep_alive, timeout=120)
         executor = SafariRemoteConnection(
             ignore_proxy=options._ignore_local_proxy,
             client_config=client_config,

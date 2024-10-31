@@ -375,7 +375,7 @@ class RemoteConnection:
         LOGGER.debug("%s %s %s", command_info[0], url, str(trimmed))
         return self._request(command_info[0], url, body=data)
 
-    def _request(self, method, url, body=None, timeout=120):
+    def _request(self, method, url, body=None):
         """Send an HTTP request to the remote server.
 
         :Args:
@@ -397,12 +397,12 @@ class RemoteConnection:
             body = None
 
         if self._client_config.keep_alive:
-            response = self._conn.request(method, url, body=body, headers=headers, timeout=timeout)
+            response = self._conn.request(method, url, body=body, headers=headers, timeout=self._client_config.timeout)
             statuscode = response.status
         else:
             conn = self._get_connection_manager()
             with conn as http:
-                response = http.request(method, url, body=body, headers=headers, timeout=timeout)
+                response = http.request(method, url, body=body, headers=headers, timeout=self._client_config.timeout)
             statuscode = response.status
         data = response.data.decode("UTF-8")
         LOGGER.debug("Remote response: status=%s | data=%s | headers=%s", response.status, data, response.headers)
