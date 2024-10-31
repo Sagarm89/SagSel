@@ -136,6 +136,18 @@ class RemoteConnection:
     """
 
     browser_name = None
+    # Keep backward compatibility for AppiumConnection - https://github.com/SeleniumHQ/selenium/issues/14694
+    import os
+    import socket
+
+    import certifi
+
+    _timeout = (
+        float(os.getenv("GLOBAL_DEFAULT_TIMEOUT", str(socket.getdefaulttimeout())))
+        if os.getenv("GLOBAL_DEFAULT_TIMEOUT") is not None
+        else socket.getdefaulttimeout()
+    )
+    _ca_certs = os.getenv("REQUESTS_CA_BUNDLE") if "REQUESTS_CA_BUNDLE" in os.environ else certifi.where()
     _client_config: ClientConfig = None
 
     system = platform.system().lower()
@@ -296,6 +308,9 @@ class RemoteConnection:
             init_args_for_pool_manager=init_args_for_pool_manager,
         )
 
+        # Keep backward compatibility for AppiumConnection - https://github.com/SeleniumHQ/selenium/issues/14694
+        RemoteConnection._timeout = self._client_config.timeout
+        RemoteConnection._ca_certs = self._client_config.ca_certs
         RemoteConnection._client_config = self._client_config
 
         if remote_server_addr:
