@@ -17,12 +17,13 @@
 
 from selenium.webdriver.chromium.webdriver import ChromiumDriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.common.driver_extensions.has_fedcm_dialog import HasFedCmDialog
 
 from .options import Options
 from .service import Service
 
 
-class WebDriver(ChromiumDriver):
+class WebDriver(ChromiumDriver, HasFedCmDialog):
     """Controls the ChromeDriver and allows you to drive the browser."""
 
     def __init__(
