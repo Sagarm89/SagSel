@@ -288,3 +288,4 @@ class NoSuchDriverException(WebDriverException):
 
 class DetachedShadowRootException(WebDriverException):
     """Raised when referenced shadow root is no longer attached to the DOM"""
+    
