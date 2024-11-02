@@ -36,25 +36,19 @@ class Network:
         self.scopes = {}
         self.conn = None
 
-    async def add_request_handler(
-        self,
-        request_filter=lambda _: True,
-        handler=default_request_handler,
-        conn=None,
-        task_status=trio.TASK_STATUS_IGNORED
-    ):
-        if not self.conn:
-            self.conn = conn
-        with trio.CancelScope() as scope:
-            self.network = network.Network(conn)
-            params = AddInterceptParameters(["beforeRequestSent"])
-            callback = self._callback(request_filter, handler)
-            result = await self.network.add_intercept(event=BeforeRequestSent, params=params)
-            intercept = result["intercept"]
-            self.scopes[intercept] = scope
-            task_status.started(intercept)
-            await self.add_listener(event=BeforeRequestSent, callback=callback)
-            return intercept
+    async def get(self, url, conn):
+        params = NavigateParameters(context=self.driver.current_window_handle, url=url, wait="complete")
+        await conn.execute(Navigate(params).cmd())
+
+    def create_callback(self, request_filter, handler):
+        async def callback(request):
+            if request_filter(request):
+                request = handler(request)
+            else:
+                request = default_request_handler(request)
+            await self.network.continue_request(request)
+
+        return callback
 
     async def add_listener(self, event, callback):
         listener = self.conn.listen(event)
@@ -64,9 +58,25 @@ class Network:
             if request_data.isBlocked:
                 await callback(request_data)
 
-    async def get(self, url, conn):
-        params = NavigateParameters(context=self.driver.current_window_handle, url=url, wait="complete")
-        await conn.execute(Navigate(params).cmd())
+    async def add_request_handler(
+        self,
+        request_filter=lambda _: True,
+        handler=default_request_handler,
+        conn=None,
+        task_status=trio.TASK_STATUS_IGNORED,
+    ):
+        if not self.conn:
+            self.conn = conn
+        with trio.CancelScope() as scope:
+            self.network = network.Network(conn)
+            params = AddInterceptParameters(["beforeRequestSent"])
+            result = await self.network.add_intercept(event=BeforeRequestSent, params=params)
+            intercept = result["intercept"]
+            self.scopes[intercept] = scope
+            task_status.started(intercept)
+            callback = self.create_callback(request,filter,handler)
+            await self.add_listener(event=BeforeRequestSent, callback=callback)
+            return intercept
 
     async def remove_request_handler(self, intercept):
         await self.network.remove_intercept(
@@ -75,13 +85,3 @@ class Network:
         )
         self.scopes[intercept].cancel()
         self.scopes.pop(intercept)
-
-    def _callback(self, request_filter, handler):
-        async def callback(request):
-            if request_filter(request):
-                request = handler(request)
-            else:
-                request = default_request_handler(request)
-            await self.network.continue_request(request)
-
-        return callback
