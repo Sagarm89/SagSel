@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import typing
+from typing import List
 from dataclasses import dataclass
 
 from .session import session_subscribe
@@ -76,7 +76,7 @@ class ConsoleLogEntry:
     text: str
     timestamp: str
     method: str
-    args: typing.List[dict]
+    args: List[dict]
     type_: str
 
     @classmethod
