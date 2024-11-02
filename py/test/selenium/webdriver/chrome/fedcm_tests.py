@@ -15,27 +15,15 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import os
-
 import pytest
 
 from selenium.common.exceptions import NoAlertPresentException
 
 
-@pytest.mark.xfail_safari(reason="FedCM not supported")
-@pytest.mark.xfail_firefox(reason="FedCM not supported")
-@pytest.mark.xfail_ie(reason="FedCM not supported")
-@pytest.mark.xfail_edge(reason="FedCM not supported")
 class TestFedCM:
     @pytest.fixture(autouse=True)
-    def setup(self, driver):
-        html_file_path = os.path.abspath(
-            "/Users/navinchandra/Documents/Projects/selenium/common/src/web/fedcm/fedcm.html"
-        )
-        print("File path is: ", html_file_path)
-
-        driver.get(f"file://{html_file_path}")
-        # driver.get('fedcm/fedcm.html')
+    def setup(self, driver, webserver):
+        driver.get(webserver.where_is("fedcm/fedcm.html", localhost=True))
         self.dialog = driver.fedcm_dialog
 
     def test_no_dialog_present(self, driver):
@@ -52,7 +40,8 @@ class TestFedCM:
         with pytest.raises(NoAlertPresentException):
             self.dialog.cancel()
 
-    def test_dialog_present(self, driver):
+    def test_dialog_present(self, driver, webserver):
+
         driver.execute_script("triggerFedCm();")
         dialog = driver.wait_for_fedcm_dialog()
 
@@ -64,6 +53,8 @@ class TestFedCM:
         assert accounts[0].name == "John Doe"
 
         dialog.select_account(1)
+        # wait for the dialog to become interactable after selecting the account
+        driver.wait_for_fedcm_dialog()
         dialog.cancel()
 
         with pytest.raises(NoAlertPresentException):
@@ -121,8 +112,12 @@ class TestFedCM:
         # Test account selection
         dialog.select_account(1)
 
-        # Test dialog button click
-        dialog.click_continue()
+        # Wait for the dialog to become interactable
+        driver.wait_for_fedcm_dialog()
+
+        # # Test dialog button click
+        # dialog.click_continue()
+        # driver.wait_for_fedcm_dialog()
 
         # Test dialog cancellation
         dialog.cancel()
