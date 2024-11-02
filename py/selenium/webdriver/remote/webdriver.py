@@ -22,7 +22,6 @@ import os
 import pkgutil
 import tempfile
 import types
-import typing
 import warnings
 import zipfile
 from abc import ABCMeta
@@ -35,6 +34,8 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Union
+from typing import Type
+
 
 from selenium.common.exceptions import InvalidArgumentException
 from selenium.common.exceptions import JavascriptException
@@ -248,9 +249,9 @@ class WebDriver(BaseWebDriver):
 
     def __exit__(
         self,
-        exc_type: typing.Optional[typing.Type[BaseException]],
-        exc: typing.Optional[BaseException],
-        traceback: typing.Optional[types.TracebackType],
+        exc_type: Optional[Type[BaseException]],
+        exc: Optional[BaseException],
+        traceback: Optional[types.TracebackType],
     ):
         self.quit()
 
@@ -614,7 +615,7 @@ class WebDriver(BaseWebDriver):
         """
         return self.execute(Command.GET_ALL_COOKIES)["value"]
 
-    def get_cookie(self, name) -> typing.Optional[typing.Dict]:
+    def get_cookie(self, name) -> Optional[Dict]:
         """Get a single cookie by name. Returns the cookie if found, None if
         not.
 
