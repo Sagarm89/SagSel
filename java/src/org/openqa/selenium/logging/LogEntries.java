@@ -17,8 +17,6 @@
 
 package org.openqa.selenium.logging;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
 
 import java.util.Iterator;
 import java.util.List;
@@ -35,8 +33,7 @@ public class LogEntries implements Iterable<LogEntry> {
   private final List<LogEntry> entries;
 
   public LogEntries(Iterable<LogEntry> entries) {
-    this.entries =
-      StreamSupport.stream(entries.spliterator(), false).toList();
+    this.entries = StreamSupport.stream(entries.spliterator(), false).toList();
   }
 
   /**

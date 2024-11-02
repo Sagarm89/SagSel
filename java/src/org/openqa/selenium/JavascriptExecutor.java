@@ -17,7 +17,6 @@
 
 package org.openqa.selenium;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.NullMarked;
@@ -178,7 +177,8 @@ public interface JavascriptExecutor {
    */
   default Set<ScriptKey> getPinnedScripts() {
     return UnpinnedScriptKey.getPinnedScripts(this).stream()
-      .map(key -> (ScriptKey) key).collect(Collectors.toUnmodifiableSet());
+        .map(key -> (ScriptKey) key)
+        .collect(Collectors.toUnmodifiableSet());
   }
 
   /**
