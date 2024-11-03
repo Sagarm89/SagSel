@@ -94,7 +94,6 @@ jobs:
     with:
       name: Integration Tests (safari)
       browser: safari
-      os: macos-15
+      os: macos
       cache-key: py-safari
-      run: |
-        bazel test --local_test_jobs 1 --flaky_test_attempts 3 //py:test-safari
+      run: bazel test --local_test_jobs 1 --flaky_test_attempts 3 //py:test-safari
