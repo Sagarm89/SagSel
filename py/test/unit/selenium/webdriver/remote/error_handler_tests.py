@@ -243,7 +243,7 @@ def test_raises_exception_for_method_not_allowed(handler, code):
 
 
 @pytest.mark.parametrize("code", ErrorCode.DETACHED_SHADOW_ROOT)
-def test_raises_exception_for_invalid_selector(handler, code):
+def test_raises_exception_for_detached_shadow_root(handler, code):
     with pytest.raises(exceptions.DetachedShadowRootException):
         handler.check_response({"status": code, "value": "foo"})
 
