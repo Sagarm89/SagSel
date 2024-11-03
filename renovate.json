@@ -4,33 +4,40 @@
   "labels": ["dependencies"],
   "packageRules": [
     {
-      "matchPackageNames": ["bazel", "bazelisk"],
-      "commitMessageSuffix": "[dotnet][java][js][py][rb][rust]"
+      "matchManagers": ["bazel", "bazel-module", "bazelisk"],
+      "commitMessagePrefix": "[dotnet][java][js][py][rb][rust]",
+      "labels": ["c-build"]
     },
     {
-      "matchPackageNames": ["nuget"],
-      "commitMessagePrefix": "[dotnet]"
+      "matchManagers": ["nuget"],
+      "commitMessagePrefix": "[dotnet]",
+      "labels": ["c-dotnet"]
     },
     {
-      "matchPackageNames": ["maven"],
-      "commitMessagePrefix": "[java]"
+      "matchManagers": ["maven", "github-actions"],
+      "commitMessagePrefix": "[java]",
+      "labels": ["c-java"]
     },
     {
-      "matchPackageNames": ["npm"],
-      "commitMessagePrefix": "[js]"
+      "matchManagers": ["npm"],
+      "commitMessagePrefix": "[js]",
+      "labels": ["c-nodejs"]
     },
     {
-      "matchPackageNames": ["pip_requirements"],
-      "commitMessagePrefix": "[py]"
+      "matchManagers": ["pip_requirements", "pip_setup", "pep621"],
+      "commitMessagePrefix": "[py]",
+      "labels": ["c-py"]
     },
     {
-      "matchPackageNames": ["bundler", "ruby-version"],
-      "commitMessagePrefix": "[rb]"
+      "matchManagers": ["bundler", "ruby-version"],
+      "commitMessagePrefix": "[rb]",
+      "labels": ["c-rb"]
     },
     {
-      "matchPackageNames": ["cargo"],
-      "commitMessagePrefix": "[rust]"
+      "matchManagers": ["cargo"],
+      "commitMessagePrefix": "[rust]",
+      "labels": ["c-rust"]
     }
   ],
-  "prConcurrentLimit": 5
+  "prConcurrentLimit": 15
 }
