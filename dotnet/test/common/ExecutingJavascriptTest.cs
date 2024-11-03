@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace OpenQA.Selenium
 {
@@ -447,6 +448,30 @@ namespace OpenQA.Selenium
                 Assert.That(jquery.Length, Is.GreaterThan(50000));
                 ExecuteScript(jquery, null);
             }
+        }
+
+        [Test]
+        public async Task ShouldBeAbleToPinJavascriptCodeAndExecuteRepeatedly()
+        {
+            IJavaScriptEngine jsEngine = new JavaScriptEngine(driver);
+
+            driver.Url = xhtmlTestPage;
+
+            PinnedScript script = await jsEngine.PinScript("return document.title;");
+            for (int i = 0; i < 5; i++)
+            {
+                object result = ((IJavaScriptExecutor)driver).ExecuteScript(script);
+
+                Assert.That(result, Is.InstanceOf<string>());
+                Assert.That(result, Is.EqualTo("XHTML Test Page"));
+            }
+
+            await jsEngine.UnpinScript(script);
+
+            Assert.That(() =>
+            {
+                _ = ((IJavaScriptExecutor)driver).ExecuteScript(script);
+            }, Throws.TypeOf<JavaScriptException>());
         }
 
         [Test]

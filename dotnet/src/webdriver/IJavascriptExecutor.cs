@@ -16,6 +16,7 @@
 // limitations under the License.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 
 namespace OpenQA.Selenium
@@ -97,6 +98,7 @@ namespace OpenQA.Selenium
         /// variable, as if the function were called via "Function.apply"
         /// </para>
         /// </remarks>
+        /// <exception cref="ArgumentNullException">If <paramref name="script" /> is null.</exception>
         object ExecuteScript(PinnedScript script, params object[] args);
 
         /// <summary>
