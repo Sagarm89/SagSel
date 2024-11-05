@@ -18,6 +18,7 @@
 
 #if !NET8_0_OR_GREATER
 
+// Following polyfill guidance explained here https://devblogs.microsoft.com/dotnet/creating-aot-compatible-libraries/#targetframeworks
 // Original code in https://github.com/dotnet/runtime/blob/419e949d258ecee4c40a460fb09c66d974229623/src/libraries/System.Private.CoreLib/src/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
 
 namespace System.Diagnostics.CodeAnalysis
