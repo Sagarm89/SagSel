@@ -1,4 +1,6 @@
-﻿using OpenQA.Selenium.BiDi.Communication;
+using OpenQA.Selenium.BiDi.Communication;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules;
 

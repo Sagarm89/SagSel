@@ -1,4 +1,6 @@
-﻿namespace OpenQA.Selenium.BiDi.Modules.Session;
+#nullable enable
+
+namespace OpenQA.Selenium.BiDi.Modules.Session;
 
 public class CapabilityRequest
 {

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules.Network;
 

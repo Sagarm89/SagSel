@@ -1,10 +1,12 @@
-﻿using OpenQA.Selenium.BiDi.Communication;
+using OpenQA.Selenium.BiDi.Communication;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules.BrowsingContext;
 
 internal class CreateCommand(CreateCommandParameters @params) : Command<CreateCommandParameters>(@params);
 
-internal record CreateCommandParameters(BrowsingContextType Type) : CommandParameters
+internal record CreateCommandParameters(ContextType Type) : CommandParameters
 {
     public BrowsingContext? ReferenceContext { get; set; }
 
@@ -22,7 +24,7 @@ public record CreateOptions : CommandOptions
     public Browser.UserContext? UserContext { get; set; }
 }
 
-public enum BrowsingContextType
+public enum ContextType
 {
     Tab,
     Window

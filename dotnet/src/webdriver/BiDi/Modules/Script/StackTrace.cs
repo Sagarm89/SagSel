@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules.Script;
 

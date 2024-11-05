@@ -1,11 +1,13 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
 
+#nullable enable
+
 namespace OpenQA.Selenium.BiDi.Communication.Transport;
 
-public interface ITransport : IDisposable
+interface ITransport : IDisposable
 {
     Task ConnectAsync(CancellationToken cancellationToken);
 

@@ -1,5 +1,7 @@
-﻿using OpenQA.Selenium.BiDi.Modules.BrowsingContext;
+using OpenQA.Selenium.BiDi.Modules.BrowsingContext;
 using System;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules.Network;
 

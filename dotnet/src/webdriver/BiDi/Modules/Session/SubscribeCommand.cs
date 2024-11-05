@@ -1,5 +1,7 @@
-﻿using OpenQA.Selenium.BiDi.Communication;
+using OpenQA.Selenium.BiDi.Communication;
 using System.Collections.Generic;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules.Session;
 

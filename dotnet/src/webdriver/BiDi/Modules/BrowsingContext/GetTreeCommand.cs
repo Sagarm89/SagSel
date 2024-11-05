@@ -1,5 +1,7 @@
-﻿using OpenQA.Selenium.BiDi.Communication;
+using OpenQA.Selenium.BiDi.Communication;
 using System.Collections.Generic;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules.BrowsingContext;
 
@@ -14,9 +16,21 @@ internal record GetTreeCommandParameters : CommandParameters
 
 public record GetTreeOptions : CommandOptions
 {
+    public GetTreeOptions() { }
+
+    internal GetTreeOptions(BrowsingContextGetTreeOptions? options)
+    {
+        MaxDepth = options?.MaxDepth;
+    }
+
     public long? MaxDepth { get; set; }
 
     public BrowsingContext? Root { get; set; }
+}
+
+public record BrowsingContextGetTreeOptions
+{
+    public long? MaxDepth { get; set; }
 }
 
 public record GetTreeResult(IReadOnlyList<BrowsingContextInfo> Contexts);

@@ -1,5 +1,7 @@
-﻿using OpenQA.Selenium.BiDi.Communication;
+using OpenQA.Selenium.BiDi.Communication;
 using System.Collections.Generic;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules.Script;
 
@@ -7,7 +9,7 @@ internal class AddPreloadScriptCommand(AddPreloadScriptCommandParameters @params
 
 internal record AddPreloadScriptCommandParameters(string FunctionDeclaration) : CommandParameters
 {
-    public IEnumerable<ChannelValue>? Arguments { get; set; }
+    public IEnumerable<LocalValue.Channel>? Arguments { get; set; }
 
     public IEnumerable<BrowsingContext.BrowsingContext>? Contexts { get; set; }
 
@@ -16,9 +18,24 @@ internal record AddPreloadScriptCommandParameters(string FunctionDeclaration) : 
 
 public record AddPreloadScriptOptions : CommandOptions
 {
-    public IEnumerable<ChannelValue>? Arguments { get; set; }
+    public AddPreloadScriptOptions() { }
+
+    internal AddPreloadScriptOptions(BrowsingContextAddPreloadScriptOptions? options)
+    {
+        Arguments = options?.Arguments;
+        Sandbox = options?.Sandbox;
+    }
+
+    public IEnumerable<LocalValue.Channel>? Arguments { get; set; }
 
     public IEnumerable<BrowsingContext.BrowsingContext>? Contexts { get; set; }
+
+    public string? Sandbox { get; set; }
+}
+
+public record BrowsingContextAddPreloadScriptOptions
+{
+    public IEnumerable<LocalValue.Channel>? Arguments { get; set; }
 
     public string? Sandbox { get; set; }
 }

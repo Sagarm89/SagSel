@@ -1,3 +1,5 @@
-﻿namespace OpenQA.Selenium.BiDi.Modules.Network;
+#nullable enable
+
+namespace OpenQA.Selenium.BiDi.Modules.Network;
 
 public record Header(string Name, BytesValue Value);

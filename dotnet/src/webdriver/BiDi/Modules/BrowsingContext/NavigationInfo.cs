@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules.BrowsingContext;
 

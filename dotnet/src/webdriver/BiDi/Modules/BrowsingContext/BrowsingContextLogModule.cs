@@ -1,12 +1,14 @@
-﻿using OpenQA.Selenium.BiDi.Modules.Log;
+using OpenQA.Selenium.BiDi.Modules.Log;
 using System.Threading.Tasks;
 using System;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules.BrowsingContext;
 
 public class BrowsingContextLogModule(BrowsingContext context, LogModule logModule)
 {
-    public Task<Subscription> OnEntryAddedAsync(Func<BaseLogEntry, Task> handler)
+    public Task<Subscription> OnEntryAddedAsync(Func<Entry, Task> handler, SubscriptionOptions? options = null)
     {
         return logModule.OnEntryAddedAsync(async args =>
         {
@@ -14,10 +16,10 @@ public class BrowsingContextLogModule(BrowsingContext context, LogModule logModu
             {
                 await handler(args).ConfigureAwait(false);
             }
-        });
+        }, options);
     }
 
-    public Task<Subscription> OnEntryAddedAsync(Action<BaseLogEntry> handler)
+    public Task<Subscription> OnEntryAddedAsync(Action<Entry> handler, SubscriptionOptions? options = null)
     {
         return logModule.OnEntryAddedAsync(args =>
         {
@@ -25,6 +27,6 @@ public class BrowsingContextLogModule(BrowsingContext context, LogModule logModu
             {
                 handler(args);
             }
-        });
+        }, options);
     }
 }

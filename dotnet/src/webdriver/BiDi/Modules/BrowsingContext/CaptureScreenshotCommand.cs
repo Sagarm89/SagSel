@@ -1,5 +1,7 @@
-﻿using OpenQA.Selenium.BiDi.Communication;
+using OpenQA.Selenium.BiDi.Communication;
 using System.Text.Json.Serialization;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Modules.BrowsingContext;
 
@@ -35,18 +37,16 @@ public record struct ImageFormat(string Type)
 }
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-[JsonDerivedType(typeof(BoxClipRectangle), "box")]
-[JsonDerivedType(typeof(ElementClipRectangle), "element")]
-public abstract record ClipRectangle;
+[JsonDerivedType(typeof(Box), "box")]
+[JsonDerivedType(typeof(Element), "element")]
+public abstract record ClipRectangle
+{
+    public record Box(double X, double Y, double Width, double Height) : ClipRectangle;
 
-public record BoxClipRectangle(double X, double Y, double Width, double Height) : ClipRectangle;
-
-public record ElementClipRectangle(Script.SharedReference Element) : ClipRectangle;
+    public record Element([property: JsonPropertyName("element")] Script.SharedReference SharedReference) : ClipRectangle;
+}
 
 public record CaptureScreenshotResult(string Data)
 {
-    public byte[] AsBytes()
-    {
-        return System.Convert.FromBase64String(Data);
-    }
+    public byte[] ToByteArray() => System.Convert.FromBase64String(Data);
 }

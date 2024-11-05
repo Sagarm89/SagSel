@@ -1,7 +1,9 @@
-﻿using OpenQA.Selenium.BiDi.Modules.Script;
+using OpenQA.Selenium.BiDi.Modules.Script;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Communication.Json.Converters.Polymorphic;
 
@@ -14,8 +16,8 @@ internal class EvaluateResultConverter : JsonConverter<EvaluateResult>
 
         return jsonDocument.RootElement.GetProperty("type").ToString() switch
         {
-            "success" => jsonDocument.Deserialize<EvaluateResultSuccess>(options),
-            "exception" => jsonDocument.Deserialize<EvaluateResultException>(options),
+            "success" => jsonDocument.Deserialize<EvaluateResult.Success>(options),
+            "exception" => jsonDocument.Deserialize<EvaluateResult.Exception>(options),
             _ => null,
         };
     }

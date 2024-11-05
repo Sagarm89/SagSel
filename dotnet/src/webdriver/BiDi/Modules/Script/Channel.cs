@@ -1,14 +1,5 @@
-﻿namespace OpenQA.Selenium.BiDi.Modules.Script;
+#nullable enable
 
-public class Channel
-{
-    readonly BiDi _bidi;
+namespace OpenQA.Selenium.BiDi.Modules.Script;
 
-    internal Channel(BiDi bidi, string id)
-    {
-        _bidi = bidi;
-        Id = id;
-    }
-
-    internal string Id { get; }
-}
+public record Channel(string Id);

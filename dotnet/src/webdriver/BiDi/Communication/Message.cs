@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+using System.Text.Json;
+
+#nullable enable
 
 namespace OpenQA.Selenium.BiDi.Communication;
 
