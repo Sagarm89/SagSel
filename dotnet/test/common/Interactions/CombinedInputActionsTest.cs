@@ -397,7 +397,6 @@ namespace OpenQA.Selenium.Interactions
             Assert.IsTrue(DateTime.Now - start > TimeSpan.FromMilliseconds(1200));
         }
 
-
         [Test]
         public void ShouldHandleClashingDeviceNamesGracefully()
         {
