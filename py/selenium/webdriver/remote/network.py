@@ -15,12 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 from collections import defaultdict
+from contextlib import asynccontextmanager
 
 import trio
 
 from selenium.webdriver.common.bidi import network
 from selenium.webdriver.common.bidi.browsing_context import Navigate
 from selenium.webdriver.common.bidi.browsing_context import NavigateParameters
+from selenium.webdriver.common.bidi.cdp import open_cdp
 from selenium.webdriver.common.bidi.network import AddInterceptParameters
 from selenium.webdriver.common.bidi.network import BeforeRequestSent
 from selenium.webdriver.common.bidi.network import BeforeRequestSentParameters
@@ -36,13 +38,24 @@ class Network:
         self.intercepts = defaultdict(lambda: {"event_name": None, "handlers": []})
         self.bidi_network = None
         self.conn = None
+        self.nursery = None
 
         self.remove_request_handler = self.remove_intercept
         self.clear_request_handlers = self.clear_intercepts
 
-    async def get(self, url, conn, wait="complete"):
+    @asynccontextmanager
+    async def set_context(self):
+        ws_url = self.driver.caps.get("webSocketUrl")
+        async with open_cdp(ws_url) as conn:
+            self.conn = conn
+            self.bidi_network = network.Network(conn)
+            async with trio.open_nursery() as nursery:
+                self.nursery = nursery
+                yield
+
+    async def get(self, url, wait="complete"):
         params = NavigateParameters(context=self.driver.current_window_handle, url=url, wait=wait)
-        await conn.execute(Navigate(params).cmd())
+        await self.conn.execute(Navigate(params).cmd())
 
     async def add_listener(self, event, callback):
         event_name = event.event_class
@@ -57,11 +70,7 @@ class Network:
         except trio.ClosedResourceError:
             pass
 
-    async def add_handler(self, event, handler, urlPatterns=None, conn=None, task_status=trio.TASK_STATUS_IGNORED):
-        if not self.conn:
-            self.conn = conn
-            self.bidi_network = network.Network(conn)
-
+    async def add_handler(self, event, handler, urlPatterns=None):
         event_name = event.event_class
         phase_name = event_name.split(".")[-1]
 
@@ -73,11 +82,11 @@ class Network:
 
         self.intercepts[intercept]["event_name"] = event_name
         self.intercepts[intercept]["handlers"].append(handler)
-        task_status.started(intercept)
-        await self.add_listener(event=event, callback=self.handle_events)
+        self.nursery.start_soon(self.add_listener, event, self.handle_events)
+        return intercept
 
-    async def add_request_handler(self, handler, urlPatterns=None, conn=None, task_status=trio.TASK_STATUS_IGNORED):
-        intercept = await self.add_handler(BeforeRequestSent, handler, urlPatterns, conn, task_status)
+    async def add_request_handler(self, handler, urlPatterns=None):
+        intercept = await self.add_handler(BeforeRequestSent, handler, urlPatterns)
         return intercept
 
     async def handle_events(self, event_params):

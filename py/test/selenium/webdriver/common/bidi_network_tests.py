@@ -15,9 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 import pytest
-import trio
 
-from selenium.webdriver.common.bidi.cdp import open_cdp
 from selenium.webdriver.common.bidi.network import UrlPatternString
 
 
@@ -38,23 +36,22 @@ async def test_request_handler(driver, pages):
         json = {"request": request, "url": url3}
         return json
 
-    ws_url = driver.caps.get("webSocketUrl")
-    async with open_cdp(ws_url) as conn:
-        async with trio.open_nursery() as nursery:
-            # Multiple intercepts
-            intercept1 = await nursery.start(driver.network.add_request_handler, request_handler, pattern1, conn)
-            intercept2 = await nursery.start(driver.network.add_request_handler, request_handler, pattern2, conn)
-            await driver.network.get(url1, conn)
-            assert driver.title == "We Leave From Here"
-            await driver.network.get(url2, conn)
-            assert driver.title == "We Leave From Here"
+    async with driver.network.set_context():
+        # Multiple intercepts
+        intercept1 = await driver.network.add_request_handler(request_handler, pattern1)
+        intercept2 = await driver.network.add_request_handler(request_handler, pattern2)
+        await driver.network.get(url1)
+        assert driver.title == "We Leave From Here"
+        await driver.network.get(url2)
+        assert driver.title == "We Leave From Here"
 
-            # Removal of a single intercept
-            await driver.network.remove_intercept(intercept2)
-            await driver.network.get(url2, conn)
-            assert driver.title == "clicks"
-            await driver.network.get(url1, conn)
-            assert driver.title == "We Leave From Here"
+        # Removal of a single intercept
+        await driver.network.remove_intercept(intercept2)
+        await driver.network.get(url2)
+        assert driver.title == "clicks"
+        await driver.network.get(url1)
+        assert driver.title == "We Leave From Here"
 
-            await driver.network.remove_intercept(intercept1)
-            assert driver.title == "We Leave From Here"
+        await driver.network.remove_intercept(intercept1)
+        await driver.network.get(url1)
+        assert driver.title == "Hello WebDriver"
