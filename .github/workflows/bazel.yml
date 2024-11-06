@@ -83,6 +83,7 @@ jobs:
       - name: Checkout source tree
         uses: actions/checkout@v4
       - name: Pull latest changes
+        if: github.repository_owner == 'seleniumhq'
         run: git pull origin ${{ github.head_ref }}
       - name: Free space
         if: inputs.os != 'windows'
