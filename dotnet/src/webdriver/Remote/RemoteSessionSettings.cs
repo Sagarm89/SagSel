@@ -22,6 +22,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace OpenQA.Selenium
 {
@@ -34,7 +35,6 @@ namespace OpenQA.Selenium
         private const string AlwaysMatchCapabilityName = "alwaysMatch";
 
         private readonly List<string> reservedSettingNames = new List<string>() { FirstMatchCapabilityName, AlwaysMatchCapabilityName };
-        private DriverOptions mustMatchDriverOptions;
         private List<DriverOptions> firstMatchOptions = new List<DriverOptions>();
         private Dictionary<string, object> remoteMetadataSettings = new Dictionary<string, object>();
 
@@ -60,7 +60,7 @@ namespace OpenQA.Selenium
         /// </param>
         public RemoteSessionSettings(DriverOptions mustMatchDriverOptions, params DriverOptions[] firstMatchDriverOptions)
         {
-            this.mustMatchDriverOptions = mustMatchDriverOptions;
+            this.MustMatchDriverOptions = mustMatchDriverOptions;
             foreach (DriverOptions firstMatchOption in firstMatchDriverOptions)
             {
                 this.AddFirstMatchDriverOption(firstMatchOption);
@@ -70,18 +70,12 @@ namespace OpenQA.Selenium
         /// <summary>
         /// Gets a value indicating the options that must be matched by the remote end to create a session.
         /// </summary>
-        internal DriverOptions MustMatchDriverOptions
-        {
-            get { return this.mustMatchDriverOptions; }
-        }
+        internal DriverOptions MustMatchDriverOptions { get; private set; }
 
         /// <summary>
         /// Gets a value indicating the number of options that may be matched by the remote end to create a session.
         /// </summary>
-        internal int FirstMatchOptionsCount
-        {
-            get { return this.firstMatchOptions.Count; }
-        }
+        internal int FirstMatchOptionsCount => this.firstMatchOptions.Count;
 
         /// <summary>
         /// Gets the capability value with the specified name.
@@ -91,6 +85,7 @@ namespace OpenQA.Selenium
         /// <exception cref="ArgumentException">
         /// The specified capability name is not in the set of capabilities.
         /// </exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="capabilityName"/> is null.</exception>
         public object this[string capabilityName]
         {
             get
@@ -145,7 +140,7 @@ namespace OpenQA.Selenium
                 throw new ArgumentException(string.Format("'{0}' is a reserved name for a metadata setting, and cannot be used as a name.", settingName), nameof(settingName));
             }
 
-            if (!this.IsJsonSerializable(settingValue))
+            if (!IsJsonSerializable(settingValue))
             {
                 throw new ArgumentException("Metadata setting value must be JSON serializable.", nameof(settingValue));
             }
@@ -160,9 +155,9 @@ namespace OpenQA.Selenium
         /// <param name="options">The <see cref="DriverOptions"/> to add to the list of "first matched" options.</param>
         public void AddFirstMatchDriverOption(DriverOptions options)
         {
-            if (mustMatchDriverOptions != null)
+            if (MustMatchDriverOptions != null)
             {
-                DriverOptionsMergeResult mergeResult = mustMatchDriverOptions.GetMergeResult(options);
+                DriverOptionsMergeResult mergeResult = MustMatchDriverOptions.GetMergeResult(options);
                 if (mergeResult.IsMergeConflict)
                 {
                     string msg = string.Format(CultureInfo.InvariantCulture, "You cannot request the same capability in both must-match and first-match capabilities. You are attempting to add a first-match driver options object that defines a capability, '{0}', that is already defined in the must-match driver options.", mergeResult.MergeConflictOptionName);
@@ -197,7 +192,7 @@ namespace OpenQA.Selenium
                 }
             }
 
-            this.mustMatchDriverOptions = options;
+            this.MustMatchDriverOptions = options;
         }
 
         /// <summary>
@@ -255,7 +250,7 @@ namespace OpenQA.Selenium
                 capabilitiesDictionary[remoteMetadataSetting.Key] = remoteMetadataSetting.Value;
             }
 
-            if (this.mustMatchDriverOptions != null)
+            if (this.MustMatchDriverOptions != null)
             {
                 capabilitiesDictionary["alwaysMatch"] = GetAlwaysMatchOptionsAsSerializableDictionary();
             }
@@ -291,12 +286,12 @@ namespace OpenQA.Selenium
 
         private IDictionary<string, object> GetAlwaysMatchOptionsAsSerializableDictionary()
         {
-            return this.mustMatchDriverOptions.ToDictionary();
+            return this.MustMatchDriverOptions.ToDictionary();
         }
 
         private List<object> GetFirstMatchOptionsAsSerializableList()
         {
-            List<object> optionsMatches = new List<object>();
+            List<object> optionsMatches = new List<object>(this.firstMatchOptions.Count);
             foreach (DriverOptions options in this.firstMatchOptions)
             {
                 optionsMatches.Add(options.ToDictionary());
@@ -305,34 +300,42 @@ namespace OpenQA.Selenium
             return optionsMatches;
         }
 
-        private bool IsJsonSerializable(object arg)
+        private static bool IsJsonSerializable(object arg)
         {
-            IEnumerable argAsEnumerable = arg as IEnumerable;
-            IDictionary argAsDictionary = arg as IDictionary;
-
-            if (arg is string || arg is float || arg is double || arg is int || arg is long || arg is bool || arg == null)
+            if (arg is null)
             {
                 return true;
             }
-            else if (argAsDictionary != null)
+
+            if (arg is string or float or double or int or long or bool)
             {
-                foreach (object key in argAsDictionary.Keys)
+                return true;
+            }
+
+            if (arg is JsonNode or JsonElement)
+            {
+                return true;
+            }
+
+            if (arg is IDictionary argAsDictionary)
+            {
+                foreach (DictionaryEntry item in argAsDictionary)
                 {
-                    if (!(key is string))
+                    if (item.Key is not string)
+                    {
+                        return false;
+                    }
+
+                    if (!IsJsonSerializable(item.Value))
                     {
                         return false;
                     }
                 }
 
-                foreach (object value in argAsDictionary.Values)
-                {
-                    if (!IsJsonSerializable(value))
-                    {
-                        return false;
-                    }
-                }
+                return true;
             }
-            else if (argAsEnumerable != null)
+
+            if (arg is IEnumerable argAsEnumerable)
             {
                 foreach (object item in argAsEnumerable)
                 {
@@ -341,13 +344,11 @@ namespace OpenQA.Selenium
                         return false;
                     }
                 }
-            }
-            else
-            {
-                return false;
+
+                return true;
             }
 
-            return true;
+            return false;
         }
     }
 }
