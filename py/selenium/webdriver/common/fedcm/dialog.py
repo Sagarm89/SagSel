@@ -55,10 +55,10 @@ class Dialog:
         """Selects an account from the dialog by index."""
         self._driver.fedcm.select_account(index)
 
-    def click_continue(self) -> None:
+    def accept(self) -> None:
         """Clicks the continue button in the dialog."""
-        self._driver.fedcm.click_continue()
+        self._driver.fedcm.accept()
 
-    def cancel(self) -> None:
+    def dismiss(self) -> None:
         """Cancels/dismisses the dialog."""
-        self._driver.fedcm.cancel_dialog()
+        self._driver.fedcm.dismiss()

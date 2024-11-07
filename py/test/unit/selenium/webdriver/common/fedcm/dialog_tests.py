@@ -41,13 +41,13 @@ def dialog(mock_driver, fedcm):
 
 
 def test_click_continue(dialog, fedcm):
-    dialog.click_continue()
-    fedcm.click_continue.assert_called_once()
+    dialog.accept()
+    fedcm.accept.assert_called_once()
 
 
 def test_cancel(dialog, fedcm):
-    dialog.cancel()
-    fedcm.cancel_dialog.assert_called_once()
+    dialog.dismiss()
+    fedcm.dismiss.assert_called_once()
 
 
 def test_select_account(dialog, fedcm):

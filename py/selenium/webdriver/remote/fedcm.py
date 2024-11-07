@@ -49,11 +49,11 @@ class FedCM:
         """Selects an account from the dialog by index."""
         self._driver.execute(Command.SELECT_FEDCM_ACCOUNT, {"accountIndex": index})
 
-    def click_continue(self) -> None:
+    def accept(self) -> None:
         """Clicks the continue button in the dialog."""
         self._driver.execute(Command.CLICK_FEDCM_DIALOG_BUTTON, {"dialogButton": "ConfirmIdpLoginContinue"})
 
-    def cancel_dialog(self) -> None:
+    def dismiss(self) -> None:
         """Cancels/dismisses the FedCM dialog."""
         self._driver.execute(Command.CANCEL_FEDCM_DIALOG)
 

@@ -23,6 +23,7 @@ from selenium.common.exceptions import NoAlertPresentException
 @pytest.mark.xfail_safari(reason="FedCM not supported")
 @pytest.mark.xfail_firefox(reason="FedCM not supported")
 @pytest.mark.xfail_ie(reason="FedCM not supported")
+@pytest.mark.xfail_remote(reason="FedCM not supported, since remote uses Firefox")
 class TestFedCM:
     @pytest.fixture(autouse=True)
     def setup(self, driver, webserver):
@@ -51,11 +52,11 @@ class TestFedCM:
 
     def test_no_dialog_cancel(driver):
         with pytest.raises(NoAlertPresentException):
-            driver.dialog.cancel()
+            driver.dialog.dismiss()
 
     def test_no_dialog_click_continue(driver):
         with pytest.raises(NoAlertPresentException):
-            driver.dialog.click_continue()
+            driver.dialog.accept()
 
     def test_trigger_and_verify_dialog_title(self, driver):
         driver.execute_script("triggerFedCm();")
@@ -89,7 +90,7 @@ class TestFedCM:
     def test_dialog_cancel(self, driver):
         driver.execute_script("triggerFedCm();")
         dialog = driver.fedcm_dialog()
-        dialog.cancel()
+        dialog.dismiss()
         with pytest.raises(NoAlertPresentException):
             dialog.title
 
@@ -124,11 +125,11 @@ class TestFedCM:
 
     def test_fedcm_no_cancel_dialog_present(self, driver):
         with pytest.raises(NoAlertPresentException):
-            driver.fedcm.cancel_dialog()
+            driver.fedcm.dismiss()
 
     def test_fedcm_no_click_continue_present(self, driver):
         with pytest.raises(NoAlertPresentException):
-            driver.fedcm.click_continue()
+            driver.fedcm.accept()
 
     def test_verify_dialog_type_after_cooldown_reset(self, driver):
         driver.reset_fedcm_cooldown()
