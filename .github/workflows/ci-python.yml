@@ -104,6 +104,8 @@ jobs:
             os: macos
           - browser: chrome
             os: macos
+          - browser: edge
+            os: windows
     with:
       name: Integration Tests (${{ matrix.browser }}, ${{ matrix.os }})
       browser: ${{ matrix.browser }}
