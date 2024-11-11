@@ -67,7 +67,7 @@ namespace OpenQA.Selenium.Firefox
         /// <param name="value">A <see cref="string"/> value give the preference.</param>
         /// <remarks>If the preference already exists in the currently-set list of preferences,
         /// the value will be updated.</remarks>
-        /// <exception cref="ArgumentNullException">If <paramref name="key"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="key"/> is <see langword="null"/>.</exception>
         internal void SetPreference(string key, string value)
         {
             this.SetPreferenceValue(key, value);
@@ -80,7 +80,7 @@ namespace OpenQA.Selenium.Firefox
         /// <param name="value">A <see cref="int"/> value give the preference.</param>
         /// <remarks>If the preference already exists in the currently-set list of preferences,
         /// the value will be updated.</remarks>
-        /// <exception cref="ArgumentNullException">If <paramref name="key"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="key"/> is <see langword="null"/>.</exception>
         internal void SetPreference(string key, int value)
         {
             this.SetPreferenceValue(key, value);
@@ -93,7 +93,7 @@ namespace OpenQA.Selenium.Firefox
         /// <param name="value">A <see cref="bool"/> value give the preference.</param>
         /// <remarks>If the preference already exists in the currently-set list of preferences,
         /// the value will be updated.</remarks>
-        /// <exception cref="ArgumentNullException">If <paramref name="key"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="key"/> is <see langword="null"/>.</exception>
         internal void SetPreference(string key, bool value)
         {
             this.SetPreferenceValue(key, value);
@@ -104,7 +104,7 @@ namespace OpenQA.Selenium.Firefox
         /// </summary>
         /// <param name="preferenceName">The name of the preference to retrieve.</param>
         /// <returns>The value of the preference, or an empty string if the preference is not set.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="preferenceName"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="preferenceName"/> is <see langword="null"/>.</exception>
         internal string GetPreference(string preferenceName)
         {
             if (this.preferences.ContainsKey(preferenceName))
