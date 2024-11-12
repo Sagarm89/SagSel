@@ -20,11 +20,12 @@
 module Selenium
   module WebDriver
     class Network
-      attr_reader :auth_callbacks
+      attr_reader :auth_callbacks, :request_callbacks
 
       def initialize(bridge)
         @network = BiDi::Network.new(bridge.bidi)
         @auth_callbacks = {}
+        @request_callbacks = {}
       end
 
       def add_authentication_handler(username, password)
@@ -46,6 +47,18 @@ module Selenium
 
       def clear_authentication_handlers
         @auth_callbacks.each_key { |id| remove_authentication_handler(id) }
+      end
+
+      def add_request_handler
+        intercept = @network.add_intercept(phases: [BiDi::Network::PHASES[:before_request]])
+        request_id = @network.on(:before_request) do |event|
+          request_id = event['requestId']
+          @network.continue_with_request(request_id: request_id)
+        end
+
+        @request_callbacks[request_id] = intercept
+
+        request_id
       end
     end # Network
   end # WebDriver

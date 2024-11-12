@@ -53,6 +53,14 @@ module Selenium
           expect(network.auth_callbacks.count).to be 0
         end
       end
+
+      it 'adds a request handler' do
+        reset_driver!(web_socket_url: true) do |driver|
+          network = described_class.new(driver)
+          network.add_request_handler
+          expect(network.request_callbacks.count).to be 1
+        end
+      end
     end
   end
 end

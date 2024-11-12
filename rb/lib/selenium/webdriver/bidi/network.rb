@@ -60,11 +60,27 @@ module Selenium
           )
         end
 
+        def continue_with_request(**args)
+          @bidi.send_cmd(
+            'network.continueWithRequest',
+            request: args[:request_id],
+            'body' => args[:body],
+            'cookies' => args[:cookies],
+            'headers' => args[:headers],
+            'method' => args[:method],
+            'url' => args[:url]
+          )
+        end
+
         def on(event, &)
           event = EVENTS[event] if event.is_a?(Symbol)
           @bidi.add_callback(event, &)
         end
-      end # Network
-    end # BiDi
+      end
+
+      # Network
+    end
+
+    # BiDi
   end # WebDriver
 end # Selenium

@@ -3,11 +3,15 @@ module Selenium
     class Network
       @network: BiDi::Network
 
+      @request_callbacks: untyped
+
       attr_reader auth_callbacks: Hash[String, String]
 
       def initialize: (Remote::Bridge bridge) -> void
 
       def add_authentication_handler: (String username, String password) -> String
+
+      def add_request_handler: -> untyped
 
       def clear_authentication_handlers: -> Hash[nil, nil]
 
