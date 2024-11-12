@@ -15,7 +15,11 @@ module Selenium
 
       def clear_authentication_handlers: -> Hash[nil, nil]
 
+      def clear_request_handlers: -> untyped
+
       def remove_authentication_handler: (String id) -> nil
+
+      def remove_request_handler: -> untyped
     end
   end
 end

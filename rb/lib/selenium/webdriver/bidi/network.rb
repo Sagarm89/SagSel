@@ -26,7 +26,7 @@ module Selenium
           response_started: 'network.responseStarted',
           response_completed: 'network.responseCompleted',
           auth_required: 'network.authRequired',
-          FETCH_ERROR: 'network.fetchError'
+          fetch_error: 'network.fetchError'
         }.freeze
 
         PHASES = {
@@ -76,11 +76,7 @@ module Selenium
           event = EVENTS[event] if event.is_a?(Symbol)
           @bidi.add_callback(event, &)
         end
-      end
-
-      # Network
-    end
-
-    # BiDi
+      end # Network
+    end # BiDi
   end # WebDriver
 end # Selenium

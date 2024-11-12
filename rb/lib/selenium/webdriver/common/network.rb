@@ -60,6 +60,16 @@ module Selenium
 
         request_id
       end
+
+      def remove_request_handler(id)
+        intercept = @request_callbacks[id]
+        @network.remove_intercept(intercept['intercept'])
+        @request_callbacks.delete(id)
+      end
+
+      def clear_request_handlers
+        @request_callbacks.each_key { |id| remove_request_handler(id) }
+      end
     end # Network
   end # WebDriver
 end # Selenium

@@ -61,6 +61,25 @@ module Selenium
           expect(network.request_callbacks.count).to be 1
         end
       end
+
+      it 'removes a request handler' do
+        reset_driver!(web_socket_url: true) do |driver|
+          network = described_class.new(driver)
+          id = network.add_request_handler
+          network.remove_request_handler(id)
+          expect(network.request_callbacks.count).to be 0
+        end
+      end
+
+      it 'clears all request handlers' do
+        reset_driver!(web_socket_url: true) do |driver|
+          network = described_class.new(driver)
+          network.add_request_handler
+          network.add_request_handler
+          network.clear_request_handlers
+          expect(network.request_callbacks.count).to be 0
+        end
+      end
     end
   end
 end
