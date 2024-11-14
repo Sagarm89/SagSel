@@ -15,13 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import pytest
 
-from selenium.webdriver import Edge
-
-
-@pytest.fixture
-def driver():
-    driver = Edge()
-    yield driver
-    driver.quit()
+def pytest_generate_tests(metafunc):
+    if "driver" in metafunc.fixturenames and metafunc.config.option.drivers:
+        metafunc.parametrize("driver", metafunc.config.option.drivers, indirect=True)
