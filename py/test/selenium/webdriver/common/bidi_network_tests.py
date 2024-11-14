@@ -2,52 +2,75 @@ import pytest
 
 from selenium import webdriver
 from selenium.webdriver.common.bidi.network import Network
+from selenium.webdriver.common.bidi.network import Response
+from selenium.webdriver.common.bidi.network import Request
 
-
-def url_for(page):
-    return webserver.where_is(page)
 
 @pytest.fixture
 def network(driver):
-    return Network(driver)
+    yield Network(driver)
 
-def test_add_intercept(driver, network):
-    network.add_intercept(phases=[Network.PHASES['before_request']])
+@pytest.fixture
+def network_response(network):
+    yield Response(network)
 
-def test_remove_intercept(driver, network):
-    intercept = network.add_intercept(phases=[Network.PHASES['before_request']])
-    network.remove_intercept(intercept)
+@pytest.fixture
+def network_request(network):
+    yield Request(network)
 
-def test_continue_response(driver, network):
-    network.add_intercept(phases=[Network.PHASES['before_request']])
-    network.on('before_request', lambda event: network.continue_response(event['requestId'], 200))
-    
-    driver.get(url_for("basicAuth"))
-    assert driver.find_element_by_tag_name('h1').text == 'authorized'
+def test_add_response_handler(response):
+    passed = [False]
 
-def test_continue_request(driver, network):
-    network.add_intercept(phases=[Network.PHASES['before_request']])
-    network.on('before_request', lambda event: network.continue_request(event['requestId'], url=url_for("basicAuth")))
-    
-    driver.get(url_for("basicAuth"))
-    assert driver.find_element_by_tag_name('h1').text == 'authorized'
+    def callback(event):
+        if event['response']['status'] == 200:
+            passed[0] = True
 
-def test_continue_with_auth(driver, network):
-    username = 'your_username'
-    password = 'your_password'
-    
-    network.add_intercept(phases=[Network.PHASES['auth_required']])
-    network.on('auth_required', lambda event: network.continue_with_auth(event['requestId'], username, password))
-    
-    driver.get(url_for("basicAuth"))
-    assert driver.find_element_by_tag_name('h1').text == 'authorized'
+    network_response.add_response_handler(callback)
+    pages.load("basicAuth")
+    assert passed[0] == True, "Callback was NOT successful"
 
-def test_add_request_handler(driver, network):
-    network.add_request_handler(callback=lambda event: network.continue_request(event['requestId'], url=url_for("basicAuth")))
-    driver.get(url_for("basicAuth"))
-    assert driver.find_element_by_tag_name('h1').text == 'authorized'
+def test_remove_response_handler(response):
+    passed = [False]
 
-def test_add_response_handler(driver, network):
-    network.add_response_handler(callback=lambda event: network.continue_response(event['requestId'], 200))
-    driver.get(url_for("basicAuth"))
-    assert driver.find_element_by_tag_name('h1').text == 'authorized'
+    def callback(event):
+        if event['response']['status'] == 200:
+            passed[0] = True
+
+    network_response.add_response_handler(callback)
+    network_response.remove_response_handler(callback)
+    pages.load("basicAuth")
+    assert passed[0] == False, "Callback was successful"
+
+def test_add_request_handler(request):
+    passed = [False]
+
+    def callback(event):
+        if event['request']['method'] == 'GET':
+            passed[0] = True
+
+    network_request.add_request_handler(callback)
+    pages.load("basicAuth")
+    assert passed[0] == True, "Callback was NOT successful"
+
+def test_remove_request_handler(request):
+    passed = [False]
+
+    def callback(event):
+        if event['request']['method'] == 'GET':
+            passed[0] = True
+
+    network_request.add_request_handler(callback)
+    network_request.remove_request_handler(callback)
+    pages.load("basicAuth")
+    assert passed[0] == False, "Callback was successful"
+
+def test_add_authentication_handler(network):
+    network.add_authentication_handler('test','test')
+    pages.load("basicAuth")
+    assert driver.find_element_by_tag_name('h1').text == 'authorized', "Authentication was NOT successful"
+
+def test_remove_authentication_handler(network):
+    network.add_authentication_handler('test', 'test')
+    network.remove_authentication_handler()
+    pages.load("basicAuth")
+    assert driver.find_element_by_tag_name('h1').text != 'authorized', "Authentication was successful"
