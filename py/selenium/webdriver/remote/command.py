@@ -25,6 +25,7 @@ class Command:
 
         https://w3c.github.io/webdriver/
     """
+
     NEW_SESSION: str = "newSession"
     DELETE_SESSION: str = "deleteSession"
     NEW_WINDOW: str = "newWindow"
