@@ -31,7 +31,7 @@ module Selenium
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
           network.add_authentication_handler(username, password)
-          expect(network.auth_callbacks.count).to be 1
+          expect(network.callbacks.count).to be 1
         end
       end
 
@@ -40,7 +40,7 @@ module Selenium
           network = described_class.new(driver)
           id = network.add_authentication_handler(username, password)
           network.remove_authentication_handler(id)
-          expect(network.auth_callbacks.count).to be 0
+          expect(network.callbacks.count).to be 0
         end
       end
 
@@ -50,7 +50,7 @@ module Selenium
           network.add_authentication_handler(username, password)
           network.add_authentication_handler(username, password)
           network.clear_authentication_handlers
-          expect(network.auth_callbacks.count).to be 0
+          expect(network.callbacks.count).to be 0
         end
       end
 
@@ -58,7 +58,7 @@ module Selenium
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
           network.add_request_handler
-          expect(network.request_callbacks.count).to be 1
+          expect(network.callbacks.count).to be 1
         end
       end
 
@@ -67,7 +67,7 @@ module Selenium
           network = described_class.new(driver)
           id = network.add_request_handler
           network.remove_request_handler(id)
-          expect(network.request_callbacks.count).to be 0
+          expect(network.callbacks.count).to be 0
         end
       end
 
@@ -77,7 +77,7 @@ module Selenium
           network.add_request_handler
           network.add_request_handler
           network.clear_request_handlers
-          expect(network.request_callbacks.count).to be 0
+          expect(network.callbacks.count).to be 0
         end
       end
     end

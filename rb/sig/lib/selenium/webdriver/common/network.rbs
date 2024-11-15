@@ -3,9 +3,9 @@ module Selenium
     class Network
       @network: BiDi::Network
 
-      @request_callbacks: untyped
+      @callbacks: Hash[String, String]
 
-      attr_reader auth_callbacks: Hash[String, String]
+      attr_reader callbacks: Hash[String, String]
 
       def initialize: (Remote::Bridge bridge) -> void
 
