@@ -13,13 +13,9 @@ module Selenium
 
       def add_request_handler: -> Integer
 
-      def clear_authentication_handlers: -> Hash[nil, nil]
+      def clear_handlers: -> Hash[nil, nil]
 
-      def clear_request_handlers: -> Hash[nil, nil]
-
-      def remove_authentication_handler: (Integer id) -> nil
-
-      def remove_request_handler: (Integer id) -> nil
+      def remove_handler: (Integer id) -> nil
     end
   end
 end

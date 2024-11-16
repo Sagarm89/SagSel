@@ -38,14 +38,14 @@ module Selenium
         auth_id
       end
 
-      def remove_authentication_handler(id)
+      def remove_handler(id)
         intercept = @callbacks[id]
         @network.remove_intercept(intercept['intercept'])
         @callbacks.delete(id)
       end
 
-      def clear_authentication_handlers
-        @callbacks.each_key { |id| remove_authentication_handler(id) }
+      def clear_handlers
+        @callbacks.each_key { |id| remove_handler(id) }
       end
 
       def add_request_handler
@@ -58,16 +58,6 @@ module Selenium
         @callbacks[request_id] = intercept
 
         request_id
-      end
-
-      def remove_request_handler(id)
-        intercept = @callbacks[id]
-        @network.remove_intercept(intercept['intercept'])
-        @callbacks.delete(id)
-      end
-
-      def clear_request_handlers
-        @callbacks.each_key { |id| remove_request_handler(id) }
       end
     end # Network
   end # WebDriver
