@@ -21,9 +21,10 @@
 
 // As per guidance in https://devblogs.microsoft.com/dotnet/creating-aot-compatible-libraries/#targetframeworks
 
+#if !NET8_0_OR_GREATER
+
 namespace System.Diagnostics.CodeAnalysis
 {
-#if !NET8_0_OR_GREATER
     /// <summary>
     /// Indicates that the specified method requires the ability to generate new code at runtime,
     /// for example through <see cref="System.Reflection"/>.
@@ -433,5 +434,6 @@ namespace System.Diagnostics.CodeAnalysis
         /// </summary>
         All = ~None
     }
-#endif
 }
+
+#endif
