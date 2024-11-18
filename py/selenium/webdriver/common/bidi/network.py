@@ -52,31 +52,34 @@ class Network:
             'contexts': contexts,
             'urlPatterns': url_patterns
         }
-        self.conn.execute('network.addIntercept', params)
+        command = {'command': 'network.addIntercept', 'params': params}
+        self.conn.execute()
 
     def __remove_intercept(self, intercept=None, request_id=None):
         """Remove an intercept from the network."""
         if request_id is not None:
-            self.conn.execute('network.removeIntercept', {'requestId': request_id})
+            command = {'command': 'network.removeIntercept', 'requestId': request_id}
+            self.conn.execute(command)
         elif intercept is not None:
-            self.conn.execute('network.removeIntercept', {'intercept': intercept})
+            command = {'command': 'network.removeIntercept', 'intercept': intercept}
+            self.conn.execute(command)
         else:
             raise ValueError('Either requestId or intercept must be specified')
 
     def __continue_with_auth(self, request_id, username, password):
         """Continue with authentication."""
-        self.conn.execute(
-            'network.continueWithAuth',
-            {
-                'request': request_id,
-                'action': 'provideCredentials',
-                'credentials': {
-                    'type': 'password',
-                    'username': username,
-                    'password': password
-                }
-            }
-        )
+        command = {'command': 'network.continueWithAuth', 'params': 
+                    {
+                        'request': request_id,
+                        'action': 'provideCredentials',
+                        'credentials': {
+                            'type': 'password',
+                            'username': username,
+                            'password': password
+                        }
+                    }
+        }
+        self.conn.execute(command)
 
     def __on(self, event, callback):
         """Set a callback function to subscribe to a network event."""
@@ -208,7 +211,8 @@ class Request:
             params['headers'] = self.headers
         if self.postData is not None:
             params['postData'] = self.postData
-        self.network.conn.execute('network.continueRequest', params)
+        command = {'command': 'network.continueRequest', 'params': params}
+        self.network.conn.execute(command)
 
 class Response:
     def __init__(self, request_id, url, status_code, headers, body, network: Network):
@@ -229,4 +233,5 @@ class Response:
             params['headers'] = self.headers
         if self.body is not None:
             params['body'] = self.body
-        self.network.conn.execute('network.continueResponse', params)
+        command = {'command': 'network.continueResponse', 'params': params}
+        self.network.conn.execute(command)
