@@ -17,6 +17,10 @@
 // under the License.
 // </copyright>
 
+using System;
+
+#nullable enable
+
 namespace OpenQA.Selenium
 {
     /// <summary>
@@ -27,8 +31,9 @@ namespace OpenQA.Selenium
         /// <summary>
         /// Gets a <see cref="PrintDocument"/> object representing a PDF-formatted print representation of the page.
         /// </summary>
-        /// <param name="options">A <see cref="PrintOptions"/> object describing the options of the printed document.</param>
+        /// <param name="printOptions">A <see cref="PrintOptions"/> object describing the options of the printed document.</param>
         /// <returns>The <see cref="PrintDocument"/> object containing the PDF-formatted print representation of the page.</returns>
-        PrintDocument Print(PrintOptions options);
+        /// <exception cref="ArgumentNullException">If <paramref name="printOptions"/> is <see langword="null"/>.</exception>
+        PrintDocument Print(PrintOptions printOptions);
     }
 }
