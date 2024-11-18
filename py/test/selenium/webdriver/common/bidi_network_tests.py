@@ -1,7 +1,9 @@
 import pytest
 
-from selenium.webdriver.common.bidi.network import Network
 
+@pytest.mark.xfail_safari
+def test_network_initialized(driver):
+    assert driver.network is not None
 
 @pytest.mark.xfail_safari
 def test_add_response_handler(driver, pages):
