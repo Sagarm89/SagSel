@@ -37,7 +37,17 @@ class Network:
     def __init__(self, conn):
         self.conn = conn
         self.callbacks = {}
-        self.subscriptions = {}
+        self.subscriptions = {
+            'network.responseStarted': [],
+            'network.beforeRequestSent': [],
+            'network.authRequired': []
+        }
+
+
+    def command_iterator(self, command):
+        """Generator to yield command."""
+        yield command
+        return
 
     def has_callbacks(self):
         """Checks if there are any callbacks set."""
@@ -47,28 +57,43 @@ class Network:
         """Add an intercept to the network."""
         if phases is None:
             phases = []
-        params = {
-            'phases': phases,
-            'contexts': contexts,
-            'urlPatterns': url_patterns
-        }
-        command = {'command': 'network.addIntercept', 'params': params}
-        self.conn.execute(command)
+        if contexts is None and url_patterns is None:
+            params = {
+                'phases': phases,
+            }
+        elif contexts is None:
+            params = {
+                'phases': phases,
+                'urlPatterns': url_patterns
+            }
+        elif url_patterns is None:
+            params = {
+                'phases': phases,
+                'contexts': contexts
+            }
+        else:
+            params = {
+                'phases': phases,
+                'contexts': contexts,
+                'urlPatterns': url_patterns
+            }
+        command = {'method': 'network.addIntercept', 'params': params}
+        self.conn.execute(self.command_iterator(command))
 
     def __remove_intercept(self, intercept=None, request_id=None):
         """Remove an intercept from the network."""
         if request_id is not None:
-            command = {'command': 'network.removeIntercept', 'requestId': request_id}
-            self.conn.execute(command)
+            command = {'method': 'network.removeIntercept', 'requestId': request_id}
+            self.conn.execute(self.command_iterator(command))
         elif intercept is not None:
-            command = {'command': 'network.removeIntercept', 'intercept': intercept}
-            self.conn.execute(command)
+            command = {'method': 'network.removeIntercept', 'intercept': intercept}
+            self.conn.execute(self.command_iterator(command))
         else:
             raise ValueError('Either requestId or intercept must be specified')
 
     def __continue_with_auth(self, request_id, username, password):
         """Continue with authentication."""
-        command = {'command': 'network.continueWithAuth', 'params': 
+        command = {'method': 'network.continueWithAuth', 'params': 
                     {
                         'request': request_id,
                         'action': 'provideCredentials',
@@ -79,13 +104,13 @@ class Network:
                         }
                     }
         }
-        self.conn.execute(command)
+        self.conn.execute(self.command_iterator(command))
 
     def __on(self, event, callback):
         """Set a callback function to subscribe to a network event."""
         event = self.EVENTS.get(event, event)
         self.callbacks[event] = callback
-        if self.subscriptions[event] is None:
+        if len(self.subscriptions[event]) == 0:
             session_subscribe(self.conn, event, self.__handle_event)
 
     def __handle_event(self, event, data):
@@ -99,7 +124,7 @@ class Network:
         self.__on('auth_required', lambda data: self.__continue_with_auth(data['request']['request'], username, password))
         self.subscriptions['auth_required'] = [username, password]
 
-    def remove_authentication_handler(self, username,):
+    def remove_authentication_handler(self):
         """Removes an authentication handler."""
         self.__remove_intercept(intercept='auth_required')
         del self.subscriptions['auth_required']
@@ -128,7 +153,7 @@ class Network:
                 url = data['request'].get('url')
                 method = data['request'].get('method')
                 headers = data['request'].get('headers', {})
-                body = data['request'].get('postData', None)
+                body = data['request'].get('body', None)
                 request = Request(request_id, url, method, headers, body, self)
                 callback(request)
         self.__on('before_request', callback_on_url_match)
@@ -209,10 +234,10 @@ class Request:
             params['method'] = self.method
         if self.headers is not None:
             params['headers'] = self.headers
-        if self.postData is not None:
-            params['postData'] = self.postData
-        command = {'command': 'network.continueRequest', 'params': params}
-        self.network.conn.execute(command)
+        if self.body is not None:
+            params['body'] = self.body
+        command = {'method': 'network.continueRequest', 'params': params}
+        self.network.conn.execute(self.command_iterator(command))
 
 class Response:
     def __init__(self, request_id, url, status_code, headers, body, network: Network):
@@ -233,5 +258,5 @@ class Response:
             params['headers'] = self.headers
         if self.body is not None:
             params['body'] = self.body
-        command = {'command': 'network.continueResponse', 'params': params}
-        self.network.conn.execute(command)
+        command = {'method': 'network.continueResponse', 'params': params}
+        self.network.conn.execute(self.command_iterator(command))
