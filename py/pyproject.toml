@@ -41,6 +41,7 @@ zip-safe = false
 include = ["selenium*"]
 exclude = ["test*"]
 namespace = false
+# include-package-data is `true` by default in pyproject.toml
 
 [project.urls]
 Repository = "https://github.com/SeleniumHQ/selenium/"
@@ -48,12 +49,6 @@ BugTracker = "https://github.com/SeleniumHQ/selenium/issues"
 Changelog = "https://github.com/SeleniumHQ/selenium/blob/trunk/py/CHANGES"
 Documentation = "https://www.selenium.dev/documentation/overview/"
 SourceCode = "https://github.com/SeleniumHQ/selenium/tree/trunk/py"
-
-[tool.setuptools.packages.find]
-include = ["selenium*"]
-exclude = ["test*"]
-namespaces = false
-# include-package-data is `true` by default in pyproject.toml
 
 [tool.setuptools.package-data]
 selenium_package = [
