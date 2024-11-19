@@ -401,7 +401,7 @@ namespace OpenQA.Selenium
 
             Assert.That(
                 () => ExecuteScript("return arguments[0];", driver),
-                Throws.TypeOf<ArgumentException>().With.Message.StartsWith("Argument is of an illegal type: "));
+                Throws.ArgumentException.With.Message.StartsWith("Argument is of an illegal type: "));
         }
 
         [Test]

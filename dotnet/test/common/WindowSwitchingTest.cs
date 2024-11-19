@@ -63,7 +63,7 @@ namespace OpenQA.Selenium
 
             Assert.That(
                 () => driver.SwitchTo().Window("invalid name"),
-                Throws.InstanceOf<NoSuchWindowException>());
+                Throws.TypeOf<NoSuchWindowException>());
 
             driver.SwitchTo().Window(current);
         }
@@ -89,7 +89,7 @@ namespace OpenQA.Selenium
             {
                 Assert.That(
                     () => driver.CurrentWindowHandle,
-                    Throws.InstanceOf<NoSuchWindowException>());
+                    Throws.TypeOf<NoSuchWindowException>());
             }
             finally
             {
@@ -118,11 +118,11 @@ namespace OpenQA.Selenium
             {
                 Assert.That(
                     () => driver.Title,
-                    Throws.InstanceOf<NoSuchWindowException>());
+                    Throws.TypeOf<NoSuchWindowException>());
 
                 Assert.That(
                     () => driver.FindElement(By.TagName("body")),
-                    Throws.InstanceOf<NoSuchWindowException>());
+                    Throws.TypeOf<NoSuchWindowException>());
             }
             finally
             {
@@ -152,7 +152,7 @@ namespace OpenQA.Selenium
             {
                 Assert.That(
                     () => body.Text,
-                    Throws.InstanceOf<NoSuchWindowException>());
+                    Throws.TypeOf<NoSuchWindowException>());
             }
             finally
             {
@@ -260,7 +260,7 @@ namespace OpenQA.Selenium
 
             Assert.That(
                 () => driver.SwitchTo().Window("i will never exist"),
-                Throws.InstanceOf<NoSuchWindowException>(),
+                Throws.TypeOf<NoSuchWindowException>(),
                 "Should not be able to change to a non-existant window");
 
             String newHandle = driver.CurrentWindowHandle;

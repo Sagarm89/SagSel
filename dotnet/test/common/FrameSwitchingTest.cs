@@ -175,18 +175,16 @@ namespace OpenQA.Selenium
             driver.SwitchTo().Frame(frameElement);
             Assert.AreEqual("2", driver.FindElement(By.Id("pageNumber")).Text);
 
-            Assert.That(() =>
-            {
-                driver.SwitchTo().Frame("third");
-            }, Throws.InstanceOf<NoSuchFrameException>());
+            Assert.That(
+                () => driver.SwitchTo().Frame("third"),
+                Throws.TypeOf<NoSuchFrameException>());
 
             driver.SwitchTo().DefaultContent();
             driver.SwitchTo().Frame("third");
 
-            Assert.That(() =>
-            {
-                driver.SwitchTo().Frame("second");
-            }, Throws.InstanceOf<NoSuchFrameException>());
+            Assert.That(
+                () => driver.SwitchTo().Frame("second"),
+                Throws.TypeOf<NoSuchFrameException>());
 
             driver.SwitchTo().DefaultContent();
             driver.SwitchTo().Frame("second");
@@ -206,7 +204,9 @@ namespace OpenQA.Selenium
         {
             driver.Url = framesetPage;
             driver.SwitchTo().Frame("fourth");
-            Assert.That(() => driver.SwitchTo().Frame("second"), Throws.InstanceOf<NoSuchFrameException>());
+            Assert.That(
+                () => driver.SwitchTo().Frame("second"),
+                Throws.TypeOf<NoSuchFrameException>());
 
         }
 
@@ -214,14 +214,20 @@ namespace OpenQA.Selenium
         public void ShouldThrowAnExceptionWhenAFrameCannotBeFound()
         {
             driver.Url = xhtmlTestPage;
-            Assert.That(() => driver.SwitchTo().Frame("Nothing here"), Throws.InstanceOf<NoSuchFrameException>());
+
+            Assert.That(
+                () => driver.SwitchTo().Frame("Nothing here"),
+                Throws.TypeOf<NoSuchFrameException>());
         }
 
         [Test]
         public void ShouldThrowAnExceptionWhenAFrameCannotBeFoundByIndex()
         {
             driver.Url = xhtmlTestPage;
-            Assert.That(() => driver.SwitchTo().Frame(27), Throws.InstanceOf<NoSuchFrameException>());
+
+            Assert.That(
+                () => driver.SwitchTo().Frame(27),
+                Throws.TypeOf<NoSuchFrameException>());
         }
 
         [Test]
@@ -460,7 +466,9 @@ namespace OpenQA.Selenium
             IWebElement killIframe = driver.FindElement(By.Id("killIframe"));
             killIframe.Click();
 
-            Assert.That(() => driver.FindElement(By.Id("killIframe")), Throws.InstanceOf<NoSuchWindowException>());
+            Assert.That(
+                () => driver.FindElement(By.Id("killIframe")),
+                Throws.TypeOf<NoSuchWindowException>());
         }
 
         [Test]
