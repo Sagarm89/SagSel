@@ -50,6 +50,7 @@ namespace OpenQA.Selenium.Support.UI
         /// to manipulate the popup window.</param>
         /// <remarks>When using this constructor overload, the timeout will be 5 seconds,
         /// and the check for a new window will be performed every 250 milliseconds.</remarks>
+        /// <exception cref="ArgumentNullException">If <paramref name="driver"/> is <see langword="null"/>.</exception>
         public PopupWindowFinder(IWebDriver driver)
             : this(driver, DefaultTimeout, DefaultSleepInterval)
         {
@@ -65,6 +66,7 @@ namespace OpenQA.Selenium.Support.UI
         /// time to wait for the popup window to appear.</param>
         /// <remarks>When using this constructor overload, the check for a new window
         /// will be performed every 250 milliseconds.</remarks>
+        /// <exception cref="ArgumentNullException">If <paramref name="driver"/> is <see langword="null"/>.</exception>
         public PopupWindowFinder(IWebDriver driver, TimeSpan timeout)
             : this(driver, timeout, DefaultSleepInterval)
         {
@@ -81,6 +83,7 @@ namespace OpenQA.Selenium.Support.UI
         /// time to wait for the popup window to appear.</param>
         /// <param name="sleepInterval">The <see cref="TimeSpan"/> representing the
         /// amount of time to wait between checks of the available window handles.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="driver"/> is <see langword="null"/>.</exception>
         public PopupWindowFinder(IWebDriver driver, TimeSpan timeout, TimeSpan sleepInterval)
         {
             this.driver = driver ?? throw new ArgumentNullException(nameof(driver));
