@@ -253,7 +253,7 @@ namespace OpenQA.Selenium
             driver.Url = CreateAlertPage("cheese");
 
             Assert.That(
-                AlertToBePresent,
+                () => AlertToBePresent(),
                 Throws.TypeOf<NoAlertPresentException>());
         }
 
