@@ -1127,6 +1127,11 @@ class WebDriver(BaseWebDriver):
         if _firefox:
             # Mozilla Automation Team asked to only support 85
             # until WebDriver Bidi is available.
+            warnings.warn(
+                "CDP support for Firefox is deprecated and will be removed in future versions. Please switch to WebDriver BiDi.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             version = 85
         else:
             version = re.search(r".*/(\d+)\.", browser_version).group(1)
