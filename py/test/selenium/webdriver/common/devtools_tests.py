@@ -25,7 +25,7 @@ def test_check_console_messages(driver, pages):
         devtools, connection = driver.start_devtools()
     console_api_calls = []
 
-    if driver.capabilities["browserName"] == "firefox":
+    if driver.caps["browserName"].lower() == "firefox":
         assert (
             record[0].message.args[0]
             == "CDP support for Firefox is deprecated and will be removed in future versions. Please switch to WebDriver BiDi."

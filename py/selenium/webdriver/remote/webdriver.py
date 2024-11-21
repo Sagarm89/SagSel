@@ -1057,6 +1057,12 @@ class WebDriver(BaseWebDriver):
                     raise WebDriverException("Unable to find url to connect to from capabilities")
 
                 devtools = cdp.import_devtools(version)
+                if self.caps["browserName"].lower() == "firefox":
+                    warnings.warn(
+                        "CDP support for Firefox is deprecated and will be removed in future versions. Please switch to WebDriver BiDi.",
+                        DeprecationWarning,
+                        stacklevel=2,
+                    )
             self._websocket_connection = WebSocketConnection(ws_url)
             targets = self._websocket_connection.execute(devtools.target.get_targets())
             target_id = targets[0].target_id
@@ -1127,11 +1133,6 @@ class WebDriver(BaseWebDriver):
         if _firefox:
             # Mozilla Automation Team asked to only support 85
             # until WebDriver Bidi is available.
-            warnings.warn(
-                "CDP support for Firefox is deprecated and will be removed in future versions. Please switch to WebDriver BiDi.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
             version = 85
         else:
             version = re.search(r".*/(\d+)\.", browser_version).group(1)
