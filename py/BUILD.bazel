@@ -74,6 +74,7 @@ BROWSER_VERSIONS = [
 TEST_DEPS = [
     requirement("attrs"),
     requirement("debugpy"),
+    requirement("filetype"),
     requirement("idna"),
     requirement("iniconfig"),
     requirement("importlib_metadata"),
