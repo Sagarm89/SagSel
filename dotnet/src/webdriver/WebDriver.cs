@@ -45,7 +45,6 @@ namespace OpenQA.Selenium
         private NetworkManager network;
         private WebElementFactory elementFactory;
         private SessionId sessionId;
-        private String authenticatorId;
         private List<string> registeredCommands = new List<string>();
 
         /// <summary>
@@ -1046,8 +1045,8 @@ namespace OpenQA.Selenium
         {
             Response commandResponse = this.Execute(DriverCommand.AddVirtualAuthenticator, options.ToDictionary());
             string id = commandResponse.Value.ToString();
-            this.authenticatorId = id;
-            return this.authenticatorId;
+            this.AuthenticatorId = id;
+            return this.AuthenticatorId;
         }
 
         /// <summary>
@@ -1057,15 +1056,15 @@ namespace OpenQA.Selenium
         public void RemoveVirtualAuthenticator(string authenticatorId)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("authenticatorId", this.authenticatorId);
+            parameters.Add("authenticatorId", this.AuthenticatorId);
             this.Execute(DriverCommand.RemoveVirtualAuthenticator, parameters);
-            this.authenticatorId = null;
+            this.AuthenticatorId = null;
         }
 
         /// <summary>
         /// Gets the virtual authenticator ID for this WebDriver instance.
         /// </summary>
-        public string AuthenticatorId { get; }
+        public string AuthenticatorId { get; private set; }
 
         /// <summary>
         /// Add a credential to the Virtual Authenticator/
@@ -1074,7 +1073,7 @@ namespace OpenQA.Selenium
         public void AddCredential(Credential credential)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>(credential.ToDictionary());
-            parameters.Add("authenticatorId", this.authenticatorId);
+            parameters.Add("authenticatorId", this.AuthenticatorId);
 
             this.Execute(driverCommandToExecute: DriverCommand.AddCredential, parameters);
         }
@@ -1086,7 +1085,7 @@ namespace OpenQA.Selenium
         public List<Credential> GetCredentials()
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("authenticatorId", this.authenticatorId);
+            parameters.Add("authenticatorId", this.AuthenticatorId);
 
             object[] commandResponse = (object[])this.Execute(driverCommandToExecute: DriverCommand.GetCredentials, parameters).Value;
 
@@ -1117,7 +1116,7 @@ namespace OpenQA.Selenium
         public void RemoveCredential(string credentialId)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("authenticatorId", this.authenticatorId);
+            parameters.Add("authenticatorId", this.AuthenticatorId);
             parameters.Add("credentialId", credentialId);
 
             this.Execute(driverCommandToExecute: DriverCommand.RemoveCredential, parameters);
@@ -1129,7 +1128,7 @@ namespace OpenQA.Selenium
         public void RemoveAllCredentials()
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("authenticatorId", this.authenticatorId);
+            parameters.Add("authenticatorId", this.AuthenticatorId);
 
             this.Execute(driverCommandToExecute: DriverCommand.RemoveAllCredentials, parameters);
         }
@@ -1141,7 +1140,7 @@ namespace OpenQA.Selenium
         public void SetUserVerified(bool verified)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("authenticatorId", this.authenticatorId);
+            parameters.Add("authenticatorId", this.AuthenticatorId);
             parameters.Add("isUserVerified", verified);
 
             this.Execute(driverCommandToExecute: DriverCommand.SetUserVerified, parameters);
