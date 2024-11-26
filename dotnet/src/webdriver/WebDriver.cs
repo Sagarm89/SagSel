@@ -380,8 +380,14 @@ namespace OpenQA.Selenium
         /// </summary>
         /// <param name="printOptions">A <see cref="PrintOptions"/> object describing the options of the printed document.</param>
         /// <returns>The <see cref="PrintDocument"/> object containing the PDF-formatted print representation of the page.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="printOptions"/> is <see langword="null"/>.</exception>
         public PrintDocument Print(PrintOptions printOptions)
         {
+            if (printOptions is null)
+            {
+                throw new ArgumentNullException(nameof(printOptions));
+            }
+
             Response commandResponse = this.Execute(DriverCommand.Print, printOptions.ToDictionary());
             string base64 = commandResponse.Value.ToString();
             return new PrintDocument(base64);
