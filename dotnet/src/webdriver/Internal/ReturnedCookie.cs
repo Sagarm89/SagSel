@@ -18,6 +18,7 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 
 namespace OpenQA.Selenium.Internal
@@ -25,6 +26,7 @@ namespace OpenQA.Selenium.Internal
     /// <summary>
     /// Represents a cookie returned to the driver by the browser.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class ReturnedCookie : Cookie
     {
 

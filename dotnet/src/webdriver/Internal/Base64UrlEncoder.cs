@@ -18,6 +18,7 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
 
 #nullable enable
 
@@ -33,6 +34,7 @@ namespace OpenQA.Selenium.Internal
     /// <summary>
     /// Encodes and Decodes strings as Base64Url encoding.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Base64UrlEncoder
     {
         private const char base64PadCharacter = '=';
