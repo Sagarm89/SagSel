@@ -17,29 +17,53 @@
 // under the License.
 // </copyright>
 
+using System;
+using System.Diagnostics.CodeAnalysis;
+
+#nullable enable
+
 namespace OpenQA.Selenium
 {
     /// <summary>
     /// Provides a mechanism for maintaining a session for a test
     /// </summary>
-    public class SessionId
+    public class SessionId : IEquatable<SessionId>, IEquatable<string>
     {
-        private string sessionOpaqueKey;
+        private readonly string? sessionOpaqueKey;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionId"/> class
         /// </summary>
         /// <param name="opaqueKey">Key for the session in use</param>
-        public SessionId(string opaqueKey)
+        [Obsolete("Call SessionId.Create")]
+        public SessionId(string? opaqueKey)
         {
             this.sessionOpaqueKey = opaqueKey;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="SessionId"/> instance, or <see langword="null"/> if <paramref name="opaqueKey"/> is <see langword="null"/>.
+        /// </summary>
+        /// <param name="opaqueKey">The session ID value.</param>
+        /// <returns>A <see cref="SessionId"/>, or <see langword="null"/>.</returns>
+        [return: NotNullIfNotNull(nameof(opaqueKey))]
+        public static SessionId? Create(string? opaqueKey)
+        {
+            if (opaqueKey is null)
+            {
+                return null;
+            }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            return new SessionId(opaqueKey);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         /// <summary>
         /// Get the value of the key
         /// </summary>
         /// <returns>The key in use</returns>
-        public override string ToString()
+        public override string? ToString()
         {
             return this.sessionOpaqueKey;
         }
@@ -50,24 +74,37 @@ namespace OpenQA.Selenium
         /// <returns>The hash code of the key</returns>
         public override int GetHashCode()
         {
-            return this.sessionOpaqueKey.GetHashCode();
+            return this.sessionOpaqueKey?.GetHashCode() ?? 0;
         }
 
         /// <summary>
-        /// Compares two Sessions
+        /// Indicates whether the current session ID value is the same as <paramref name="obj"/>.
         /// </summary>
-        /// <param name="obj">Session to compare</param>
-        /// <returns>True if they are equal or False if they are not</returns>
-        public override bool Equals(object obj)
+        /// <param name="obj">The session to compare to.</param>
+        /// <returns><see langword="true"/> if the values are equal; otherwise, <see langword="false"/>.</returns>
+        public override bool Equals(object? obj)
         {
-            bool objectsAreEqual = false;
-            SessionId other = obj as SessionId;
-            if (other != null)
-            {
-                objectsAreEqual = this.sessionOpaqueKey.Equals(other.sessionOpaqueKey);
-            }
+            return Equals(obj as SessionId);
+        }
 
-            return objectsAreEqual;
+        /// <summary>
+        /// Indicates whether the current session ID value is the same as <paramref name="other"/>.
+        /// </summary>
+        /// <param name="other">A value to compare with this session ID.</param>
+        /// <returns><see langword="true"/> if the current session ID is equal to the <paramref name="other"/> parameter; otherwise, <see langword="false"/>.</returns>
+        public bool Equals(SessionId? other)
+        {
+            return other is not null && Equals(other.sessionOpaqueKey);
+        }
+
+        /// <summary>
+        /// Indicates whether the current session ID value is the same as <paramref name="other"/>.
+        /// </summary>
+        /// <param name="other">A value to compare with this session ID></param>
+        /// <returns><see langword="true"/> if the current session ID is equal to the <paramref name="other"/> parameter; otherwise, <see langword="false"/>.</returns>
+        public bool Equals(string? other)
+        {
+            return string.Equals(this.sessionOpaqueKey, other, StringComparison.Ordinal);
         }
     }
 }
