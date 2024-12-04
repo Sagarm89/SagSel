@@ -31,7 +31,7 @@ namespace OpenQA.Selenium
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
             IWebElement child = element.FindElement(By.XPath("select"));
-            Assert.AreEqual("2", child.GetAttribute("id"));
+            Assert.That(child.GetAttribute("id"), Is.EqualTo("2"));
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace OpenQA.Selenium
             IWebElement parent = driver.FindElement(By.Id("multiline"));
             ReadOnlyCollection<IWebElement> allParaElements = driver.FindElements(By.XPath("//p"));
             ReadOnlyCollection<IWebElement> children = parent.FindElements(By.XPath("//p"));
-            Assert.AreEqual(allParaElements.Count, children.Count);
+            Assert.That(children, Has.Count.EqualTo(allParaElements.Count));
         }
 
         [Test]
@@ -49,9 +49,10 @@ namespace OpenQA.Selenium
         {
             driver.Url = simpleTestPage;
             IWebElement parent = driver.FindElement(By.Id("multiline"));
+
             ReadOnlyCollection<IWebElement> children = parent.FindElements(By.XPath("./p"));
-            Assert.AreEqual(1, children.Count);
-            Assert.AreEqual("A div containing", children[0].Text);
+            Assert.That(children, Has.Count.EqualTo(1));
+            Assert.That(children[0].Text, Is.EqualTo("A div containing"));
         }
 
         [Test]
@@ -59,7 +60,10 @@ namespace OpenQA.Selenium
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
-            Assert.That(() => element.FindElement(By.XPath("select/x")), Throws.InstanceOf<NoSuchElementException>());
+
+            Assert.That(
+                () => element.FindElement(By.XPath("select/x")),
+                Throws.InstanceOf<NoSuchElementException>());
         }
 
         [Test]
@@ -67,10 +71,14 @@ namespace OpenQA.Selenium
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
+
             ReadOnlyCollection<IWebElement> children = element.FindElements(By.XPath("select/option"));
-            Assert.AreEqual(8, children.Count);
-            Assert.AreEqual("One", children[0].Text);
-            Assert.AreEqual("Two", children[1].Text);
+            Assert.That(children, Has.Count.EqualTo(8));
+            Assert.Multiple(() =>
+            {
+                Assert.That(children[0].Text, Is.EqualTo("One"));
+                Assert.That(children[1].Text, Is.EqualTo("Two"));
+            });
         }
 
         [Test]
@@ -79,7 +87,7 @@ namespace OpenQA.Selenium
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
             ReadOnlyCollection<IWebElement> children = element.FindElements(By.XPath("select/x"));
-            Assert.AreEqual(0, children.Count);
+            Assert.That(children, Is.Empty);
         }
 
         [Test]
@@ -88,7 +96,7 @@ namespace OpenQA.Selenium
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
             IWebElement child = element.FindElement(By.Name("selectomatic"));
-            Assert.AreEqual("2", child.GetAttribute("id"));
+            Assert.That(child.GetAttribute("id"), Is.EqualTo("2"));
         }
 
         [Test]
@@ -96,8 +104,9 @@ namespace OpenQA.Selenium
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
+
             ReadOnlyCollection<IWebElement> children = element.FindElements(By.Name("selectomatic"));
-            Assert.AreEqual(children.Count, 2);
+            Assert.That(children, Has.Count.EqualTo(2));
         }
 
         [Test]
@@ -105,8 +114,9 @@ namespace OpenQA.Selenium
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
+
             IWebElement child = element.FindElement(By.Id("2"));
-            Assert.AreEqual(child.GetAttribute("name"), "selectomatic");
+            Assert.That(child.GetAttribute("name"), Is.EqualTo("selectomatic"));
         }
 
 
@@ -115,8 +125,9 @@ namespace OpenQA.Selenium
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Id("test_id_div"));
+
             IWebElement child = element.FindElement(By.Id("test_id"));
-            Assert.AreEqual(child.Text, "inside");
+            Assert.That(child.Text, Is.EqualTo("inside"));
         }
 
         [Test]
@@ -124,8 +135,9 @@ namespace OpenQA.Selenium
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Id("test_special_chars"));
+
             IWebElement childWithSpaces = element.FindElement(By.Id("white space"));
-            Assert.That(childWithSpaces.Text.Contains("space"));
+            Assert.That(childWithSpaces.Text, Does.Contain("space"));
             IWebElement childWithCssChars = element.FindElement(By.Id("css#.chars"));
             Assert.That(childWithCssChars.Text, Is.EqualTo("css escapes"));
         }
@@ -135,7 +147,10 @@ namespace OpenQA.Selenium
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Id("test_id_div"));
-            Assert.That(() => element.FindElement(By.Id("test_id_out")), Throws.InstanceOf<NoSuchElementException>());
+
+            Assert.That(
+                () => element.FindElement(By.Id("test_id_out")),
+                Throws.InstanceOf<NoSuchElementException>());
         }
 
         [Test]
@@ -144,7 +159,7 @@ namespace OpenQA.Selenium
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
             ReadOnlyCollection<IWebElement> children = element.FindElements(By.Id("2"));
-            Assert.AreEqual(children.Count, 2);
+            Assert.That(children, Has.Count.EqualTo(2));
         }
 
         [Test]
@@ -153,9 +168,9 @@ namespace OpenQA.Selenium
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Id("test_special_chars"));
             ReadOnlyCollection<IWebElement> children = element.FindElements(By.Id("white space"));
-            Assert.That(children.Count, Is.EqualTo(1));
+            Assert.That(children, Has.Count.EqualTo(1));
             ReadOnlyCollection<IWebElement> children2 = element.FindElements(By.Id("css#.chars"));
-            Assert.That(children2.Count, Is.EqualTo(1));
+            Assert.That(children2, Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -163,8 +178,9 @@ namespace OpenQA.Selenium
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("div1"));
+
             IWebElement child = element.FindElement(By.LinkText("hello world"));
-            Assert.AreEqual(child.GetAttribute("name"), "link1");
+            Assert.That(child.GetAttribute("name"), Is.EqualTo("link1"));
         }
 
 
@@ -175,9 +191,9 @@ namespace OpenQA.Selenium
             IWebElement element = driver.FindElement(By.Name("div1"));
             ReadOnlyCollection<IWebElement> elements = element.FindElements(By.LinkText("hello world"));
 
-            Assert.AreEqual(2, elements.Count);
-            Assert.AreEqual(elements[0].GetAttribute("name"), "link1");
-            Assert.AreEqual(elements[1].GetAttribute("name"), "link2");
+            Assert.That(elements, Has.Count.EqualTo(2));
+            Assert.That(elements[0].GetAttribute("name"), Is.EqualTo("link1"));
+            Assert.That(elements[1].GetAttribute("name"), Is.EqualTo("link2"));
         }
 
         [Test]
@@ -185,8 +201,9 @@ namespace OpenQA.Selenium
         {
             driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Id("test_id_div"));
+
             IWebElement element = parent.FindElement(By.Id("test_id"));
-            Assert.AreEqual("inside", element.Text);
+            Assert.That(element.Text, Is.EqualTo("inside"));
         }
 
         [Test]
@@ -195,8 +212,10 @@ namespace OpenQA.Selenium
             driver.Url = nestedPage;
             IWebElement parent = driver.FindElement(By.Id("test_id"));
 
-            Assert.AreEqual(0, parent.FindElements(By.Id("test_id")).Count);
-            Assert.That(() => parent.FindElement(By.Id("test_id")), Throws.InstanceOf<NoSuchElementException>());
+            Assert.That(parent.FindElements(By.Id("test_id")), Is.Empty);
+            Assert.That(
+                () => parent.FindElement(By.Id("test_id")),
+                Throws.InstanceOf<NoSuchElementException>());
         }
 
         [Test]
@@ -207,7 +226,7 @@ namespace OpenQA.Selenium
 
             IWebElement element = parent.FindElement(By.ClassName("one"));
 
-            Assert.AreEqual("Find me", element.Text);
+            Assert.That(element.Text, Is.EqualTo("Find me"));
         }
 
         [Test]
@@ -218,7 +237,7 @@ namespace OpenQA.Selenium
 
             ReadOnlyCollection<IWebElement> elements = parent.FindElements(By.ClassName("one"));
 
-            Assert.AreEqual(2, elements.Count);
+            Assert.That(elements, Has.Count.EqualTo(2));
         }
 
 
@@ -230,7 +249,7 @@ namespace OpenQA.Selenium
 
             IWebElement element = parent.FindElement(By.TagName("a"));
 
-            Assert.AreEqual("link1", element.GetAttribute("name"));
+            Assert.That(element.GetAttribute("name"), Is.EqualTo("link1"));
         }
 
 
@@ -242,7 +261,7 @@ namespace OpenQA.Selenium
 
             ReadOnlyCollection<IWebElement> elements = parent.FindElements(By.TagName("a"));
 
-            Assert.AreEqual(2, elements.Count);
+            Assert.That(elements, Has.Count.EqualTo(2));
         }
 
         [Test]
@@ -253,7 +272,7 @@ namespace OpenQA.Selenium
 
             IWebElement element = parent.FindElement(By.CssSelector("*[name=\"selectomatic\"]"));
 
-            Assert.AreEqual("2", element.GetAttribute("id"));
+            Assert.That(element.GetAttribute("id"), Is.EqualTo("2"));
         }
 
         [Test]
@@ -264,7 +283,7 @@ namespace OpenQA.Selenium
 
             IWebElement element = parent.FindElement(By.CssSelector("*[name^=\"selecto\"]"));
 
-            Assert.AreEqual("2", element.GetAttribute("id"));
+            Assert.That(element.GetAttribute("id"), Is.EqualTo("2"));
         }
 
         [Test]
@@ -275,7 +294,7 @@ namespace OpenQA.Selenium
 
             ReadOnlyCollection<IWebElement> elements = parent.FindElements(By.CssSelector("*[name=\"selectomatic\"]"));
 
-            Assert.AreEqual(2, elements.Count);
+            Assert.That(elements, Has.Count.EqualTo(2));
         }
 
         [Test]
@@ -284,8 +303,9 @@ namespace OpenQA.Selenium
             driver.Url = selectableItemsPage;
             ReadOnlyCollection<IWebElement> elements = driver.FindElements(By.XPath("/html/head"));
             IWebElement head = elements[0];
+
             ReadOnlyCollection<IWebElement> importedScripts = head.FindElements(By.TagName("script"));
-            Assert.That(importedScripts.Count, Is.EqualTo(3));
+            Assert.That(importedScripts, Has.Count.EqualTo(3));
         }
 
         [Test]
@@ -293,9 +313,9 @@ namespace OpenQA.Selenium
         {
             driver.Url = xhtmlTestPage;
             IWebElement table = driver.FindElement(By.Id("table"));
-            ReadOnlyCollection<IWebElement> rows = table.FindElements(By.TagName("tr"));
 
-            Assert.That(rows.Count, Is.EqualTo(0));
+            ReadOnlyCollection<IWebElement> rows = table.FindElements(By.TagName("tr"));
+            Assert.That(rows, Is.Empty);
         }
 
         [Test]
@@ -311,7 +331,9 @@ namespace OpenQA.Selenium
         {
             driver.Url = formsPage;
             IWebElement element = driver.FindElement(By.Name("login"));
-            Assert.That(() => element.FindElement(By.Name("x")), Throws.InstanceOf<NoSuchElementException>());
+            Assert.That(
+                () => element.FindElement(By.Name("x")),
+                Throws.InstanceOf<NoSuchElementException>());
         }
 
         [Test]
@@ -320,8 +342,8 @@ namespace OpenQA.Selenium
             driver.Url = xhtmlTestPage;
             IWebElement parent = driver.FindElement(By.Id("my_span"));
 
-            Assert.AreEqual(2, parent.FindElements(By.TagName("div")).Count);
-            Assert.AreEqual(2, parent.FindElements(By.TagName("span")).Count);
+            Assert.That(parent.FindElements(By.TagName("div")), Has.Count.EqualTo(2));
+            Assert.That(parent.FindElements(By.TagName("span")), Has.Count.EqualTo(2));
         }
 
         [Test]
@@ -331,7 +353,7 @@ namespace OpenQA.Selenium
             IWebElement parent = driver.FindElement(By.CssSelector("div#parent"));
             IWebElement child = parent.FindElement(By.CssSelector("div"));
 
-            Assert.AreEqual("child", child.GetAttribute("id"));
+            Assert.That(child.GetAttribute("id"), Is.EqualTo("child"));
         }
 
         [Test]
@@ -342,7 +364,7 @@ namespace OpenQA.Selenium
 
             ReadOnlyCollection<IWebElement> elements = elem.FindElements(By.PartialLinkText("link"));
             Assert.That(elements, Is.Not.Null);
-            Assert.AreEqual(6, elements.Count);
+            Assert.That(elements, Has.Count.EqualTo(6));
         }
 
         [Test]
@@ -353,7 +375,7 @@ namespace OpenQA.Selenium
             IWebElement elem = driver.FindElement(By.Id("links"));
 
             IWebElement res = elem.FindElement(By.PartialLinkText("link with leading space"));
-            Assert.AreEqual("link with leading space", res.Text);
+            Assert.That(res.Text, Is.EqualTo("link with leading space"));
         }
 
         [Test]
@@ -364,7 +386,7 @@ namespace OpenQA.Selenium
             IWebElement elem = driver.FindElement(By.Id("links"));
 
             IWebElement res = elem.FindElement(By.PartialLinkText("link with trailing space"));
-            Assert.AreEqual("link with trailing space", res.Text);
+            Assert.That(res.Text, Is.EqualTo("link with trailing space"));
         }
 
         [Test]
@@ -374,7 +396,7 @@ namespace OpenQA.Selenium
             IWebElement elem = driver.FindElement(By.Id("links"));
 
             IWebElement link = elem.FindElement(By.LinkText("link with trailing space"));
-            Assert.AreEqual("linkWithTrailingSpace", link.GetAttribute("id"));
+            Assert.That(link.GetAttribute("id"), Is.EqualTo("linkWithTrailingSpace"));
         }
     }
 }
