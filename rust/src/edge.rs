@@ -583,14 +583,14 @@ pub struct Release {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Artifact {
-    #[serde(rename = "ArtifactName")]
+    #[serde(rename = "artifactName")]
     pub artifact_name: String,
-    #[serde(rename = "Location")]
+    #[serde(rename = "location")]
     pub location: String,
-    #[serde(rename = "Hash")]
+    #[serde(rename = "hash")]
     pub hash: String,
-    #[serde(rename = "HashAlgorithm")]
+    #[serde(rename = "hashAlgorithm")]
     pub hash_algorithm: String,
-    #[serde(rename = "SizeInBytes")]
+    #[serde(rename = "sizeInBytes")]
     pub size_in_bytes: u32,
 }
