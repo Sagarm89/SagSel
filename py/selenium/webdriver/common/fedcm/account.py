@@ -32,7 +32,7 @@ class _AccountDescriptor:
         return obj._account_data.get(self.name)
 
     def __set__(self, obj, value) -> None:
-        raise AttributeError(f"Cannot set readonly attribute")
+        raise AttributeError("Cannot set readonly attribute")
 
 
 class Account:
