@@ -284,7 +284,7 @@ FindElementCompleted from IWebDriver By.XPath: //link[@type = 'text/css']
             Assert.That(findingElementArgs, Is.Not.Null);
             Assert.That(findingElementArgs.Driver, Is.EqualTo(mockDriver.Object));
             Assert.That(findingElementArgs.Element, Is.Null);
-            
+
             Assert.That(findElementCompletedArgs, Is.Not.Null);
             Assert.That(findElementCompletedArgs.Driver, Is.EqualTo(mockDriver.Object));
             Assert.That(findElementCompletedArgs.Element, Is.Null);
