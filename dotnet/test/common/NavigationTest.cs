@@ -112,12 +112,11 @@ namespace OpenQA.Selenium
 
         [Test]
         [NeedsFreshDriver(IsCreatedBeforeTest = true)]
-        public Task ShouldNotHaveProblemNavigatingWithNoPagesBrowsedAsync()
+        public void ShouldNotHaveProblemNavigatingWithNoPagesBrowsedAsync()
         {
             var navigation = driver.Navigate();
-            Assert.DoesNotThrowAsync(async () => await navigation.BackAsync());
-            Assert.DoesNotThrowAsync(async () => await navigation.ForwardAsync());
-            return Task.CompletedTask;
+            Assert.That(async () => await navigation.BackAsync(), Throws.Nothing);
+            Assert.That(async () => await navigation.ForwardAsync(), Throws.Nothing);
         }
 
         [Test]
