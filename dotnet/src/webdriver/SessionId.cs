@@ -18,7 +18,6 @@
 // </copyright>
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 #nullable enable
 
@@ -29,34 +28,15 @@ namespace OpenQA.Selenium
     /// </summary>
     public class SessionId : IEquatable<SessionId>, IEquatable<string>
     {
-        private readonly string? sessionOpaqueKey;
+        private readonly string sessionOpaqueKey;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionId"/> class
         /// </summary>
         /// <param name="opaqueKey">Key for the session in use</param>
-        [Obsolete("Call SessionId.Create")]
-        public SessionId(string? opaqueKey)
+        public SessionId(string opaqueKey)
         {
-            this.sessionOpaqueKey = opaqueKey;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="SessionId"/> instance, or <see langword="null"/> if <paramref name="opaqueKey"/> is <see langword="null"/>.
-        /// </summary>
-        /// <param name="opaqueKey">The session ID value.</param>
-        /// <returns>A <see cref="SessionId"/>, or <see langword="null"/>.</returns>
-        [return: NotNullIfNotNull(nameof(opaqueKey))]
-        public static SessionId? Create(string? opaqueKey)
-        {
-            if (opaqueKey is null)
-            {
-                return null;
-            }
-
-#pragma warning disable CS0618 // Type or member is obsolete
-            return new SessionId(opaqueKey);
-#pragma warning restore CS0618 // Type or member is obsolete
+            this.sessionOpaqueKey = opaqueKey ?? throw new ArgumentNullException(nameof(opaqueKey));
         }
 
         /// <summary>
@@ -74,12 +54,7 @@ namespace OpenQA.Selenium
         /// <returns>The hash code of the key</returns>
         public override int GetHashCode()
         {
-            if (this.sessionOpaqueKey is { } key)
-            {
-                return StringComparer.Ordinal.GetHashCode(key);
-            }
-
-            return 0;
+            return StringComparer.Ordinal.GetHashCode(this.sessionOpaqueKey);
         }
 
         /// <summary>

@@ -33,7 +33,7 @@ namespace OpenQA.Selenium
                 ["arg"] = new { param1 = true, param2 = false },
             };
 
-            var command = new Command(SessionId.Create("session"), "test command", parameters);
+            var command = new Command(new SessionId("session"), "test command", parameters);
 
             Assert.That(command.ParametersAsJsonString, Is.EqualTo("""{"arg":{"param1":true,"param2":false}}"""));
         }

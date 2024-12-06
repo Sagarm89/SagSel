@@ -679,7 +679,7 @@ namespace OpenQA.Selenium
 
             ReturnedCapabilities returnedCapabilities = new ReturnedCapabilities(rawCapabilities);
             this.capabilities = returnedCapabilities;
-            this.sessionId = SessionId.Create(response.SessionId);
+            this.sessionId = response.SessionId is null ? null : new SessionId(response.SessionId);
         }
 
         /// <summary>
