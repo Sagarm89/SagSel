@@ -26,7 +26,7 @@ namespace OpenQA.Selenium
     /// <summary>
     /// Provides a mechanism for maintaining a session for a test
     /// </summary>
-    public class SessionId : IEquatable<SessionId>, IEquatable<string>
+    public class SessionId
     {
         private readonly string sessionOpaqueKey;
 
@@ -65,54 +65,7 @@ namespace OpenQA.Selenium
         /// <returns><see langword="true"/> if the values are equal; otherwise, <see langword="false"/>.</returns>
         public override bool Equals(object? obj)
         {
-            return Equals(obj as SessionId);
-        }
-
-        /// <summary>
-        /// Indicates whether the current session ID value is the same as <paramref name="other"/>.
-        /// </summary>
-        /// <param name="other">A value to compare with this session ID.</param>
-        /// <returns><see langword="true"/> if the current session ID is equal to the <paramref name="other"/> parameter; otherwise, <see langword="false"/>.</returns>
-        public bool Equals(SessionId? other)
-        {
-            return other is not null && Equals(other.sessionOpaqueKey);
-        }
-
-        /// <summary>
-        /// Indicates whether the current session ID value is the same as <paramref name="other"/>.
-        /// </summary>
-        /// <param name="other">A value to compare with this session ID></param>
-        /// <returns><see langword="true"/> if the current session ID is equal to the <paramref name="other"/> parameter; otherwise, <see langword="false"/>.</returns>
-        public bool Equals(string? other)
-        {
-            return string.Equals(this.sessionOpaqueKey, other, StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Compares the two values to determine equality.
-        /// </summary>
-        /// <param name="left">The value to compare with <paramref name="right"/>.</param>
-        /// <param name="right">The value to compare with <paramref name="left"/>.</param>
-        /// <returns><see langword="true"/> if <paramref name="left"/> is equal to <paramref name="right"/>; otherwise, <see langword="false"/>.</returns>
-        public static bool operator ==(SessionId? left, SessionId? right)
-        {
-            if (left is null)
-            {
-                return right is null;
-            }
-
-            return left.Equals(right);
-        }
-
-        /// <summary>
-        /// Compares the two values to determine inequality.
-        /// </summary>
-        /// <param name="left">The value to compare with <paramref name="right"/>.</param>
-        /// <param name="right">The value to compare with <paramref name="left"/>.</param>
-        /// <returns><see langword="true"/> if <paramref name="left"/> is not equal to <paramref name="right"/>; otherwise, <see langword="false"/>.</returns>
-        public static bool operator !=(SessionId? left, SessionId? right)
-        {
-            return !(left == right);
+            return obj is SessionId otherSession && this.sessionOpaqueKey.Equals(otherSession.sessionOpaqueKey, StringComparison.Ordinal);
         }
     }
 }
