@@ -141,7 +141,7 @@ namespace OpenQA.Selenium
                     {
                         foreach (object? address in addressesAsArray)
                         {
-                            bypassAddresses.Add(address?.ToString() ?? throw new ArgumentException("noProxy list contained null element", nameof(settings)));
+                            bypassAddresses.Add(address?.ToString() ?? throw new ArgumentException("Proxy bypass address list \"noProxy\" contained a null element", nameof(settings)));
                         }
                     }
                 }
