@@ -42,7 +42,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = simpleTestPage;
             IWebElement img = driver.FindElement(By.Id("invalidImgTag"));
-            string attribute = img.GetAttribute("src");
+            string attribute = img.GetDomProperty("src");
             Assert.That(attribute, Is.Null);
         }
 
@@ -51,7 +51,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = simpleTestPage;
             IWebElement img = driver.FindElement(By.Id("validImgTag"));
-            string attribute = img.GetAttribute("src");
+            string attribute = img.GetDomProperty("src");
             Assert.That(attribute, Is.EqualTo(EnvironmentManager.Instance.UrlBuilder.WhereIs("icon.gif")));
         }
 
