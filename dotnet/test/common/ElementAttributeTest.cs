@@ -429,7 +429,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = EnvironmentManager.Instance.UrlBuilder.WhereIs("userDefinedProperty.html");
             IWebElement element = driver.FindElement(By.Id("d"));
-            Assert.That(element.GetAttribute("dynamicProperty"), Is.EqualTo("sampleValue"));
+            Assert.That(element.GetDomProperty("dynamicProperty"), Is.EqualTo("sampleValue"));
         }
 
         [Test]
