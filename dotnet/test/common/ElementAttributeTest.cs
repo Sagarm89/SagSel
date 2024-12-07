@@ -60,7 +60,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = simpleTestPage;
             IWebElement img = driver.FindElement(By.Id("validAnchorTag"));
-            string attribute = img.GetAttribute("href");
+            string attribute = img.GetDomProperty("href");
             Assert.That(attribute, Is.EqualTo(EnvironmentManager.Instance.UrlBuilder.WhereIs("icon.gif")));
         }
 
