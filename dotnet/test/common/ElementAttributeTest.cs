@@ -325,7 +325,7 @@ namespace OpenQA.Selenium
 
             driver.Url = svgPage;
             IWebElement svgElement = driver.FindElement(By.Id("rotate"));
-            Assert.That(svgElement.GetAttribute("transform"), Is.EqualTo("rotate(30)"));
+            Assert.That(svgElement.GetDomAttribute("transform"), Is.EqualTo("rotate(30)"));
         }
 
         [Test]
