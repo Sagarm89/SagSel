@@ -268,7 +268,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = formsPage;
             IWebElement element = driver.FindElement(By.Id("withText"));
-            Assert.That(element.GetAttribute("rows"), Is.EqualTo("5"));
+            Assert.That(element.GetDomAttribute("rows"), Is.EqualTo("5"));
         }
 
         [Test]
