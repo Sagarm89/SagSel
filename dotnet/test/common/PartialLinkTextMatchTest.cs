@@ -76,7 +76,7 @@ namespace OpenQA.Selenium
             driver.Url = simpleTestPage;
             IWebElement link = null;
             link = driver.FindElement(By.LinkText("link with trailing space"));
-            Assert.That(link.GetAttribute("id"), Is.EqualTo("linkWithTrailingSpace"));
+            Assert.That(link.GetDomAttribute("id"), Is.EqualTo("linkWithTrailingSpace"));
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace OpenQA.Selenium
 
             IWebElement link = null;
             link = elem.FindElement(By.LinkText("link with trailing space"));
-            Assert.That(link.GetAttribute("id"), Is.EqualTo("linkWithTrailingSpace"));
+            Assert.That(link.GetDomAttribute("id"), Is.EqualTo("linkWithTrailingSpace"));
         }
     }
 }

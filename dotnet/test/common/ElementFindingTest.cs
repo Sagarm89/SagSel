@@ -34,7 +34,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = xhtmlTestPage;
             IWebElement element = driver.FindElement(By.Id("linkId"));
-            Assert.That(element.GetAttribute("id"), Is.EqualTo("linkId"));
+            Assert.That(element.GetDomAttribute("id"), Is.EqualTo("linkId"));
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Id("2"));
-            Assert.That(element.GetAttribute("id"), Is.EqualTo("2"));
+            Assert.That(element.GetDomAttribute("id"), Is.EqualTo("2"));
         }
 
         [Test]
@@ -681,7 +681,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = xhtmlTestPage;
             IWebElement element = driver.FindElement(By.LinkText("Link=equalssign"));
-            Assert.That(element.GetAttribute("id"), Is.EqualTo("linkWithEqualsSign"));
+            Assert.That(element.GetDomAttribute("id"), Is.EqualTo("linkWithEqualsSign"));
         }
 
         [Test]
@@ -690,7 +690,7 @@ namespace OpenQA.Selenium
             driver.Url = xhtmlTestPage;
             ReadOnlyCollection<IWebElement> elements = driver.FindElements(By.LinkText("Link=equalssign"));
             Assert.That(elements, Has.Count.EqualTo(1));
-            Assert.That(elements[0].GetAttribute("id"), Is.EqualTo("linkWithEqualsSign"));
+            Assert.That(elements[0].GetDomAttribute("id"), Is.EqualTo("linkWithEqualsSign"));
         }
 
         [Test]
@@ -724,7 +724,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = simpleTestPage;
             IWebElement link = driver.FindElement(By.LinkText("link with trailing space"));
-            Assert.That(link.GetAttribute("id"), Is.EqualTo("linkWithTrailingSpace"));
+            Assert.That(link.GetDomAttribute("id"), Is.EqualTo("linkWithTrailingSpace"));
             Assert.That(link.Text, Is.EqualTo("link with trailing space"));
         }
 
@@ -768,7 +768,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = xhtmlTestPage;
             IWebElement element = driver.FindElement(By.PartialLinkText("Link="));
-            Assert.That(element.GetAttribute("id"), Is.EqualTo("linkWithEqualsSign"));
+            Assert.That(element.GetDomAttribute("id"), Is.EqualTo("linkWithEqualsSign"));
         }
 
         [Test]
@@ -777,7 +777,7 @@ namespace OpenQA.Selenium
             driver.Url = xhtmlTestPage;
             ReadOnlyCollection<IWebElement> elements = driver.FindElements(By.PartialLinkText("Link="));
             Assert.That(elements, Has.Count.EqualTo(1));
-            Assert.That(elements[0].GetAttribute("id"), Is.EqualTo("linkWithEqualsSign"));
+            Assert.That(elements[0].GetDomAttribute("id"), Is.EqualTo("linkWithEqualsSign"));
         }
 
         // Misc tests
@@ -996,7 +996,7 @@ namespace OpenQA.Selenium
             IWebElement parent = driver.FindElement(By.CssSelector("div#parent"));
             IWebElement child = parent.FindElement(By.CssSelector("div"));
 
-            Assert.That(child.GetAttribute("id"), Is.EqualTo("child"));
+            Assert.That(child.GetDomAttribute("id"), Is.EqualTo("child"));
         }
 
         [Test]
@@ -1025,7 +1025,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = simpleTestPage;
             IWebElement element = driver.FindElement(By.LinkText("link with \" (double quote)"));
-            Assert.That(element.GetAttribute("id"), Is.EqualTo("quote"));
+            Assert.That(element.GetDomAttribute("id"), Is.EqualTo("quote"));
         }
 
         [Test]
@@ -1033,7 +1033,7 @@ namespace OpenQA.Selenium
         {
             driver.Url = simpleTestPage;
             IWebElement element = driver.FindElement(By.LinkText("link with \\ (backslash)"));
-            Assert.That(element.GetAttribute("id"), Is.EqualTo("backslash"));
+            Assert.That(element.GetDomAttribute("id"), Is.EqualTo("backslash"));
         }
     }
 }

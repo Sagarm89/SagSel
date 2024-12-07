@@ -31,7 +31,7 @@ namespace OpenQA.Selenium
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
             IWebElement child = element.FindElement(By.XPath("select"));
-            Assert.That(child.GetAttribute("id"), Is.EqualTo("2"));
+            Assert.That(child.GetDomAttribute("id"), Is.EqualTo("2"));
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace OpenQA.Selenium
             driver.Url = nestedPage;
             IWebElement element = driver.FindElement(By.Name("form2"));
             IWebElement child = element.FindElement(By.Name("selectomatic"));
-            Assert.That(child.GetAttribute("id"), Is.EqualTo("2"));
+            Assert.That(child.GetDomAttribute("id"), Is.EqualTo("2"));
         }
 
         [Test]
@@ -269,7 +269,7 @@ namespace OpenQA.Selenium
 
             IWebElement element = parent.FindElement(By.CssSelector("*[name=\"selectomatic\"]"));
 
-            Assert.That(element.GetAttribute("id"), Is.EqualTo("2"));
+            Assert.That(element.GetDomAttribute("id"), Is.EqualTo("2"));
         }
 
         [Test]
@@ -280,7 +280,7 @@ namespace OpenQA.Selenium
 
             IWebElement element = parent.FindElement(By.CssSelector("*[name^=\"selecto\"]"));
 
-            Assert.That(element.GetAttribute("id"), Is.EqualTo("2"));
+            Assert.That(element.GetDomAttribute("id"), Is.EqualTo("2"));
         }
 
         [Test]
@@ -350,7 +350,7 @@ namespace OpenQA.Selenium
             IWebElement parent = driver.FindElement(By.CssSelector("div#parent"));
             IWebElement child = parent.FindElement(By.CssSelector("div"));
 
-            Assert.That(child.GetAttribute("id"), Is.EqualTo("child"));
+            Assert.That(child.GetDomAttribute("id"), Is.EqualTo("child"));
         }
 
         [Test]
@@ -393,7 +393,7 @@ namespace OpenQA.Selenium
             IWebElement elem = driver.FindElement(By.Id("links"));
 
             IWebElement link = elem.FindElement(By.LinkText("link with trailing space"));
-            Assert.That(link.GetAttribute("id"), Is.EqualTo("linkWithTrailingSpace"));
+            Assert.That(link.GetDomAttribute("id"), Is.EqualTo("linkWithTrailingSpace"));
         }
     }
 }

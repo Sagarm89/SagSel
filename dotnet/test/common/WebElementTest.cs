@@ -162,8 +162,8 @@ namespace OpenQA.Selenium
 
             IWebElement dynamo = driver.FindElement(By.Id("dynamo"));
             IWebElement mousedown = driver.FindElement(By.Id("mousedown"));
-            Assert.That(mousedown.GetAttribute("id"), Is.EqualTo("mousedown"));
-            Assert.That(dynamo.GetAttribute("id"), Is.EqualTo("dynamo"));
+            Assert.That(mousedown.GetDomAttribute("id"), Is.EqualTo("mousedown"));
+            Assert.That(dynamo.GetDomAttribute("id"), Is.EqualTo("dynamo"));
 
         }
     }

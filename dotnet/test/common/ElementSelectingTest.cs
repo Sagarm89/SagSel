@@ -244,7 +244,7 @@ namespace OpenQA.Selenium
 
         private static string Describe(IWebElement element)
         {
-            return element.GetAttribute("id");
+            return element.GetDomAttribute("id");
         }
 
         private static void AssertCanToggle(IWebElement element)

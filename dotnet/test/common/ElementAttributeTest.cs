@@ -288,10 +288,10 @@ namespace OpenQA.Selenium
             IWebElement th1 = driver.FindElement(By.Id("th1"));
             IWebElement td2 = driver.FindElement(By.Id("td2"));
 
-            Assert.That(th1.GetAttribute("id"), Is.EqualTo("th1"), "th1 id");
+            Assert.That(th1.GetDomAttribute("id"), Is.EqualTo("th1"), "th1 id");
             Assert.That(th1.GetAttribute("colspan"), Is.EqualTo("3"), "th1 colspan should be 3");
 
-            Assert.That(td2.GetAttribute("id"), Is.EqualTo("td2"), "td2 id");
+            Assert.That(td2.GetDomAttribute("id"), Is.EqualTo("td2"), "td2 id");
             Assert.That(td2.GetAttribute("colspan"), Is.EqualTo("2"), "td2 colspan should be 2");
         }
 

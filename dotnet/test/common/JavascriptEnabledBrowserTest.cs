@@ -128,7 +128,7 @@ namespace OpenQA.Selenium
             driver.FindElement(By.Id("switchFocus")).Click();
 
             IWebElement element = driver.SwitchTo().ActiveElement();
-            Assert.That(element.GetAttribute("id"), Is.EqualTo("theworks"));
+            Assert.That(element.GetDomAttribute("id"), Is.EqualTo("theworks"));
         }
 
         [Test]
