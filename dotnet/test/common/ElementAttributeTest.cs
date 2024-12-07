@@ -365,7 +365,7 @@ namespace OpenQA.Selenium
             IWebElement element1 = driver.FindElement(By.Id("working"));
             Assert.That(element1.GetDomAttribute("required"), Is.Null);
             IWebElement element2 = driver.FindElement(By.Id("wallace"));
-            Assert.That(element2.GetAttribute("nowrap"), Is.Null);
+            Assert.That(element2.GetDomAttribute("nowrap"), Is.Null);
         }
 
         [Test]
@@ -381,7 +381,7 @@ namespace OpenQA.Selenium
             IWebElement element4 = driver.FindElement(By.Id("textAreaRequired"));
             Assert.That(element4.GetDomAttribute("required"), Is.EqualTo("true"));
             IWebElement element5 = driver.FindElement(By.Id("unwrappable"));
-            Assert.That(element5.GetAttribute("nowrap"), Is.EqualTo("true"));
+            Assert.That(element5.GetDomAttribute("nowrap"), Is.EqualTo("true"));
         }
 
         [Test]
