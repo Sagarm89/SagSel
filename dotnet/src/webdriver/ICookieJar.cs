@@ -55,11 +55,15 @@ namespace OpenQA.Selenium
         /// <param name="cookie">The <see cref="Cookie"/> to be deleted.</param>
         void DeleteCookie(Cookie? cookie);
 
+#nullable disable
+
         /// <summary>
         /// Deletes the cookie with the specified name from the page.
         /// </summary>
         /// <param name="name">The name of the cookie to be deleted.</param>
-        void DeleteCookieNamed(string? name);
+        void DeleteCookieNamed(string name);
+
+#nullable enable
 
         /// <summary>
         /// Deletes all cookies from the page.

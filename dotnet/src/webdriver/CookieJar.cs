@@ -92,11 +92,13 @@ namespace OpenQA.Selenium
             this.driver.InternalExecute(DriverCommand.AddCookie, parameters);
         }
 
+#nullable disable
+
         /// <summary>
         /// Delete the cookie by passing in the name of the cookie
         /// </summary>
         /// <param name="name">The name of the cookie that is in the browser</param>
-        public void DeleteCookieNamed(string? name)
+        public void DeleteCookieNamed(string name)
         {
             if (name is not null)
             {
@@ -105,6 +107,8 @@ namespace OpenQA.Selenium
                 this.driver.InternalExecute(DriverCommand.DeleteCookie, parameters);
             }
         }
+
+#nullable enable
 
         /// <summary>
         /// Delete a cookie in the browser by passing in a copy of a cookie
