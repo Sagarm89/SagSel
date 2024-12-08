@@ -178,6 +178,8 @@ namespace OpenQA.Selenium
                 throw new WebDriverException($"The 'value > error' property is not a string{Environment.NewLine}{value}");
             }
 
+            response.Value = deserializedResponse["value"];
+
             response.Status = WebDriverError.ResultFromError(errorString);
 
             return response;
