@@ -174,9 +174,12 @@ namespace OpenQA.Selenium
                 throw new WebDriverException($"The 'value > error' property is not a string{Environment.NewLine}{value}");
             }
 
-            var status = WebDriverError.ResultFromError(errorString);
+            var response = new Response();
 
-            return new Response(sessionId: null, status, valueDictionary);
+            response.Value = valueDictionary;
+            response.Status = WebDriverError.ResultFromError(errorString);
+
+            return response;
         }
 
         /// <summary>
