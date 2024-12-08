@@ -622,7 +622,11 @@ namespace OpenQA.Selenium
             }
             catch (System.Net.Http.HttpRequestException e)
             {
-                commandResponse = new Response(sessionId: null, WebDriverResult.UnhandledError, e);
+                commandResponse = new Response
+                {
+                    Status = WebDriverResult.UnhandledError,
+                    Value = e
+                };
             }
 
             if (commandResponse.Status != WebDriverResult.Success)
