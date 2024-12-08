@@ -21,22 +21,25 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+#nullable enable
+
 namespace OpenQA.Selenium
 {
     /// <summary>
     /// Defines an interface allowing the user to manipulate cookies on the current page.
     /// </summary>
-    internal class CookieJar : ICookieJar
+    internal sealed class CookieJar : ICookieJar
     {
-        private WebDriver driver;
+        private readonly WebDriver driver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CookieJar"/> class.
         /// </summary>
         /// <param name="driver">The driver that is currently in use</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="driver"/> is <see langword="null"/>.</exception>
         public CookieJar(WebDriver driver)
         {
-            this.driver = driver;
+            this.driver = driver ?? throw new ArgumentNullException(nameof(driver));
         }
 
         /// <summary>
@@ -44,15 +47,46 @@ namespace OpenQA.Selenium
         /// </summary>
         public ReadOnlyCollection<Cookie> AllCookies
         {
-            get { return this.GetAllCookies(); }
+            get
+            {
+                object returned = this.driver.InternalExecute(DriverCommand.GetAllCookies, new Dictionary<string, object>()).Value;
+
+                try
+                {
+                    List<Cookie> toReturn = new List<Cookie>();
+                    if (returned is object?[] cookies)
+                    {
+                        foreach (object? rawCookie in cookies)
+                        {
+                            if (rawCookie != null)
+                            {
+                                Cookie newCookie = Cookie.FromDictionary((Dictionary<string, object?>)rawCookie);
+                                toReturn.Add(newCookie);
+                            }
+                        }
+                    }
+
+                    return new ReadOnlyCollection<Cookie>(toReturn);
+                }
+                catch (Exception e)
+                {
+                    throw new WebDriverException("Unexpected problem getting cookies", e);
+                }
+            }
         }
 
         /// <summary>
         /// Method for creating a cookie in the browser
         /// </summary>
         /// <param name="cookie"><see cref="Cookie"/> that represents a cookie in the browser</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="cookie"/> is <see langword="null"/>.</exception>
         public void AddCookie(Cookie cookie)
         {
+            if (cookie is null)
+            {
+                throw new ArgumentNullException(nameof(cookie));
+            }
+
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("cookie", cookie);
             this.driver.InternalExecute(DriverCommand.AddCookie, parameters);
@@ -62,18 +96,21 @@ namespace OpenQA.Selenium
         /// Delete the cookie by passing in the name of the cookie
         /// </summary>
         /// <param name="name">The name of the cookie that is in the browser</param>
-        public void DeleteCookieNamed(string name)
+        public void DeleteCookieNamed(string? name)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("name", name);
-            this.driver.InternalExecute(DriverCommand.DeleteCookie, parameters);
+            if (name is not null)
+            {
+                Dictionary<string, object> parameters = new Dictionary<string, object>();
+                parameters.Add("name", name);
+                this.driver.InternalExecute(DriverCommand.DeleteCookie, parameters);
+            }
         }
 
         /// <summary>
         /// Delete a cookie in the browser by passing in a copy of a cookie
         /// </summary>
         /// <param name="cookie">An object that represents a copy of the cookie that needs to be deleted</param>
-        public void DeleteCookie(Cookie cookie)
+        public void DeleteCookie(Cookie? cookie)
         {
             if (cookie != null)
             {
@@ -94,10 +131,10 @@ namespace OpenQA.Selenium
         /// </summary>
         /// <param name="name">name of the cookie that needs to be returned</param>
         /// <returns>A Cookie from the name</returns>
-        public Cookie GetCookieNamed(string name)
+        public Cookie? GetCookieNamed(string? name)
         {
-            Cookie cookieToReturn = null;
-            if (name != null)
+            Cookie? cookieToReturn = null;
+            if (name is not null)
             {
                 ReadOnlyCollection<Cookie> allCookies = this.AllCookies;
                 foreach (Cookie currentCookie in allCookies)
@@ -111,38 +148,6 @@ namespace OpenQA.Selenium
             }
 
             return cookieToReturn;
-        }
-
-        /// <summary>
-        /// Method for getting a Collection of Cookies that are present in the browser
-        /// </summary>
-        /// <returns>ReadOnlyCollection of Cookies in the browser</returns>
-        private ReadOnlyCollection<Cookie> GetAllCookies()
-        {
-            List<Cookie> toReturn = new List<Cookie>();
-            object returned = this.driver.InternalExecute(DriverCommand.GetAllCookies, new Dictionary<string, object>()).Value;
-
-            try
-            {
-                object[] cookies = returned as object[];
-                if (cookies != null)
-                {
-                    foreach (object rawCookie in cookies)
-                    {
-                        Dictionary<string, object> cookieDictionary = rawCookie as Dictionary<string, object>;
-                        if (rawCookie != null)
-                        {
-                            toReturn.Add(Cookie.FromDictionary(cookieDictionary));
-                        }
-                    }
-                }
-
-                return new ReadOnlyCollection<Cookie>(toReturn);
-            }
-            catch (Exception e)
-            {
-                throw new WebDriverException("Unexpected problem getting cookies", e);
-            }
         }
     }
 }
