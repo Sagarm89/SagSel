@@ -100,12 +100,9 @@ namespace OpenQA.Selenium
         /// <param name="name">The name of the cookie that is in the browser</param>
         public void DeleteCookieNamed(string name)
         {
-            if (name is not null)
-            {
-                Dictionary<string, object> parameters = new Dictionary<string, object>();
-                parameters.Add("name", name);
-                this.driver.InternalExecute(DriverCommand.DeleteCookie, parameters);
-            }
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("name", name);
+            this.driver.InternalExecute(DriverCommand.DeleteCookie, parameters);
         }
 
 #nullable enable
