@@ -23,77 +23,45 @@ using System.Collections.ObjectModel;
 
 namespace OpenQA.Selenium
 {
-    /// <summary>
-    /// Defines an interface allowing the user to manipulate cookies on the current page.
-    /// </summary>
-    internal class CookieJar : ICookieJar
+    internal class CookieJar(WebDriver driver) : ICookieJar
     {
-        private WebDriver driver;
+        public ReadOnlyCollection<Cookie> AllCookies => GetAllCookies();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CookieJar"/> class.
-        /// </summary>
-        /// <param name="driver">The driver that is currently in use</param>
-        public CookieJar(WebDriver driver)
-        {
-            this.driver = driver;
-        }
-
-        /// <summary>
-        /// Gets all cookies defined for the current page.
-        /// </summary>
-        public ReadOnlyCollection<Cookie> AllCookies
-        {
-            get { return this.GetAllCookies(); }
-        }
-
-        /// <summary>
-        /// Method for creating a cookie in the browser
-        /// </summary>
-        /// <param name="cookie"><see cref="Cookie"/> that represents a cookie in the browser</param>
         public void AddCookie(Cookie cookie)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("cookie", cookie);
-            this.driver.InternalExecute(DriverCommand.AddCookie, parameters);
+            if (cookie is null)
+            {
+                throw new ArgumentNullException(nameof(cookie));
+            }
+
+            driver.InternalExecute(DriverCommand.AddCookie, new() { { "cookie", cookie } });
         }
 
-        /// <summary>
-        /// Delete the cookie by passing in the name of the cookie
-        /// </summary>
-        /// <param name="name">The name of the cookie that is in the browser</param>
         public void DeleteCookieNamed(string name)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("name", name);
-            this.driver.InternalExecute(DriverCommand.DeleteCookie, parameters);
+            if (name is null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            driver.InternalExecute(DriverCommand.DeleteCookie, new() { { "name", name } });
         }
 
-        /// <summary>
-        /// Delete a cookie in the browser by passing in a copy of a cookie
-        /// </summary>
-        /// <param name="cookie">An object that represents a copy of the cookie that needs to be deleted</param>
         public void DeleteCookie(Cookie cookie)
         {
-            if (cookie != null)
+            if (cookie is null)
             {
-                this.DeleteCookieNamed(cookie.Name);
+                throw new ArgumentNullException(nameof(cookie));
             }
+
+            DeleteCookieNamed(cookie.Name);
         }
 
-        /// <summary>
-        /// Delete All Cookies that are present in the browser
-        /// </summary>
         public void DeleteAllCookies()
         {
-            this.driver.InternalExecute(DriverCommand.DeleteAllCookies, null);
+            driver.InternalExecute(DriverCommand.DeleteAllCookies, null);
         }
 
-        /// <summary>
-        /// Method for returning a getting a cookie by name
-        /// </summary>
-        /// <param name="name">name of the cookie that needs to be returned</param>
-        /// <returns>A Cookie from the name</returns>
         public Cookie GetCookieNamed(string name)
         {
             Cookie cookieToReturn = null;
@@ -113,14 +81,10 @@ namespace OpenQA.Selenium
             return cookieToReturn;
         }
 
-        /// <summary>
-        /// Method for getting a Collection of Cookies that are present in the browser
-        /// </summary>
-        /// <returns>ReadOnlyCollection of Cookies in the browser</returns>
         private ReadOnlyCollection<Cookie> GetAllCookies()
         {
             List<Cookie> toReturn = new List<Cookie>();
-            object returned = this.driver.InternalExecute(DriverCommand.GetAllCookies, new Dictionary<string, object>()).Value;
+            object returned = driver.InternalExecute(DriverCommand.GetAllCookies, new Dictionary<string, object>()).Value;
 
             try
             {
