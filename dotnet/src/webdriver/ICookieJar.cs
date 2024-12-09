@@ -43,8 +43,7 @@ namespace OpenQA.Selenium
         /// Gets a cookie with the specified name.
         /// </summary>
         /// <param name="name">The name of the cookie to retrieve.</param>
-        /// <returns>The <see cref="Cookie"/> containing the name. Returns <see langword="null"/>
-        /// if no cookie with the specified name is found.</returns>
+        /// <returns>The <see cref="Cookie"/> containing the name.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="name"/> is <see langword="null"/>.</exception>
         /// <exception cref="NoSuchCookieException">If <paramref name="name"/> is not found.</exception>
         Cookie GetCookieNamed(string name);
