@@ -16,10 +16,10 @@ closure_js_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-      "@io_bazel_rules_closure//closure/library/array",
-      "@io_bazel_rules_closure//closure/library/dom",
-      "@io_bazel_rules_closure//closure/library/dom:nodetype",
-      "@io_bazel_rules_closure//closure/library/string",
-      "@io_bazel_rules_closure//closure/library/useragent",
+        "@io_bazel_rules_closure//closure/library/array",
+        "@io_bazel_rules_closure//closure/library/dom",
+        "@io_bazel_rules_closure//closure/library/dom:nodetype",
+        "@io_bazel_rules_closure//closure/library/string",
+        "@io_bazel_rules_closure//closure/library/useragent",
     ],
 )

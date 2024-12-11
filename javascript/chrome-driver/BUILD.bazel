@@ -29,7 +29,7 @@ closure_fragment(
     function = "goog.style.getPageOffset",
     module = "goog.style",
     deps = [
-      "@io_bazel_rules_closure//closure/library/style",
+        "@io_bazel_rules_closure//closure/library/style",
     ],
 )
 
