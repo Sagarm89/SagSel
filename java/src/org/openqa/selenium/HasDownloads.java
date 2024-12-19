@@ -27,7 +27,14 @@ public interface HasDownloads {
   /**
    * Requires downloads to be enabled.
    *
-   * <p>TODO: Create an example in the documentation and provide a link to it.
+   * <p>Example usage:
+   * <pre>
+   * {@code
+   * Capabilities capabilities = new Capabilities();
+   * capabilities.setCapability("se:downloadsEnabled", true);
+   * driver.requireDownloadsEnabled(capabilities);
+   * }
+   * </pre>
    *
    * @param capabilities the capabilities object
    * @throws WebDriverException if capability to enable downloads is not set
