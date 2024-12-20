@@ -1,4 +1,4 @@
-// <copyright file="IWrapsDriver.cs" company="Selenium Committers">
+// <copyright file="IRemoteReference.cs" company="Selenium Committers">
 // Licensed to the Software Freedom Conservancy (SFC) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -19,16 +19,20 @@
 
 #nullable enable
 
-namespace OpenQA.Selenium
+namespace OpenQA.Selenium.BiDi.Modules.Script;
+
+public interface IRemoteReference;
+
+public interface ISharedReference : IRemoteReference
 {
-    /// <summary>
-    /// Defines the interface through which the user can access the driver used to find an element.
-    /// </summary>
-    public interface IWrapsDriver
-    {
-        /// <summary>
-        /// Gets the <see cref="IWebDriver"/> used to find this element.
-        /// </summary>
-        IWebDriver WrappedDriver { get; }
-    }
+    public string SharedId { get; }
+
+    public Handle? Handle { get; set; }
+}
+
+public interface IRemoteObjectReference : IRemoteReference
+{
+    public Handle Handle { get; }
+
+    public string? SharedId { get; set; }
 }
