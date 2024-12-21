@@ -101,7 +101,7 @@ namespace OpenQA.Selenium.Firefox.Internal
         /// <exception cref="ArgumentNullException">
         /// <para>If <paramref name="sectionName"/> is <see langword="null"/> or <see cref="string.Empty"/>.</para>
         /// <para>-or-</para>
-        /// <para>If <paramref name="sectionName"/> is <see langword="null"/> or <see cref="string.Empty"/>.</para>
+        /// <para>If <paramref name="valueName"/> is <see langword="null"/> or <see cref="string.Empty"/>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para>If no section named <paramref name="sectionName"/> exists.</para>
