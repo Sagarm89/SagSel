@@ -29,7 +29,9 @@ module Selenium
       it 'adds an auth handler' do
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
-          network.add_authentication_handler(username, password)
+          network.add_authentication_handler do |response|
+            response.authenticate(username, password)
+          end
           driver.navigate.to url_for('basicAuth')
           expect(driver.find_element(tag_name: 'h1').text).to eq('authorized')
           expect(network.callbacks.count).to be 1
@@ -39,7 +41,9 @@ module Selenium
       it 'removes an auth handler' do
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
-          id = network.add_authentication_handler(username, password)
+          id = network.add_authentication_handler do |response|
+            response.authenticate(username, password)
+          end
           network.remove_handler(id)
           expect(network.callbacks.count).to be 0
         end
@@ -48,17 +52,37 @@ module Selenium
       it 'clears all auth handlers' do
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
-          network.add_authentication_handler(username, password)
-          network.add_authentication_handler(username, password)
+          2.times do
+            network.add_authentication_handler do |response|
+              response.authenticate(username, password)
+            end
+          end
           network.clear_handlers
           expect(network.callbacks.count).to be 0
+        end
+      end
+
+      it 'continues without auth' do
+        reset_driver!(web_socket_url: true) do |driver|
+          network = described_class.new(driver)
+          network.add_authentication_handler(&:skip)
+          expect { driver.navigate.to url_for('basicAuth') }.to raise_error(Error::WebDriverError)
+        end
+      end
+
+      it 'cancels auth' do
+        reset_driver!(web_socket_url: true) do |driver|
+          network = described_class.new(driver)
+          network.add_authentication_handler(&:cancel)
+          driver.navigate.to url_for('basicAuth')
+          expect(driver.find_element(tag_name: 'pre').text).to eq('Login please')
         end
       end
 
       it 'adds a request handler' do
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
-          network.add_request_handler { |event| network.continue_with_request(request_id: network.fetch_id(event)) }
+          network.add_request_handler(&:continue)
           driver.navigate.to url_for('formPage.html')
           expect(driver.find_element(name: 'login')).to be_displayed
           expect(network.callbacks.count).to be 1
@@ -68,7 +92,7 @@ module Selenium
       it 'removes a request handler' do
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
-          id = network.add_request_handler
+          id = network.add_request_handler(&:continue)
           network.remove_handler(id)
           expect(network.callbacks.count).to be 0
         end
@@ -77,8 +101,7 @@ module Selenium
       it 'clears all request handlers' do
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
-          network.add_request_handler
-          network.add_request_handler
+          2.times { network.add_request_handler(&:continue) }
           network.clear_handlers
           expect(network.callbacks.count).to be 0
         end
@@ -87,7 +110,7 @@ module Selenium
       it 'adds a response handler' do
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
-          network.add_response_handler { |event| network.continue_with_response(request_id: network.fetch_id(event)) }
+          network.add_response_handler(&:continue)
           driver.navigate.to url_for('formPage.html')
           expect(driver.find_element(name: 'login')).to be_displayed
           expect(network.callbacks.count).to be 1
@@ -97,8 +120,9 @@ module Selenium
       it 'removes a response handler' do
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
-          id = network.add_response_handler
+          id = network.add_response_handler(&:continue)
           network.remove_handler(id)
+          network.clear_handlers
           expect(network.callbacks.count).to be 0
         end
       end
@@ -106,8 +130,7 @@ module Selenium
       it 'clears all response handlers' do
         reset_driver!(web_socket_url: true) do |driver|
           network = described_class.new(driver)
-          network.add_response_handler
-          network.add_response_handler
+          2.times { network.add_response_handler(&:continue) }
           network.clear_handlers
           expect(network.callbacks.count).to be 0
         end

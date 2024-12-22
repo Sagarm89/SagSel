@@ -91,7 +91,7 @@ module Selenium
         def continue_with_response(**args)
           @bidi.send_cmd(
             'network.continueResponse',
-            request: args[:request_id],
+            request: args[:response_id],
             'body' => args[:body],
             'cookies' => args[:cookies],
             'credentials' => args[:credentials],

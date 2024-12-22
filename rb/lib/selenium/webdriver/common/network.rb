@@ -44,37 +44,30 @@ module Selenium
         callbacks.each_key { |id| remove_handler(id) }
       end
 
-      def add_authentication_handler(username, password)
-        intercept = network.add_intercept(phases: [Selenium::WebDriver::BiDi::Network::PHASES[:auth_required]])
-        auth_id = network.on(:auth_required) do |event|
-          request_id = fetch_id(event)
-          network.continue_with_auth(request_id, username, password)
-        end
-
-        callbacks[auth_id] = intercept
-        auth_id
+      def add_authentication_handler(&)
+        add_handler(:auth_required, BiDi::Network::PHASES[:auth_required], BiDi::InterceptedAuth, &)
       end
 
       def add_request_handler(&)
-        intercept = network.add_intercept(phases: [BiDi::Network::PHASES[:before_request]])
-        request_id = network.on(:before_request, &)
-
-        callbacks[request_id] = intercept
-
-        request_id
+        add_handler(:before_request, BiDi::Network::PHASES[:before_request], BiDi::InterceptedRequest, &)
       end
 
       def add_response_handler(&)
-        intercept = network.add_intercept(phases: [BiDi::Network::PHASES[:response_started]])
-        response_id = network.on(:response_started, &)
-
-        callbacks[response_id] = intercept
-
-        response_id
+        add_handler(:response_started, BiDi::Network::PHASES[:response_started], BiDi::InterceptedResponse, &)
       end
 
-      def fetch_id(event)
-        event['request']['request']
+      private
+
+      def add_handler(event_type, phase, intercept_type, &block)
+        intercept = network.add_intercept(phases: [phase])
+        callback_id = network.on(event_type) do |event|
+          request = event['request']
+          intercepted_item = intercept_type.new(network, request)
+          block.call(intercepted_item)
+        end
+
+        callbacks[callback_id] = intercept
+        callback_id
       end
     end # Network
   end # WebDriver
