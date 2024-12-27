@@ -44,7 +44,7 @@ class Service(service.Service):
         driver_path_env_key: str = None,
         **kwargs,
     ) -> None:
-        self.service_args = service_args or []
+        self._service_args = service_args or []
         driver_path_env_key = driver_path_env_key or "SE_GECKODRIVER"
 
         super().__init__(
@@ -57,9 +57,19 @@ class Service(service.Service):
         )
 
         # Set a port for CDP
-        if "--connect-existing" not in self.service_args:
-            self.service_args.append("--websocket-port")
-            self.service_args.append(f"{utils.free_port()}")
+        if "--connect-existing" not in self._service_args:
+            self._service_args.append("--websocket-port")
+            self._service_args.append(f"{utils.free_port()}")
 
     def command_line_args(self) -> List[str]:
-        return ["--port", f"{self.port}"] + self.service_args
+        return ["--port", f"{self.port}"] + self._service_args
+
+    @property
+    def service_args(self) -> List[str]:
+        return self._service_args
+
+    @service_args.setter
+    def service_args(self, value: List[str]):
+        if not isinstance(value, List):
+            raise TypeError("service args must be a List of strings")
+        self._service_args = value

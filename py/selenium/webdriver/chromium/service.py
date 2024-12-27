@@ -14,6 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+
 from io import IOBase
 from typing import List
 from typing import Mapping
@@ -44,7 +45,7 @@ class ChromiumService(service.Service):
         driver_path_env_key: str = None,
         **kwargs,
     ) -> None:
-        self.service_args = service_args or []
+        self._service_args = service_args or []
         driver_path_env_key = driver_path_env_key or "SE_CHROMEDRIVER"
 
         if isinstance(log_output, str):
@@ -64,5 +65,15 @@ class ChromiumService(service.Service):
             **kwargs,
         )
 
+    @property
+    def service_args(self) -> List[str]:
+        return self._service_args
+
+    @service_args.setter
+    def service_args(self, value: List[str]):
+        if not isinstance(value, List):
+            raise TypeError("service args must be a List of strings")
+        self._service_args = value
+
     def command_line_args(self) -> List[str]:
-        return [f"--port={self.port}"] + self.service_args
+        return [f"--port={self.port}"] + self._service_args

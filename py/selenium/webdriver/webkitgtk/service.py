@@ -14,6 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+
 import warnings
 from typing import List
 from typing import Mapping
@@ -59,4 +60,14 @@ class Service(service.Service):
         )
 
     def command_line_args(self) -> List[str]:
-        return ["-p", f"{self.port}"] + self.service_args
+        return ["-p", f"{self.port}"] + self._service_args
+
+    @property
+    def service_args(self) -> List[str]:
+        return self._service_args
+
+    @service_args.setter
+    def service_args(self, value: List[str]):
+        if not isinstance(value, List):
+            raise TypeError("service args must be a List of strings")
+        self._service_args = value

@@ -44,15 +44,25 @@ class Service(service.ChromiumService):
         driver_path_env_key: str = None,
         **kwargs,
     ) -> None:
-        self.service_args = service_args or []
+        self._service_args = service_args or []
         driver_path_env_key = driver_path_env_key or "SE_EDGEDRIVER"
 
         super().__init__(
             executable_path=executable_path,
             port=port,
-            service_args=service_args,
+            service_args=self.service_args,
             log_output=log_output,
             env=env,
             driver_path_env_key=driver_path_env_key,
             **kwargs,
         )
+
+    @property
+    def service_args(self) -> List[str]:
+        return self._service_args
+
+    @service_args.setter
+    def service_args(self, value: List[str]):
+        if not isinstance(value, List):
+            raise TypeError("service args must be a List of strings")
+        self._service_args = value

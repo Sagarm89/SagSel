@@ -46,13 +46,14 @@ class Service(service.Service):
          - log_output: (Optional) int representation of STDOUT/DEVNULL, any IO instance or String path to file.
            Default is "stdout".
         """
-        self.service_args = service_args or []
+
+        self._service_args = service_args or []
         driver_path_env_key = driver_path_env_key or "SE_IEDRIVER"
 
         if host:
-            self.service_args.append(f"--host={host}")
+            self._service_args.append(f"--host={host}")
         if log_level:
-            self.service_args.append(f"--log-level={log_level}")
+            self._service_args.append(f"--log-level={log_level}")
 
         super().__init__(
             executable_path=executable_path,
@@ -63,4 +64,14 @@ class Service(service.Service):
         )
 
     def command_line_args(self) -> List[str]:
-        return [f"--port={self.port}"] + self.service_args
+        return [f"--port={self.port}"] + self._service_args
+
+    @property
+    def service_args(self) -> List[str]:
+        return self._service_args
+
+    @service_args.setter
+    def service_args(self, value: List[str]):
+        if not isinstance(value, List):
+            raise TypeError("service args must be a List of strings")
+        self._service_args = value
