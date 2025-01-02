@@ -21,16 +21,17 @@ const LoginState = {
 }
 
 class Account {
-
-  constructor(accountId,
-              email,
-              name,
-              givenName,
-              pictureUrl,
-              idpConfigUrl,
-              loginState,
-              termsOfServiceUrl,
-              privacyPolicyUrl ) {
+  constructor(
+    accountId,
+    email,
+    name,
+    givenName,
+    pictureUrl,
+    idpConfigUrl,
+    loginState,
+    termsOfServiceUrl,
+    privacyPolicyUrl,
+  ) {
     this._accountId = accountId
     this._email = email
     this._name = name

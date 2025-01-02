@@ -325,12 +325,12 @@ const W3C_COMMAND_MAP = new Map([
   [cmd.Name.CANCEL_DIALOG, post(`/session/:sessionId/fedcm/canceldialog`)],
   [cmd.Name.SELECT_ACCOUNT, post(`/session/:sessionId/fedcm/selectaccount`)],
   [cmd.Name.GET_FEDCM_TITLE, get(`/session/:sessionId/fedcm/gettitle`)],
-  [cmd.Name.GET_FEDCM_DIALOG_TYPE , get('/session/:sessionId/fedcm/getdialogtype')],
-  [cmd.Name.SET_DELAY_ENABLED,post(`/session/:sessionId/fedcm/setdelayenabled`)],
+  [cmd.Name.GET_FEDCM_DIALOG_TYPE, get('/session/:sessionId/fedcm/getdialogtype')],
+  [cmd.Name.SET_DELAY_ENABLED, post(`/session/:sessionId/fedcm/setdelayenabled`)],
   [cmd.Name.RESET_COOLDOWN, post(`/session/:sessionId/fedcm/resetcooldown`)],
   [cmd.Name.CLICK_DIALOG_BUTTON, post(`/session/:sessionId/fedcm/clickdialogbutton`)],
-    [cmd.Name.GET_ACCOUNTS, get(`/session/:sessionId/fedcm/accountlist`)]
-                                ])
+  [cmd.Name.GET_ACCOUNTS, get(`/session/:sessionId/fedcm/accountlist`)],
+])
 
 /**
  * Handles sending HTTP messages to a remote end.

@@ -23,44 +23,36 @@ const LoginState = {
 }
 
 class Dialog {
-
   constructor(driver) {
     this._driver = driver
   }
 
   async title() {
-    const result = await this._driver.execute(
-        new command.Command(command.Name.GET_FEDCM_TITLE))
+    const result = await this._driver.execute(new command.Command(command.Name.GET_FEDCM_TITLE))
 
     return result.title
   }
 
   subtitle() {
-    return this._driver.execute(
-        new command.Command(command.Name.GET_FEDCM_TITLE))
+    return this._driver.execute(new command.Command(command.Name.GET_FEDCM_TITLE))
   }
 
   type() {
-    return this._driver.execute(
-        new command.Command(command.Name.GET_FEDCM_DIALOG_TYPE))
+    return this._driver.execute(new command.Command(command.Name.GET_FEDCM_DIALOG_TYPE))
   }
 
   accounts() {
-
-    const result =  this._driver.execute(new command.Command(command.Name.GET_ACCOUNTS))
+    const result = this._driver.execute(new command.Command(command.Name.GET_ACCOUNTS))
 
     return result
   }
 
   selectAccount(index) {
-    return this._driver.execute(
-        new command.Command(command.Name.SELECT_ACCOUNT).setParameter(
-            'accountIndex', index))
+    return this._driver.execute(new command.Command(command.Name.SELECT_ACCOUNT).setParameter('accountIndex', index))
   }
 
   accept() {
-    return this._driver.execute(
-        new command.Command(command.Name.CLICK_DIALOG_BUTTON))
+    return this._driver.execute(new command.Command(command.Name.CLICK_DIALOG_BUTTON))
   }
 
   dismiss() {
@@ -69,5 +61,5 @@ class Dialog {
 }
 
 module.exports = {
-  Dialog
+  Dialog,
 }
