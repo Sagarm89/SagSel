@@ -60,6 +60,6 @@ module Selenium
           end
         end
       end
-    end
-  end
-end
+    end # BiDi
+  end # WebDriver
+end # Selenium
