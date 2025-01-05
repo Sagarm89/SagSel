@@ -55,12 +55,12 @@ module Selenium
         def continue_with_auth(request_id, username, password)
           @bidi.send_cmd(
             'network.continueWithAuth',
-            'request' => request_id,
-            'action' => 'provideCredentials',
-            'credentials' => {
-              'type' => 'password',
-              'username' => username,
-              'password' => password
+            request: request_id,
+            action: 'provideCredentials',
+            credentials: {
+              type: 'password',
+              username: username,
+              password: password
             }
           )
         end
@@ -68,16 +68,16 @@ module Selenium
         def continue_without_auth(request_id)
           @bidi.send_cmd(
             'network.continueWithAuth',
-            'request' => request_id,
-            'action' => 'default'
+            request: request_id,
+            action: 'default'
           )
         end
 
         def cancel_auth(request_id)
           @bidi.send_cmd(
             'network.continueWithAuth',
-            'request' => request_id,
-            'action' => 'cancel'
+            request: request_id,
+            action: 'cancel'
           )
         end
 
@@ -85,11 +85,11 @@ module Selenium
           @bidi.send_cmd(
             'network.continueRequest',
             request: args[:id],
-            'body' => args[:body],
-            'cookies' => args[:cookies],
-            'headers' => args[:headers],
-            'method' => args[:method],
-            'url' => args[:url]
+            body: args[:body],
+            cookies: args[:cookies],
+            headers: args[:headers],
+            method: args[:method],
+            url: args[:url]
           )
         end
 
@@ -104,11 +104,11 @@ module Selenium
           @bidi.send_cmd(
             'network.continueResponse',
             request: args[:id],
-            'cookies' => args[:cookies],
-            'credentials' => args[:credentials],
-            'headers' => args[:headers],
-            'reasonPhrase' => args[:reason],
-            'statusCode' => args[:status]
+            cookies: args[:cookies],
+            credentials: args[:credentials],
+            headers: args[:headers],
+            reasonPhrase: args[:reason],
+            statusCode: args[:status]
           )
         end
 

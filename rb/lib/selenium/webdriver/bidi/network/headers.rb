@@ -23,16 +23,16 @@ module Selenium
       module Headers
         def add_header(name, value)
           headers.push(
-            'name' => name,
-            'value' => {
-              'type' => 'string',
-              'value' => value
+            name: name,
+            value: {
+              type: 'string',
+              value: value
             }
           )
         end
 
         def remove_header(name)
-          headers.delete_if { |header| header['name'] == name }
+          headers.delete_if { |header| header[:name] == name }
         end
       end
     end # BiDi

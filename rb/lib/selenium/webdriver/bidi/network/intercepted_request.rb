@@ -49,8 +49,8 @@ module Selenium
 
         def body=(value)
           @body = {
-            'type' => 'string',
-            'value' => value.to_json
+            type: 'string',
+            value: value.to_json
           }
         end
       end

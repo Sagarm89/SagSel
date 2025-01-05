@@ -2,9 +2,9 @@ module Selenium
   module WebDriver
     class BiDi
       module Headers
-        def add_header: (untyped name, untyped value) -> untyped
+        def add_header: (String name, String value) -> Array[Hash[Symbol, String]]
 
-        def remove_header: (untyped name) -> untyped
+        def remove_header: (String name) -> Array[Hash[Symbol, String]]
       end
     end
   end

@@ -44,9 +44,9 @@ module Selenium
 
         def add_credentials(username, password)
           @credentials = {
-            'type' => 'password',
-            'username' => username,
-            'password' => password
+            type: 'password',
+            username: username,
+            password: password
           }
         end
       end
