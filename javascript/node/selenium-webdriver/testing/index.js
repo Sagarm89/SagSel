@@ -312,7 +312,6 @@ class Environment {
       options.setChromeBinaryPath(binary)
       options.setAcceptInsecureCerts(true)
       options.addArguments('disable-infobars', 'disable-breakpad', 'disable-dev-shm-usage', 'no-sandbox')
-      options.set('fedcm:accounts', true)
       builder.setChromeOptions(options)
     }
     // Edge
