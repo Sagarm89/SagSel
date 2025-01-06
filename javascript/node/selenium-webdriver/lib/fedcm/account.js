@@ -15,11 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-const LoginState = {
-  SIGN_IN: 'SignIn',
-  SIGN_UP: 'SignUp',
-}
-
 class Account {
   constructor(
     accountId,
@@ -79,3 +74,5 @@ class Account {
     return this._privacyPolicyUrl
   }
 }
+
+module.exports = Account

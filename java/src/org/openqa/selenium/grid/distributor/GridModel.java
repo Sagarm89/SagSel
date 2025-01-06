@@ -22,7 +22,6 @@ import static org.openqa.selenium.grid.data.Availability.DRAINING;
 import static org.openqa.selenium.grid.data.Availability.UP;
 
 import com.google.common.collect.ImmutableSet;
-
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;

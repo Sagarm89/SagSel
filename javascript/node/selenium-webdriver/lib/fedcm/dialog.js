@@ -16,6 +16,7 @@
 // under the License.
 
 const command = require('../command')
+const Account = require('./account')
 
 class Dialog {
   constructor(driver) {
@@ -36,10 +37,27 @@ class Dialog {
     return this._driver.execute(new command.Command(command.Name.GET_FEDCM_DIALOG_TYPE))
   }
 
-  accounts() {
-    const result = this._driver.execute(new command.Command(command.Name.GET_ACCOUNTS))
+  async accounts() {
+    const result = await this._driver.execute(new command.Command(command.Name.GET_ACCOUNTS))
 
-    return result
+    const accountArray = []
+
+    result.forEach((account) => {
+      const acc = new Account(
+        account.accountId,
+        account.email,
+        account.name,
+        account.givenName,
+        account.pictureUrl,
+        account.idpConfigUrl,
+        account.loginState,
+        account.termsOfServiceUrl,
+        account.privacyPolicyUrl,
+      )
+      accountArray.push(acc)
+    })
+
+    return accountArray
   }
 
   selectAccount(index) {
