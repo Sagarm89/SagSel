@@ -8,7 +8,7 @@ debugpy==1.8.11
 filetype==1.2.0
 h11==0.14.0
 idna==3.10
-importlib-metadata==6.8.0
+importlib-metadata==6.11.0
 inflection==0.5.1
 iniconfig==2.0.0
 more-itertools==10.1.0
