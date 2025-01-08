@@ -144,7 +144,7 @@ def url_changes(url: str) -> Callable[[WebDriver], bool]:
 
 
 def visibility_of_element_located(
-    locator: LocatorType
+    locator: LocatorType,
 ) -> Callable[[WebDriverOrWebElement], Union[Literal[False], WebElement]]:
     """An expectation for checking that an element is present on the DOM of a
     page and visible. Visibility means that the element is not only displayed
@@ -211,7 +211,7 @@ def visibility_of_any_elements_located(locator: LocatorType) -> Callable[[WebDri
 
 
 def visibility_of_all_elements_located(
-    locator: LocatorType
+    locator: LocatorType,
 ) -> Callable[[WebDriverOrWebElement], Union[List[WebElement], Literal[False]]]:
     """An expectation for checking that all elements are present on the DOM of
     a page and visible. Visibility means that the elements are not only
@@ -251,9 +251,7 @@ def text_to_be_present_in_element(locator: LocatorType, text_: str) -> Callable[
     return _predicate
 
 
-def text_to_be_present_in_element_value(
-    locator: LocatorType, text_: str
-) -> Callable[[WebDriverOrWebElement], bool]:
+def text_to_be_present_in_element_value(locator: LocatorType, text_: str) -> Callable[[WebDriverOrWebElement], bool]:
     """An expectation for checking if the given text is present in the
     element's value.
 
