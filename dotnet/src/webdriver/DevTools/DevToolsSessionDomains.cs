@@ -17,11 +17,8 @@
 // under the License.
 // </copyright>
 
-using System;
 using System.ComponentModel;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 #nullable enable
 
@@ -39,7 +36,7 @@ namespace OpenQA.Selenium.DevTools
         {
             Converters =
             {
-                new InvalidUtf16Converter(),
+                new Json.StringConverter(),
             }
         };
 
@@ -60,29 +57,5 @@ namespace OpenQA.Selenium.DevTools
         /// Populates the command response type map.
         /// </summary>
         protected abstract void PopulateCommandResponseTypeMap();
-
-        private sealed class InvalidUtf16Converter : JsonConverter<string>
-        {
-            public override bool HandleNull => true;
-
-            public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            {
-                try
-                {
-                    return reader.GetString();
-                }
-                catch (InvalidOperationException)
-                {
-                    var bytes = reader.ValueSpan;
-                    var sb = new StringBuilder(bytes.Length);
-                    foreach (byte b in bytes)
-                        sb.Append(Convert.ToChar(b));
-                    return sb.ToString();
-                }
-            }
-
-            public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options) =>
-                writer.WriteStringValue(value);
-        }
     }
 }
