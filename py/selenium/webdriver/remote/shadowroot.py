@@ -16,9 +16,15 @@
 # under the License.
 
 from hashlib import md5 as md5_hash
+from typing import List
+from typing import Optional
+from typing import Union
 
-from ..common.by import By
 from .command import Command
+from .webelement import WebElement
+from ..common.by import By
+from ..common.by import ByType
+from ..support.relative_locator import RelativeBy
 
 
 class ShadowRoot:
@@ -39,7 +45,8 @@ class ShadowRoot:
             type(self), self.session.session_id, self._id
         )
 
-    def find_element(self, by: str = By.ID, value: str = None):
+    def find_element(self, by: Union[ByType, RelativeBy] = By.ID,
+                     value: Optional[str] = None) -> WebElement:
         """Find an element inside a shadow root given a By strategy and
         locator.
 
@@ -76,9 +83,11 @@ class ShadowRoot:
             by = By.CSS_SELECTOR
             value = f'[name="{value}"]'
 
-        return self._execute(Command.FIND_ELEMENT_FROM_SHADOW_ROOT, {"using": by, "value": value})["value"]
+        return self._execute(Command.FIND_ELEMENT_FROM_SHADOW_ROOT, {"using": by, "value": value})[
+            "value"]
 
-    def find_elements(self, by: str = By.ID, value: str = None):
+    def find_elements(self, by: Union[ByType, RelativeBy] = By.ID, value: Optional[str] = None) -> \
+    List[WebElement]:
         """Find elements inside a shadow root given a By strategy and locator.
 
         Parameters:
@@ -114,7 +123,8 @@ class ShadowRoot:
             by = By.CSS_SELECTOR
             value = f'[name="{value}"]'
 
-        return self._execute(Command.FIND_ELEMENTS_FROM_SHADOW_ROOT, {"using": by, "value": value})["value"]
+        return self._execute(Command.FIND_ELEMENTS_FROM_SHADOW_ROOT, {"using": by, "value": value})[
+            "value"]
 
     # Private Methods
     def _execute(self, command, params=None):

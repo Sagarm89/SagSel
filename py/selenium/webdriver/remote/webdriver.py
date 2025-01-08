@@ -43,6 +43,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.bidi.script import Script
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.by import ByType
 from selenium.webdriver.common.options import ArgOptions
 from selenium.webdriver.common.options import BaseOptions
 from selenium.webdriver.common.print_page_options import PrintOptions
@@ -769,7 +770,7 @@ class WebDriver(BaseWebDriver):
         """
         _ = self.execute(Command.SET_TIMEOUTS, timeouts._to_json())["value"]
 
-    def find_element(self, by=By.ID, value: Optional[str] = None) -> WebElement:
+    def find_element(self, by: Union[ByType, RelativeBy] = By.ID, value: Optional[str] = None) -> WebElement:
         """Find an element given a By strategy and locator.
 
         Parameters:
@@ -805,7 +806,7 @@ class WebDriver(BaseWebDriver):
 
         return self.execute(Command.FIND_ELEMENT, {"using": by, "value": value})["value"]
 
-    def find_elements(self, by=By.ID, value: Optional[str] = None) -> List[WebElement]:
+    def find_elements(self, by: Union[ByType, RelativeBy] = By.ID, value: Optional[str] = None) -> List[WebElement]:
         """Find elements given a By strategy and locator.
 
         Parameters:
