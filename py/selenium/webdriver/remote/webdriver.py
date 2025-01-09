@@ -819,7 +819,7 @@ class WebDriver(BaseWebDriver):
 
         Returns:
         --------
-         - Timeouts: A named tuple with the following fields:
+        Timeouts: A named tuple with the following fields:
             - implicit_wait: The time to wait for elements to be found.
             - page_load: The time to wait for a page to load.
             - script: The time to wait for scripts to execute.
@@ -1436,6 +1436,8 @@ class WebDriver(BaseWebDriver):
     @property
     def fedcm(self) -> FedCM:
         """
+        Returns the Federated Credential Management (FedCM) dialog object for interaction.
+        
         Returns:
         -------
         FedCM: an object providing access to all Federated Credential Management (FedCM) dialog commands.
