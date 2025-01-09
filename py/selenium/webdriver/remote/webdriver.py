@@ -714,10 +714,9 @@ class WebDriver(BaseWebDriver):
         """Get a single cookie by name. Returns the cookie if found, None if
         not.
 
-        :Usage:
-            ::
-
-                driver.get_cookie('my_cookie')
+        Example:
+        --------
+        >>> cookie = driver.get_cookie('my_cookie')
         """
         with contextlib.suppress(NoSuchCookieException):
             return self.execute(Command.GET_COOKIE, {"name": name})["value"]
@@ -775,7 +774,7 @@ class WebDriver(BaseWebDriver):
         time_to_wait : float
             - Amount of time to wait (in seconds)
 
-       Example:
+        Example:
         --------
         >>> driver.implicitly_wait(30)
         """
@@ -1104,9 +1103,9 @@ class WebDriver(BaseWebDriver):
         """Set the file detector to be used when sending keyboard input. By
         default, this is set to a file detector that does nothing.
 
-        see FileDetector
-        see LocalFileDetector
-        see UselessFileDetector
+        - see FileDetector
+        - see LocalFileDetector
+        - see UselessFileDetector
 
         Parameters:
         ----------
@@ -1279,12 +1278,24 @@ class WebDriver(BaseWebDriver):
 
     # Virtual Authenticator Methods
     def add_virtual_authenticator(self, options: VirtualAuthenticatorOptions) -> None:
-        """Adds a virtual authenticator with the given options."""
+        """Adds a virtual authenticator with the given options.
+        
+        Example:
+        --------
+        >>> from selenium.webdriver.common.virtual_authenticator import VirtualAuthenticatorOptions
+        >>> options = VirtualAuthenticatorOptions(protocol="u2f", transport="usb", device_id="myDevice123")
+        >>> driver.add_virtual_authenticator(options)
+        """
         self._authenticator_id = self.execute(Command.ADD_VIRTUAL_AUTHENTICATOR, options.to_dict())["value"]
 
     @property
     def virtual_authenticator_id(self) -> str:
-        """Returns the id of the virtual authenticator."""
+        """Returns the id of the virtual authenticator.
+        
+        Example:
+        --------
+        >>> print(driver.virtual_authenticator_id)
+        """
         return self._authenticator_id
 
     @required_virtual_authenticator
@@ -1293,24 +1304,46 @@ class WebDriver(BaseWebDriver):
 
         The authenticator is no longer valid after removal, so no
         methods may be called.
+
+        Example:
+        --------
+        >>> driver.remove_virtual_authenticator()
         """
         self.execute(Command.REMOVE_VIRTUAL_AUTHENTICATOR, {"authenticatorId": self._authenticator_id})
         self._authenticator_id = None
 
     @required_virtual_authenticator
     def add_credential(self, credential: Credential) -> None:
-        """Injects a credential into the authenticator."""
+        """Injects a credential into the authenticator.
+        
+        Example:
+        --------
+        >>> from selenium.webdriver.common.credential import Credential
+        >>> credential = Credential(id="user@example.com", password="aPassword")
+        >>> driver.add_credential(credential)
+        """
         self.execute(Command.ADD_CREDENTIAL, {**credential.to_dict(), "authenticatorId": self._authenticator_id})
 
     @required_virtual_authenticator
     def get_credentials(self) -> List[Credential]:
-        """Returns the list of credentials owned by the authenticator."""
+        """Returns the list of credentials owned by the authenticator.
+        
+        Example:
+        --------
+        >>> credentials = driver.get_credentials()
+        """
         credential_data = self.execute(Command.GET_CREDENTIALS, {"authenticatorId": self._authenticator_id})
         return [Credential.from_dict(credential) for credential in credential_data["value"]]
 
     @required_virtual_authenticator
     def remove_credential(self, credential_id: Union[str, bytearray]) -> None:
-        """Removes a credential from the authenticator."""
+        """Removes a credential from the authenticator.
+        
+        Example:
+        --------
+        >>> credential_id = "user@example.com"
+        >>> driver.remove_credential(credential_id)
+        """
         # Check if the credential is bytearray converted to b64 string
         if isinstance(credential_id, bytearray):
             credential_id = urlsafe_b64encode(credential_id).decode()
@@ -1321,7 +1354,12 @@ class WebDriver(BaseWebDriver):
 
     @required_virtual_authenticator
     def remove_all_credentials(self) -> None:
-        """Removes all credentials from the authenticator."""
+        """Removes all credentials from the authenticator.
+        
+        Example:
+        --------
+        >>> driver.remove_all_credentials()
+        """
         self.execute(Command.REMOVE_ALL_CREDENTIALS, {"authenticatorId": self._authenticator_id})
 
     @required_virtual_authenticator
@@ -1329,13 +1367,24 @@ class WebDriver(BaseWebDriver):
         """Sets whether the authenticator will simulate success or fail on user
         verification.
 
+        Parameters:
+        ----------
         verified: True if the authenticator will pass user verification, False otherwise.
+
+        Example:
+        --------
+        >>> driver.set_user_verified(True)
         """
         self.execute(Command.SET_USER_VERIFIED, {"authenticatorId": self._authenticator_id, "isUserVerified": verified})
 
     def get_downloadable_files(self) -> dict:
         """Retrieves the downloadable files as a map of file names and their
-        corresponding URLs."""
+        corresponding URLs.
+        
+        Example:
+        --------
+        >>> files = driver.get_downloadable_files()
+        """
         if "se:downloadsEnabled" not in self.capabilities:
             raise WebDriverException("You must enable downloads in order to work with downloadable files.")
 
@@ -1345,8 +1394,16 @@ class WebDriver(BaseWebDriver):
         """Downloads a file with the specified file name to the target
         directory.
 
-        file_name: The name of the file to download.
-        target_directory: The path to the directory to save the downloaded file.
+        Parameters:
+        ----------
+        file_name : str
+            - The name of the file to download.
+        target_directory : str
+            - The path to the directory to save the downloaded file.
+
+        Example:
+        --------
+        >>> driver.download_file("example.zip", "/path/to/directory")
         """
         if "se:downloadsEnabled" not in self.capabilities:
             raise WebDriverException("You must enable downloads in order to work with downloadable files.")
@@ -1365,7 +1422,12 @@ class WebDriver(BaseWebDriver):
                 zip_ref.extractall(target_directory)
 
     def delete_downloadable_files(self) -> None:
-        """Deletes all downloadable files."""
+        """Deletes all downloadable files.
+        
+        Example:
+        --------
+        >>> driver.delete_downloadable_files()
+        """
         if "se:downloadsEnabled" not in self.capabilities:
             raise WebDriverException("You must enable downloads in order to work with downloadable files.")
 
@@ -1395,7 +1457,12 @@ class WebDriver(BaseWebDriver):
 
     @property
     def supports_fedcm(self) -> bool:
-        """Returns whether the browser supports FedCM capabilities."""
+        """Returns whether the browser supports FedCM capabilities.
+        
+        Example:
+        --------
+        >>> print(driver.supports_fedcm)
+        """
         return self.capabilities.get(ArgOptions.FEDCM_CAPABILITY, False)
 
     def _require_fedcm_support(self):
@@ -1408,14 +1475,19 @@ class WebDriver(BaseWebDriver):
 
     @property
     def dialog(self):
-        """Returns the FedCM dialog object for interaction."""
+        """Returns the FedCM dialog object for interaction.
+        
+        Example:
+        --------
+        >>> dialog = driver.dialog
+        """
         self._require_fedcm_support()
         return Dialog(self)
 
     def fedcm_dialog(self, timeout=5, poll_frequency=0.5, ignored_exceptions=None):
         """Waits for and returns the FedCM dialog.
 
-       Parameters:
+        Parameters:
         ----------
         timeout : int
             - How long to wait for the dialog
