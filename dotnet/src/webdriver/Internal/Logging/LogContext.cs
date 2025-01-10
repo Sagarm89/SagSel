@@ -31,7 +31,7 @@ namespace OpenQA.Selenium.Internal.Logging
     /// Represents a logging context that provides methods for creating sub-contexts, retrieving loggers, emitting log messages, and configuring minimum log levels.
     /// </summary>
     /// <inheritdoc cref="ILogContext"/>
-    internal class LogContext : ILogContext
+    internal sealed class LogContext : ILogContext
     {
         private ConcurrentDictionary<Type, ILogger>? _loggers;
 
@@ -66,12 +66,7 @@ namespace OpenQA.Selenium.Internal.Logging
 
         public ILogContext CreateContext(LogEventLevel minimumLevel)
         {
-            ConcurrentDictionary<Type, ILogger>? loggers = null;
-
-            if (_loggers != null)
-            {
-                loggers = new ConcurrentDictionary<Type, ILogger>(_loggers.Select(l => new KeyValuePair<Type, ILogger>(l.Key, new Logger(l.Value.Issuer, minimumLevel))));
-            }
+            ConcurrentDictionary<Type, ILogger>? loggers = CloneLoggers(_loggers, minimumLevel);
 
             var context = new LogContext(minimumLevel, this, loggers, Handlers);
 
