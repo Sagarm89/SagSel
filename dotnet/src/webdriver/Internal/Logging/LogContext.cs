@@ -46,7 +46,10 @@ namespace OpenQA.Selenium.Internal.Logging
 
             _parentLogContext = parentLogContext;
 
-            _loggers = loggers;
+            if (loggers is not null)
+            {
+                _loggers = new ConcurrentDictionary<Type, ILogger>(loggers.Select(l => new KeyValuePair<Type, ILogger>(l.Key, new Logger(l.Value.Issuer, level))));
+            }
 
             if (handlers is not null)
             {
