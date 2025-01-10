@@ -96,17 +96,12 @@ namespace OpenQA.Selenium.Environment
 
         public IWebDriver CreateDriverWithOptions(DriverService service, Type driverType, DriverOptions driverOptions)
         {
-            Console.WriteLine($"Creating new driver of {driverType} type...");
-
-            Browser browser = Browser.All;
-            
             DriverOptions options = null;
 
             List<Type> constructorArgTypeList = new List<Type>();
             IWebDriver driver = null;
             if (typeof(ChromeDriver).IsAssignableFrom(driverType))
             {
-                browser = Browser.Chrome;
                 options = GetDriverOptions<ChromeOptions>(driverType, driverOptions);
 
                 var chromeOptions = (ChromeOptions)options;
@@ -119,7 +114,6 @@ namespace OpenQA.Selenium.Environment
             }
             else if (typeof(EdgeDriver).IsAssignableFrom(driverType))
             {
-                browser = Browser.Edge;
                 options = GetDriverOptions<EdgeOptions>(driverType, driverOptions);
 
                 var edgeOptions = (EdgeOptions)options;
@@ -132,12 +126,10 @@ namespace OpenQA.Selenium.Environment
             }
             else if (typeof(InternetExplorerDriver).IsAssignableFrom(driverType))
             {
-                browser = Browser.IE;
                 options = GetDriverOptions<InternetExplorerOptions>(driverType, driverOptions);
             }
             else if (typeof(FirefoxDriver).IsAssignableFrom(driverType))
             {
-                browser = Browser.Firefox;
                 options = GetDriverOptions<FirefoxOptions>(driverType, driverOptions);
                 if (!string.IsNullOrEmpty(this.browserBinaryLocation))
                 {
@@ -146,7 +138,6 @@ namespace OpenQA.Selenium.Environment
             }
             else if (typeof(SafariDriver).IsAssignableFrom(driverType))
             {
-                browser = Browser.Safari;
                 options = GetDriverOptions<SafariOptions>(driverType, driverOptions);
             }
 
