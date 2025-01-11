@@ -339,7 +339,7 @@ ruby.bundle_fetch(
         "webmock-3.24.0": "be01357f6fc773606337ca79f3ba332b7d52cbe5c27587671abc0572dbec7122",
         "webrick-1.9.0": "9ee50c57006489960b2a07544f68de6f23dfbee30e7b424167b5c14b72ace964",
         "websocket-1.2.11": "b7e7a74e2410b5e85c25858b26b3322f29161e300935f70a0e0d3c35e0462737",
-        "yard-0.9.37": "a6e910399e78e613f80ba9add9ba7c394b1a935f083cccbef82903a3d2a26992"
+        "yard-0.9.37": "a6e910399e78e613f80ba9add9ba7c394b1a935f083cccbef82903a3d2a26992",
     },
     gemfile = "//:rb/Gemfile",
     gemfile_lock = "//:rb/Gemfile.lock",
