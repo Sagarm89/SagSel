@@ -491,11 +491,24 @@ namespace OpenQA.Selenium.Firefox
 
                 if (this.SessionId is not null)
                 {
-                    this.Execute(DriverCommand.Quit, null);
-
-                    this.SessionId = null;
+                    try
+                    {
+                        this.Execute(DriverCommand.Quit, null);
+                    }
+                    catch (NotImplementedException)
+                    {
+                    }
+                    catch (InvalidOperationException)
+                    {
+                    }
+                    catch (WebDriverException)
+                    {
+                    }
+                    finally
+                    {
+                        this.SessionId = null;
+                    }
                 }
-
 
                 if (this.disposeDriverService)
                 {

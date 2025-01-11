@@ -14,7 +14,9 @@ namespace OpenQA.Selenium
         {
             using (var driver = new ChromeDriver())
             {
-
+                driver.Close();
+                driver.Quit();
+                driver.Dispose();
             }
 
             Assert.That(Process.GetProcessesByName("chromedriver"), Is.Empty);
@@ -55,7 +57,9 @@ namespace OpenQA.Selenium
         {
             using (var driver = new FirefoxDriver())
             {
-
+                driver.Close();
+                driver.Quit();
+                driver.Dispose();
             }
 
             Assert.That(Process.GetProcessesByName("geckodriver"), Is.Empty);
