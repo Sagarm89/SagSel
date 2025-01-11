@@ -61,8 +61,8 @@ module Selenium
           @headers ||= Headers.new
         end
 
-        def cookies
-          @cookies ||= Cookies.new
+        def cookies(cookies = {})
+          @cookies ||= Cookies.new(cookies)
         end
       end
     end # BiDi

@@ -8,10 +8,6 @@ module Selenium
 
         def all: () -> untyped
 
-        def add_header: (untyped name, untyped value) -> untyped
-
-        def remove_header: (untyped name) -> untyped
-
         def []=: (untyped key, untyped value) -> untyped
 
         def []: (untyped key) -> untyped

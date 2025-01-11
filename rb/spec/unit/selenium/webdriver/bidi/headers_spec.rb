@@ -34,33 +34,33 @@ module Selenium
 
         describe '#all' do
           it 'returns the underlying headers hash' do
-            headers.add_header('Authorization', 'Bearer abc123')
+            headers['Authorization'] = 'Bearer abc123'
             expect(headers.all).to eq({'Authorization' => 'Bearer abc123'})
           end
         end
 
         describe '#add_header' do
           it 'adds a header to the internal store' do
-            headers.add_header('Content-Type', 'application/json')
+            headers['Content-Type'] = 'application/json'
             expect(headers['Content-Type']).to eq('application/json')
           end
 
           it 'updates an existing header if the name already exists' do
-            headers.add_header('Content-Type', 'text/html')
-            headers.add_header('Content-Type', 'application/json')
+            headers['Content-Type'] = 'text/html'
+            headers['Content-Type'] = 'application/json'
             expect(headers['Content-Type']).to eq('application/json')
           end
         end
 
         describe '#remove_header' do
           it 'removes a header by name' do
-            headers.add_header('X-Custom-Header', 'foo')
-            headers.remove_header('X-Custom-Header')
+            headers['X-Custom-Header'] = 'foo'
+            headers.delete('X-Custom-Header')
             expect(headers['X-Custom-Header']).to be_nil
           end
 
           it 'does not raise an error if header does not exist' do
-            expect { headers.remove_header('Non-Existent') }.not_to raise_error
+            expect { headers.delete('Non-Existent') }.not_to raise_error
           end
         end
 
@@ -96,7 +96,7 @@ module Selenium
         describe '#serialize' do
           it 'returns an array of header hashes in the correct format' do
             headers['Accept'] = 'application/json'
-            headers.add_header('User-Agent', 'MyAgent/1.0')
+            headers['User-Agent'] = 'MyAgent/1.0'
 
             serialized = headers.serialize
             expect(serialized).to be_an(Array)

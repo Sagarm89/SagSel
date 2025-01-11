@@ -1,12 +1,14 @@
 module Selenium
   module WebDriver
     class BiDi
-      class Cookies
-        @cookies: untyped
+      class SetCookieHeaders
+        @set_cookie_headers: untyped
 
-        def initialize: (untyped cookies) -> void
+        def initialize: (untyped set_cookie_headers) -> void
 
         def all: () -> untyped
+
+        def set_cookie_header: (**untyped args) -> untyped
 
         def []=: (untyped key, untyped value) -> untyped
 
@@ -14,7 +16,7 @@ module Selenium
 
         def delete: (untyped key) -> untyped
 
-        def serialize: () -> untyped
+        def serialize: () -> (::Array[untyped] | untyped)
       end
     end
   end

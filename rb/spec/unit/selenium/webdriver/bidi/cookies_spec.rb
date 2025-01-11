@@ -27,40 +27,46 @@ module Selenium
         let(:cookies) { described_class.new }
 
         describe '#initialize' do
-          it 'initializes an empty cookies hash' do
+          it 'initializes with an empty hash by default' do
             expect(cookies.all).to eq({})
+          end
+
+          it 'stores the passed cookie hash internally' do
+            my_hash = {'foo' => {value: 'bar'}}
+            cookie_headers = described_class.new(my_hash)
+            expect(cookie_headers.all).to eq(my_hash)
           end
         end
 
         describe '#all' do
           it 'returns the underlying cookies hash' do
-            cookies.add_cookie('session_id', 'abc123')
+            cookies['session_id'] = 'abc123'
             expect(cookies.all).to eq({'session_id' => 'abc123'})
           end
         end
 
         describe '#add_cookie' do
           it 'adds a cookie to the internal store' do
-            cookies.add_cookie('foo', 'bar')
+            cookies['foo'] = 'bar'
             expect(cookies['foo']).to eq('bar')
           end
 
           it 'updates an existing cookie if the name already exists' do
-            cookies.add_cookie('foo', 'bar')
-            cookies.add_cookie('foo', 'baz')
+            cookies['foo'] = 'bar'
+            cookies['foo'] = 'baz'
             expect(cookies['foo']).to eq('baz')
           end
         end
 
         describe '#remove_cookie' do
           it 'removes a cookie by name' do
-            cookies.add_cookie('foo', 'bar')
-            cookies.remove_cookie('foo')
+            cookies['foo'] = 'bar'
+            cookies.delete('foo')
             expect(cookies['foo']).to be_nil
           end
 
           it 'does not raise an error if cookie does not exist' do
-            expect { cookies.remove_cookie('non_existent') }.not_to raise_error
+            expect { cookies.delete('non_existent') }.not_to raise_error
           end
         end
 
@@ -93,7 +99,7 @@ module Selenium
         describe '#serialize' do
           it 'returns an array of cookie hashes in the minimal format' do
             cookies['key4'] = 'value4'
-            cookies.add_cookie('session_id', 'xyz123')
+            cookies['session_id'] = 'xyz123'
 
             serialized = cookies.serialize
             expect(serialized).to be_an(Array)

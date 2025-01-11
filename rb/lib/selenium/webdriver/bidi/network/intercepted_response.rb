@@ -50,7 +50,7 @@ module Selenium
           @headers ||= Headers.new
         end
 
-        def set_cookie_headers(set_cookie_headers = nil)
+        def set_cookie_headers(set_cookie_headers = {})
           @set_cookie_headers ||= SetCookieHeaders.new(set_cookie_headers)
         end
       end

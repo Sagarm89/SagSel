@@ -21,24 +21,16 @@ module Selenium
   module WebDriver
     class BiDi
       class Cookies
-        def initialize
-          @cookies = {}
+        def initialize(cookies = {})
+          @cookies = cookies
         end
 
         def all
           @cookies
         end
 
-        def add_cookie(name, value)
-          @cookies[name] = value
-        end
-
-        def remove_cookie(name)
-          @cookies.delete(name)
-        end
-
         def []=(key, value)
-          add_cookie(key, value)
+          @cookies[key] = value
         end
 
         def [](key)
@@ -46,10 +38,12 @@ module Selenium
         end
 
         def delete(key)
-          remove_cookie(key)
+          @cookies.delete(key)
         end
 
         def serialize
+          return [] unless @cookies
+
           @cookies.map do |name, value|
             {
               name: name.to_s,
@@ -61,6 +55,8 @@ module Selenium
           end
         end
       end
-    end # BiDi
+    end
+
+    # BiDi
   end # WebDriver
 end # Selenium

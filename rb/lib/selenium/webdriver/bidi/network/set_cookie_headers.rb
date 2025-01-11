@@ -21,7 +21,7 @@ module Selenium
   module WebDriver
     class BiDi
       class SetCookieHeaders
-        def initialize(set_cookie_headers)
+        def initialize(set_cookie_headers = {})
           @set_cookie_headers = set_cookie_headers
         end
 
@@ -29,33 +29,8 @@ module Selenium
           @set_cookie_headers
         end
 
-        def add_set_cookie_header(name, value)
-          @set_cookie_headers[name] = {value: value}
-        end
-
-        def remove_set_cookie_header(name)
-          @set_cookie_headers.delete(name)
-        end
-
-        def set_cookie_header(**args)
-          set_cookie_header = args[:name]
-
-          set_cookie_header_data = {
-            value: 'input',
-            domain: args[:domain],
-            httpOnly: args[:http_only],
-            expiry: args[:expiry],
-            maxAge: args[:max_age],
-            path: args[:path],
-            sameSite: args[:same_site],
-            secure: args[:secure]
-          }
-
-          @set_cookie_headers[set_cookie_header] = set_cookie_header_data
-        end
-
         def []=(key, value)
-          add_set_cookie_header(key, value)
+          @set_cookie_headers[key] = {value: value}
         end
 
         def [](key)
@@ -63,7 +38,7 @@ module Selenium
         end
 
         def delete(key)
-          remove_set_cookie_header(key)
+          @set_cookie_headers.delete(key)
         end
 
         def serialize

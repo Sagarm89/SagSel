@@ -29,16 +29,8 @@ module Selenium
           @headers
         end
 
-        def add_header(name, value)
-          @headers[name] = value
-        end
-
-        def remove_header(name)
-          @headers.delete(name)
-        end
-
         def []=(key, value)
-          add_header(key, value)
+          @headers[key] = value
         end
 
         def [](key)
@@ -46,7 +38,7 @@ module Selenium
         end
 
         def delete(key)
-          remove_header(key)
+          @headers.delete(key)
         end
 
         def serialize
