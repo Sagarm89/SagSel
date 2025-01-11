@@ -471,6 +471,13 @@ namespace OpenQA.Selenium.Chromium
                     this.devToolsSession = null;
                 }
 
+                if (this.SessionId is not null)
+                {
+                    this.Execute(DriverCommand.Quit, null);
+
+                    this.SessionId = null;
+                }
+
                 if (this.disposeDriverService)
                 {
                     this.driverService.Dispose();
