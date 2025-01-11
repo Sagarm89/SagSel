@@ -2,7 +2,6 @@ module Selenium
   module WebDriver
     class BiDi
       class InterceptedRequest < InterceptedItem
-        # We now rely on the modules above to initialize @headers and @cookies as Hashes
         @method: untyped
 
         @url: untyped
