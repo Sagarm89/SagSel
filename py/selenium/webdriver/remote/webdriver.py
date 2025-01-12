@@ -385,18 +385,18 @@ class WebDriver(BaseWebDriver):
         cmd : str,
             - Command name
         cmd_args : dict
-            - Command args 
+            - Command args
             - Empty dict {} if there is no command args
 
         Returns:
         --------
             A dict, empty dict {} if there is no result to return.
                 - To getResponseBody: {'base64Encoded': False, 'body': 'response body string'}
-        
+
         Example:
         --------
         >>> driver.execute_cdp_cmd('Network.getResponseBody', {'requestId': requestId})
-        
+
         """
         return self.execute("executeCdpCommand", {"cmd": cmd, "params": cmd_args})["value"]
 
@@ -799,14 +799,14 @@ class WebDriver(BaseWebDriver):
         """Set the amount of time to wait for a page load to complete before
         throwing an error.
 
-       Parameters:
-        ---------
-        time_to_wait : float
-            - The amount of time to wait (in seconds)
+        Parameters:
+         ---------
+         time_to_wait : float
+             - The amount of time to wait (in seconds)
 
-        Example:
-        --------
-        >>> driver.set_page_load_timeout(30)
+         Example:
+         --------
+         >>> driver.set_page_load_timeout(30)
         """
         try:
             self.execute(Command.SET_TIMEOUTS, {"pageLoad": int(float(time_to_wait) * 1000)})
@@ -1005,7 +1005,7 @@ class WebDriver(BaseWebDriver):
         ----------
         width : int
             - the width in pixels to set the window to
-        height : int 
+        height : int
             - the height in pixels to set the window to
 
         Example:
