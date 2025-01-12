@@ -14,11 +14,9 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-"""A simple web server for testing purpose.
 
-It serves the testing html pages that are needed by the webdriver unit
-tests.
-"""
+"""A simple web server for testing purpose.
+It serves the testing html pages that are needed by the webdriver unit tests."""
 import contextlib
 import logging
 import os
@@ -121,7 +119,7 @@ class HtmlOnlyHandler(BaseHTTPRequestHandler):
             self.send_error(500, f"Error found: {e}")
 
     def log_message(self, format, *args):
-        """Override default to avoid trashing stderr."""
+        """Override default to avoid trashing stderr"""
         pass
 
 

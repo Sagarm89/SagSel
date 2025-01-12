@@ -89,7 +89,7 @@ def parse_json_event(json: T_JSON_DICT) -> typing.Any:
 
 
 def indent(s, n):
-    """A shortcut for ``textwrap.indent`` that always uses spaces."""
+    ''' A shortcut for ``textwrap.indent`` that always uses spaces. '''
     return tw_indent(s, n * ' ')
 
 
@@ -97,13 +97,13 @@ BACKTICK_RE = re.compile(r'`([^`]+)`(\w+)?')
 
 
 def escape_backticks(docstr):
-    """Escape backticks in a docstring by doubling them up.
-
+    '''
+    Escape backticks in a docstring by doubling them up.
     This is a little tricky because RST requires a non-letter character after
     the closing backticks, but some CDPs docs have things like "`AxNodeId`s".
     If we double the backticks in that string, then it won't be valid RST. The
     fix is to insert an apostrophe if an "s" trails the backticks.
-    """
+    '''
     def replace_one(match):
         if match.group(2) == 's':
             return f"``{match.group(1)}``'s"
@@ -119,7 +119,7 @@ def escape_backticks(docstr):
 
 
 def inline_doc(description):
-    """Generate an inline doc, e.g. ``#: This type is a ...``"""
+    ''' Generate an inline doc, e.g. ``#: This type is a ...`` '''
     if not description:
         return ''
 
@@ -129,7 +129,7 @@ def inline_doc(description):
 
 
 def docstring(description):
-    """Generate a docstring from a description."""
+    ''' Generate a docstring from a description. '''
     if not description:
         return ''
 
@@ -138,7 +138,7 @@ def docstring(description):
 
 
 def is_builtin(name):
-    """Return True if ``name`` would shadow a builtin."""
+    ''' Return True if ``name`` would shadow a builtin. '''
     try:
         getattr(builtins, name)
         return True
@@ -147,11 +147,8 @@ def is_builtin(name):
 
 
 def snake_case(name):
-    """Convert a camel case name to snake case.
-
-    If the name would shadow a Python builtin, then append an
-    underscore.
-    """
+    ''' Convert a camel case name to snake case. If the name would shadow a
+    Python builtin, then append an underscore. '''
     name = inflection.underscore(name)
     if is_builtin(name):
         name += '_'
@@ -159,10 +156,10 @@ def snake_case(name):
 
 
 def ref_to_python(ref):
-    """Convert a CDP ``$ref`` to the name of a Python type.
-
+    '''
+    Convert a CDP ``$ref`` to the name of a Python type.
     For a dotted ref, the part before the dot is snake cased.
-    """
+    '''
     if '.' in ref:
         domain, subtype = ref.split('.')
         ref = f'{snake_case(domain)}.{subtype}'
@@ -170,7 +167,7 @@ def ref_to_python(ref):
 
 
 class CdpPrimitiveType(Enum):
-    """All of the CDP types that map directly to a Python type."""
+    ''' All of the CDP types that map directly to a Python type. '''
     boolean = 'bool'
     integer = 'int'
     number = 'float'
@@ -179,14 +176,14 @@ class CdpPrimitiveType(Enum):
 
     @classmethod
     def get_annotation(cls, cdp_type):
-        """Return a type annotation for the CDP type."""
+        ''' Return a type annotation for the CDP type. '''
         if cdp_type == 'any':
             return 'typing.Any'
         return cls[cdp_type].value
 
     @classmethod
     def get_constructor(cls, cdp_type, val):
-        """Return the code to construct a value for a given CDP type."""
+        ''' Return the code to construct a value for a given CDP type. '''
         if cdp_type == 'any':
             return val
         cons = cls[cdp_type].value
@@ -195,19 +192,19 @@ class CdpPrimitiveType(Enum):
 
 @dataclass
 class CdpItems:
-    """Represents the type of a repeated item."""
+    ''' Represents the type of a repeated item. '''
     type: str
     ref: str
 
     @classmethod
     def from_json(cls, type):
-        """Generate code to instantiate an item from a JSON object."""
+        ''' Generate code to instantiate an item from a JSON object. '''
         return cls(type.get('type'), type.get('$ref'))
 
 
 @dataclass
 class CdpProperty:
-    """A property belonging to a non-primitive CDP type."""
+    ''' A property belonging to a non-primitive CDP type. '''
     name: str
     description: Optional[str]
     type: Optional[str]
@@ -220,12 +217,12 @@ class CdpProperty:
 
     @property
     def py_name(self):
-        """Get this property's Python name."""
+        ''' Get this property's Python name. '''
         return snake_case(self.name)
 
     @property
     def py_annotation(self):
-        """This property's Python type annotation."""
+        ''' This property's Python type annotation. '''
         if self.items:
             if self.items.ref:
                 py_ref = ref_to_python(self.items.ref)
@@ -246,7 +243,7 @@ class CdpProperty:
 
     @classmethod
     def from_json(cls, property):
-        """Instantiate a CDP property from a JSON object."""
+        ''' Instantiate a CDP property from a JSON object. '''
         return cls(
             property['name'],
             property.get('description'),
@@ -260,7 +257,7 @@ class CdpProperty:
         )
 
     def generate_decl(self):
-        """Generate the code that declares this property."""
+        ''' Generate the code that declares this property. '''
         code = inline_doc(self.description)
         if code:
             code += '\n'
@@ -270,8 +267,8 @@ class CdpProperty:
         return code
 
     def generate_to_json(self, dict_, use_self=True):
-        """Generate the code that exports this property to the specified JSON
-        dict."""
+        ''' Generate the code that exports this property to the specified JSON
+        dict. '''
         self_ref = 'self.' if use_self else ''
         assign = f"{dict_}['{self.name}'] = "
         if self.items:
@@ -293,8 +290,8 @@ class CdpProperty:
         return code
 
     def generate_from_json(self, dict_):
-        """Generate the code that creates an instance from a JSON dict named
-        ``dict_``."""
+        ''' Generate the code that creates an instance from a JSON dict named
+        ``dict_``. '''
         if self.items:
             if self.items.ref:
                 py_ref = ref_to_python(self.items.ref)
@@ -317,7 +314,7 @@ class CdpProperty:
 
 @dataclass
 class CdpType:
-    """A top-level CDP type."""
+    ''' A top-level CDP type. '''
     id: str
     description: Optional[str]
     type: str
@@ -327,7 +324,7 @@ class CdpType:
 
     @classmethod
     def from_json(cls, type_):
-        """Instantiate a CDP type from a JSON object."""
+        ''' Instantiate a CDP type from a JSON object. '''
         return cls(
             type_['id'],
             type_.get('description'),
@@ -338,7 +335,7 @@ class CdpType:
         )
 
     def generate_code(self):
-        """Generate Python code for this type."""
+        ''' Generate Python code for this type. '''
         logger.debug('Generating type %s: %s', self.id, self.type)
         if self.enum:
             return self.generate_enum_code()
@@ -347,7 +344,7 @@ class CdpType:
         return self.generate_primitive_code()
 
     def generate_primitive_code(self):
-        """Generate code for a primitive type."""
+        ''' Generate code for a primitive type. '''
         if self.items:
             if self.items.ref:
                 nested_type = ref_to_python(self.items.ref)
@@ -384,13 +381,13 @@ class CdpType:
         return code
 
     def generate_enum_code(self):
-        """Generate an "enum" type.
-
+        '''
+        Generate an "enum" type.
         Enums are handled by making a python class that contains only class
         members. Each class member is upper snaked case, e.g.
         ``MyTypeClass.MY_ENUM_VALUE`` and is assigned a string value from the
         CDP metadata.
-        """
+        '''
         def_to_json = dedent('''\
             def to_json(self):
                 return self.value''')
@@ -414,11 +411,11 @@ class CdpType:
         return code
 
     def generate_class_code(self):
-        """Generate a class type.
-
+        '''
+        Generate a class type.
         Top-level types that are defined as a CDP ``object`` are turned into Python
         dataclasses.
-        """
+        '''
         # children = set()
         code = dedent(f'''\
             @dataclass
@@ -466,7 +463,7 @@ class CdpType:
         return code
 
     def get_refs(self):
-        """Return all refs for this type."""
+        ''' Return all refs for this type. '''
         refs = set()
         if self.enum:
             # Enum types don't have refs.
@@ -487,10 +484,10 @@ class CdpType:
 
 
 class CdpParameter(CdpProperty):
-    """A parameter to a CDP command."""
+    ''' A parameter to a CDP command. '''
 
     def generate_code(self):
-        """Generate the code for a parameter in a function call."""
+        ''' Generate the code for a parameter in a function call. '''
         if self.items:
             if self.items.ref:
                 nested_type = ref_to_python(self.items.ref)
@@ -512,7 +509,7 @@ class CdpParameter(CdpProperty):
         return code
 
     def generate_decl(self):
-        """Generate the declaration for this parameter."""
+        ''' Generate the declaration for this parameter. '''
         if self.description:
             code = inline_doc(self.description)
             code += '\n'
@@ -522,7 +519,7 @@ class CdpParameter(CdpProperty):
         return code
 
     def generate_doc(self):
-        """Generate the docstring for this parameter."""
+        ''' Generate the docstring for this parameter. '''
         doc = f':param {self.py_name}:'
 
         if self.experimental:
@@ -537,16 +534,18 @@ class CdpParameter(CdpProperty):
         return doc
 
     def generate_from_json(self, dict_):
-        """Generate the code to instantiate this parameter from a JSON dict."""
+        '''
+        Generate the code to instantiate this parameter from a JSON dict.
+        '''
         code = super().generate_from_json(dict_)
         return f'{self.py_name}={code}'
 
 
 class CdpReturn(CdpProperty):
-    """A return value from a CDP command."""
+    ''' A return value from a CDP command. '''
     @property
     def py_annotation(self):
-        """Return the Python type annotation for this return."""
+        ''' Return the Python type annotation for this return. '''
         if self.items:
             if self.items.ref:
                 py_ref = ref_to_python(self.items.ref)
@@ -565,7 +564,7 @@ class CdpReturn(CdpProperty):
         return ann
 
     def generate_doc(self):
-        """Generate the docstring for this return."""
+        ''' Generate the docstring for this return. '''
         if self.description:
             doc = self.description.replace('\n', ' ')
             if self.optional:
@@ -575,13 +574,13 @@ class CdpReturn(CdpProperty):
         return doc
 
     def generate_return(self, dict_):
-        """Generate code for returning this value."""
+        ''' Generate code for returning this value. '''
         return super().generate_from_json(dict_)
 
 
 @dataclass
 class CdpCommand:
-    """A CDP command."""
+    ''' A CDP command. '''
     name: str
     description: str
     experimental: bool
@@ -592,12 +591,12 @@ class CdpCommand:
 
     @property
     def py_name(self):
-        """Get a Python name for this command."""
+        ''' Get a Python name for this command. '''
         return snake_case(self.name)
 
     @classmethod
     def from_json(cls, command, domain) -> 'CdpCommand':
-        """Instantiate a CDP command from a JSON object."""
+        ''' Instantiate a CDP command from a JSON object. '''
         parameters = command.get('parameters', [])
         returns = command.get('returns', [])
 
@@ -612,7 +611,7 @@ class CdpCommand:
         )
 
     def generate_code(self):
-        """Generate code for a CDP command."""
+        ''' Generate code for a CDP command. '''
         global current_version
         # Generate the function header
         if len(self.returns) == 0:
@@ -699,7 +698,7 @@ class CdpCommand:
         return code
 
     def get_refs(self):
-        """Get all refs for this command."""
+        ''' Get all refs for this command. '''
         refs = set()
         for type_ in itertools.chain(self.parameters, self.returns):
             if type_.items and type_.items.ref:
@@ -711,7 +710,7 @@ class CdpCommand:
 
 @dataclass
 class CdpEvent:
-    """A CDP event object."""
+    ''' A CDP event object. '''
     name: str
     description: Optional[str]
     deprecated: bool
@@ -721,12 +720,12 @@ class CdpEvent:
 
     @property
     def py_name(self):
-        """Return the Python class name for this event."""
+        ''' Return the Python class name for this event. '''
         return inflection.camelize(self.name, uppercase_first_letter=True)
 
     @classmethod
     def from_json(cls, json: dict, domain: str):
-        """Create a new CDP event instance from a JSON dict."""
+        ''' Create a new CDP event instance from a JSON dict. '''
         return cls(
             json['name'],
             json.get('description'),
@@ -738,7 +737,7 @@ class CdpEvent:
         )
 
     def generate_code(self):
-        """Generate code for a CDP event."""
+        ''' Generate code for a CDP event. '''
         global current_version
         code = dedent(f'''\
             @event_class('{self.domain}.{self.name}')
@@ -773,7 +772,7 @@ class CdpEvent:
         return code
 
     def get_refs(self):
-        """Get all refs for this event."""
+        ''' Get all refs for this event. '''
         refs = set()
         for param in self.parameters:
             if param.items and param.items.ref:
@@ -785,7 +784,7 @@ class CdpEvent:
 
 @dataclass
 class CdpDomain:
-    """A CDP domain contains metadata, types, commands, and events."""
+    ''' A CDP domain contains metadata, types, commands, and events. '''
     domain: str
     description: Optional[str]
     experimental: bool
@@ -796,12 +795,12 @@ class CdpDomain:
 
     @property
     def module(self):
-        """The name of the Python module for this CDP domain."""
+        ''' The name of the Python module for this CDP domain. '''
         return snake_case(self.domain)
 
     @classmethod
     def from_json(cls, domain: dict):
-        """Instantiate a CDP domain from a JSON object."""
+        ''' Instantiate a CDP domain from a JSON object. '''
         types = domain.get('types', [])
         commands = domain.get('commands', [])
         events = domain.get('events', [])
@@ -819,7 +818,7 @@ class CdpDomain:
         )
 
     def generate_code(self):
-        """Generate the Python module code for a given CDP domain."""
+        ''' Generate the Python module code for a given CDP domain. '''
         exp = ' (experimental)' if self.experimental else ''
         code = MODULE_HEADER.format(self.domain, exp)
         import_code = self.generate_imports()
@@ -838,14 +837,14 @@ class CdpDomain:
         return code
 
     def generate_imports(self):
-        """Determine which modules this module depends on and emit the code to
+        '''
+        Determine which modules this module depends on and emit the code to
         import those modules.
-
         Notice that CDP defines a ``dependencies`` field for each domain, but
         these dependencies are a subset of the modules that we actually need to
         import to make our Python code work correctly and type safe. So we
         ignore the CDP's declared dependencies and compute them ourselves.
-        """
+        '''
         refs = set()
         for type_ in self.types:
             refs |= type_.get_refs()
@@ -866,7 +865,9 @@ class CdpDomain:
         return code
 
     def generate_sphinx(self):
-        """Generate a Sphinx document for this domain."""
+        '''
+        Generate a Sphinx document for this domain.
+        '''
         docs = self.domain + '\n'
         docs += '=' * len(self.domain) + '\n\n'
         if self.description:
@@ -928,12 +929,12 @@ class CdpDomain:
 
 
 def parse(json_path, output_path):
-    """Parse JSON protocol description and return domain objects.
-
+    '''
+    Parse JSON protocol description and return domain objects.
     :param Path json_path: path to a JSON CDP schema
     :param Path output_path: a directory path to create the modules in
     :returns: a list of CDP domain objects
-    """
+    '''
     global current_version
     with open(json_path, encoding="utf-8") as json_file:
         schema = json.load(json_file)
@@ -947,12 +948,12 @@ def parse(json_path, output_path):
 
 
 def generate_init(init_path, domains):
-    """Generate an ``__init__.py`` that exports the specified modules.
-
-    :param Path init_path: a file path to create the init file in :param
-        list[tuple] modules: a list of modules each represented as
-        tuples of (name, list_of_exported_symbols)
-    """
+    '''
+    Generate an ``__init__.py`` that exports the specified modules.
+    :param Path init_path: a file path to create the init file in
+    :param list[tuple] modules: a list of modules each represented as tuples
+        of (name, list_of_exported_symbols)
+    '''
     with open(init_path, "w", encoding="utf-8") as init_file:
         init_file.write(INIT_HEADER)
         for domain in domains:
@@ -961,7 +962,9 @@ def generate_init(init_path, domains):
 
 
 def generate_docs(docs_path, domains):
-    """Generate Sphinx documents for each domain."""
+    '''
+    Generate Sphinx documents for each domain.
+    '''
     logger.info('Generating Sphinx documents')
 
     # Remove generated documents
@@ -976,7 +979,7 @@ def generate_docs(docs_path, domains):
 
 
 def main(browser_protocol_path, js_protocol_path, output_path):
-    """Main entry point."""
+    ''' Main entry point. '''
     output_path = Path(output_path).resolve()
     json_paths = [
         browser_protocol_path,
