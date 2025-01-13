@@ -22,7 +22,6 @@ import os
 import pkgutil
 import tempfile
 import types
-import typing
 import warnings
 import zipfile
 from abc import ABCMeta
@@ -34,6 +33,7 @@ from importlib import import_module
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Type
 from typing import Union
 
 from selenium.common.exceptions import InvalidArgumentException
@@ -43,6 +43,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.bidi.script import Script
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.options import ArgOptions
 from selenium.webdriver.common.options import BaseOptions
 from selenium.webdriver.common.print_page_options import PrintOptions
 from selenium.webdriver.common.timeouts import Timeouts
@@ -53,10 +54,12 @@ from selenium.webdriver.common.virtual_authenticator import (
 )
 from selenium.webdriver.support.relative_locator import RelativeBy
 
+from ..common.fedcm.dialog import Dialog
 from .bidi_connection import BidiConnection
 from .client_config import ClientConfig
 from .command import Command
 from .errorhandler import ErrorHandler
+from .fedcm import FedCM
 from .file_detector import FileDetector
 from .file_detector import LocalFileDetector
 from .locator_converter import LocatorConverter
@@ -236,6 +239,7 @@ class WebDriver(BaseWebDriver):
         self._authenticator_id = None
         self.start_client()
         self.start_session(capabilities)
+        self._fedcm = FedCM(self)
 
         self._websocket_connection = None
         self._script = None
@@ -248,9 +252,9 @@ class WebDriver(BaseWebDriver):
 
     def __exit__(
         self,
-        exc_type: typing.Optional[typing.Type[BaseException]],
-        exc: typing.Optional[BaseException],
-        traceback: typing.Optional[types.TracebackType],
+        exc_type: Optional[Type[BaseException]],
+        exc: Optional[BaseException],
+        traceback: Optional[types.TracebackType],
     ):
         self.quit()
 
@@ -356,6 +360,26 @@ class WebDriver(BaseWebDriver):
         if isinstance(value, list):
             return list(self._unwrap_value(item) for item in value)
         return value
+
+    def execute_cdp_cmd(self, cmd: str, cmd_args: dict):
+        """Execute Chrome Devtools Protocol command and get returned result The
+        command and command args should follow chrome devtools protocol
+        domains/commands, refer to link
+        https://chromedevtools.github.io/devtools-protocol/
+
+        :Args:
+         - cmd: A str, command name
+         - cmd_args: A dict, command args. empty dict {} if there is no command args
+        :Usage:
+            ::
+
+                driver.execute_cdp_cmd('Network.getResponseBody', {'requestId': requestId})
+        :Returns:
+            A dict, empty dict {} if there is no result to return.
+            For example to getResponseBody:
+            {'base64Encoded': False, 'body': 'response body string'}
+        """
+        return self.execute("executeCdpCommand", {"cmd": cmd, "params": cmd_args})["value"]
 
     def execute(self, driver_command: str, params: dict = None) -> dict:
         """Sends a command to be executed by a command.CommandExecutor.
@@ -614,7 +638,7 @@ class WebDriver(BaseWebDriver):
         """
         return self.execute(Command.GET_ALL_COOKIES)["value"]
 
-    def get_cookie(self, name) -> typing.Optional[typing.Dict]:
+    def get_cookie(self, name) -> Optional[Dict]:
         """Get a single cookie by name. Returns the cookie if found, None if
         not.
 
@@ -748,12 +772,28 @@ class WebDriver(BaseWebDriver):
     def find_element(self, by=By.ID, value: Optional[str] = None) -> WebElement:
         """Find an element given a By strategy and locator.
 
-        :Usage:
-            ::
+        Parameters:
+        ----------
+        by : selenium.webdriver.common.by.By
+            The locating strategy to use. Default is `By.ID`. Supported values include:
+            - By.ID: Locate by element ID.
+            - By.NAME: Locate by the `name` attribute.
+            - By.XPATH: Locate by an XPath expression.
+            - By.CSS_SELECTOR: Locate by a CSS selector.
+            - By.CLASS_NAME: Locate by the `class` attribute.
+            - By.TAG_NAME: Locate by the tag name (e.g., "input", "button").
+            - By.LINK_TEXT: Locate a link element by its exact text.
+            - By.PARTIAL_LINK_TEXT: Locate a link element by partial text match.
+            - RelativeBy: Locate elements relative to a specified root element.
 
-                element = driver.find_element(By.ID, 'foo')
+        Example:
+        --------
+        element = driver.find_element(By.ID, 'foo')
 
-        :rtype: WebElement
+        Returns:
+        -------
+        WebElement
+            The first matching `WebElement` found on the page.
         """
         by, value = self.locator_converter.convert(by, value)
 
@@ -768,12 +808,28 @@ class WebDriver(BaseWebDriver):
     def find_elements(self, by=By.ID, value: Optional[str] = None) -> List[WebElement]:
         """Find elements given a By strategy and locator.
 
-        :Usage:
-            ::
+        Parameters:
+        ----------
+        by : selenium.webdriver.common.by.By
+            The locating strategy to use. Default is `By.ID`. Supported values include:
+            - By.ID: Locate by element ID.
+            - By.NAME: Locate by the `name` attribute.
+            - By.XPATH: Locate by an XPath expression.
+            - By.CSS_SELECTOR: Locate by a CSS selector.
+            - By.CLASS_NAME: Locate by the `class` attribute.
+            - By.TAG_NAME: Locate by the tag name (e.g., "input", "button").
+            - By.LINK_TEXT: Locate a link element by its exact text.
+            - By.PARTIAL_LINK_TEXT: Locate a link element by partial text match.
+            - RelativeBy: Locate elements relative to a specified root element.
 
-                elements = driver.find_elements(By.CLASS_NAME, 'foo')
+        Example:
+        --------
+        element = driver.find_element(By.ID, 'foo')
 
-        :rtype: list of WebElement
+        Returns:
+        -------
+        WebElement
+            list of `WebElements` matching locator strategy found on the page.
         """
         by, value = self.locator_converter.convert(by, value)
 
@@ -1053,6 +1109,12 @@ class WebDriver(BaseWebDriver):
                     raise WebDriverException("Unable to find url to connect to from capabilities")
 
                 devtools = cdp.import_devtools(version)
+                if self.caps["browserName"].lower() == "firefox":
+                    warnings.warn(
+                        "CDP support for Firefox is deprecated and will be removed in future versions. Please switch to WebDriver BiDi.",
+                        DeprecationWarning,
+                        stacklevel=2,
+                    )
             self._websocket_connection = WebSocketConnection(ws_url)
             targets = self._websocket_connection.execute(devtools.target.get_targets())
             target_id = targets[0].target_id
@@ -1222,3 +1284,77 @@ class WebDriver(BaseWebDriver):
             raise WebDriverException("You must enable downloads in order to work with downloadable files.")
 
         self.execute(Command.DELETE_DOWNLOADABLE_FILES)
+
+    @property
+    def fedcm(self) -> FedCM:
+        """
+        :Returns:
+            - FedCM: an object providing access to all Federated Credential Management (FedCM) dialog commands.
+
+        :Usage:
+            ::
+
+                title = driver.fedcm.title
+                subtitle = driver.fedcm.subtitle
+                dialog_type = driver.fedcm.dialog_type
+                accounts = driver.fedcm.account_list
+                driver.fedcm.select_account(0)
+                driver.fedcm.accept()
+                driver.fedcm.dismiss()
+                driver.fedcm.enable_delay()
+                driver.fedcm.disable_delay()
+                driver.fedcm.reset_cooldown()
+        """
+        return self._fedcm
+
+    @property
+    def supports_fedcm(self) -> bool:
+        """Returns whether the browser supports FedCM capabilities."""
+        return self.capabilities.get(ArgOptions.FEDCM_CAPABILITY, False)
+
+    def _require_fedcm_support(self):
+        """Raises an exception if FedCM is not supported."""
+        if not self.supports_fedcm:
+            raise WebDriverException(
+                "This browser does not support Federated Credential Management. "
+                "Please ensure you're using a supported browser."
+            )
+
+    @property
+    def dialog(self):
+        """Returns the FedCM dialog object for interaction."""
+        self._require_fedcm_support()
+        return Dialog(self)
+
+    def fedcm_dialog(self, timeout=5, poll_frequency=0.5, ignored_exceptions=None):
+        """Waits for and returns the FedCM dialog.
+
+        Args:
+            timeout: How long to wait for the dialog
+            poll_frequency: How frequently to poll
+            ignored_exceptions: Exceptions to ignore while waiting
+
+        Returns:
+            The FedCM dialog object if found
+
+        Raises:
+            TimeoutException if dialog doesn't appear
+            WebDriverException if FedCM not supported
+        """
+        from selenium.common.exceptions import NoAlertPresentException
+        from selenium.webdriver.support.wait import WebDriverWait
+
+        self._require_fedcm_support()
+
+        if ignored_exceptions is None:
+            ignored_exceptions = (NoAlertPresentException,)
+
+        def _check_fedcm():
+            try:
+                dialog = Dialog(self)
+                return dialog if dialog.type else None
+            except NoAlertPresentException:
+                return None
+
+        wait = WebDriverWait(self, timeout, poll_frequency=poll_frequency, ignored_exceptions=ignored_exceptions)
+        return wait.until(lambda _: _check_fedcm())

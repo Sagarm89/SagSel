@@ -1,19 +1,20 @@
-// <copyright file="HttpCommandExecutor.cs" company="WebDriver Committers">
+// <copyright file="HttpCommandExecutor.cs" company="Selenium Committers">
 // Licensed to the Software Freedom Conservancy (SFC) under one
-// or more contributor license agreements. See the NOTICE file
+// or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
-// regarding copyright ownership. The SFC licenses this file
-// to you under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// regarding copyright ownership.  The SFC licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//   http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 // </copyright>
 
 using OpenQA.Selenium.Internal;
@@ -315,7 +316,7 @@ namespace OpenQA.Selenium.Remote
 
         private Response CreateResponse(HttpResponseInfo responseInfo)
         {
-            Response response = new Response();
+            Response response;
             string body = responseInfo.Body;
             if ((int)responseInfo.StatusCode < 200 || (int)responseInfo.StatusCode > 299)
             {
@@ -325,8 +326,7 @@ namespace OpenQA.Selenium.Remote
                 }
                 else
                 {
-                    response.Status = WebDriverResult.UnhandledError;
-                    response.Value = body;
+                    response = new Response(sessionId: null, body, WebDriverResult.UnknownError);
                 }
             }
             else if (responseInfo.ContentType != null && responseInfo.ContentType.StartsWith(JsonMimeType, StringComparison.OrdinalIgnoreCase))
@@ -335,12 +335,12 @@ namespace OpenQA.Selenium.Remote
             }
             else
             {
-                response.Value = body;
+                response = new Response(sessionId: null, body, WebDriverResult.Success);
             }
 
-            if (response.Value is string)
+            if (response.Value is string valueString)
             {
-                response.Value = ((string)response.Value).Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
+                response.Value = valueString.Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
             }
 
             return response;
@@ -418,10 +418,10 @@ namespace OpenQA.Selenium.Remote
                 var responseTask = base.SendAsync(request, cancellationToken);
 
                 StringBuilder requestLogMessageBuilder = new();
-                requestLogMessageBuilder.AppendFormat(">> {0} RequestUri: {1}, Content: {2}, Headers: {3}", 
-                    request.Method, 
-                    request.RequestUri?.ToString() ?? "null", 
-                    request.Content?.ToString() ?? "null", 
+                requestLogMessageBuilder.AppendFormat(">> {0} RequestUri: {1}, Content: {2}, Headers: {3}",
+                    request.Method,
+                    request.RequestUri?.ToString() ?? "null",
+                    request.Content?.ToString() ?? "null",
                     request.Headers?.Count());
 
                 if (request.Content != null)

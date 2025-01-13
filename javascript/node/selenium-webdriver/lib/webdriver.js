@@ -45,6 +45,7 @@ const { PinnedScript } = require('./pinnedScript')
 const JSZip = require('jszip')
 const Script = require('./script')
 const Network = require('./network')
+const Dialog = require('./fedcm/dialog')
 
 // Capability names that are defined in the W3C spec.
 const W3C_CAPABILITY_NAMES = new Set([
@@ -1106,6 +1107,18 @@ class WebDriver {
     return this.execute(new command.Command(command.Name.SCREENSHOT))
   }
 
+  setDelayEnabled(enabled) {
+    return this.execute(new command.Command(command.Name.SET_DELAY_ENABLED).setParameter('enabled', enabled))
+  }
+
+  resetCooldown() {
+    return this.execute(new command.Command(command.Name.RESET_COOLDOWN))
+  }
+
+  getFederalCredentialManagementDialog() {
+    return new Dialog(this)
+  }
+
   /** @override */
   manage() {
     return new Options(this)
@@ -1229,6 +1242,12 @@ class WebDriver {
     let debuggerUrl = null
 
     const caps = await this.getCapabilities()
+
+    if (caps['map_'].get('browserName') === 'firefox') {
+      console.warn(
+        'CDP support for Firefox is deprecated and will be removed in future versions. Please switch to WebDriver BiDi.',
+      )
+    }
 
     if (process.env.SELENIUM_REMOTE_URL) {
       const host = new URL(process.env.SELENIUM_REMOTE_URL).host
