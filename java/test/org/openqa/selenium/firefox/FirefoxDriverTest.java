@@ -278,7 +278,7 @@ class FirefoxDriverTest extends JupiterTestBase {
     Locale.setDefault(arabicLocale);
 
     int port = PortProber.findFreePort();
-    EdgeDriverService.Builder builder = new EdgeDriverService.Builder();
+    GeckoDriverService.Builder builder = new GeckoDriverService.Builder();
     builder.usingPort(port);
 
     assertThatExceptionOfType(NumberFormatException.class)
