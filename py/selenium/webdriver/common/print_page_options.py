@@ -402,7 +402,7 @@ class PrintOptions:
     - Set
         - `None`
     """
-    # Predefined page sizes (in centimeters)
+    # Reference for predefined page size constants: https://www.agooddaytoprint.com/page/paper-size-chart-faq
     A4 = {"height": 29.7, "width": 21.0}  # size in cm
     LEGAL = {"height": 35.56, "width": 21.59}  # size in cm
     LETTER = {"height": 27.94, "width": 21.59}  # size in cm
