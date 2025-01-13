@@ -51,7 +51,7 @@ class ActionBuilder:
     def get_device_with(self, name: str) -> Optional[Union["WheelInput", "PointerInput", "KeyInput"]]:
         """Get the device with the given name.
 
-        Parameters:
+        Attributes:
         ----------
         name : str
             The name of the device to get.
@@ -85,7 +85,7 @@ class ActionBuilder:
     def add_key_input(self, name: str) -> KeyInput:
         """Add a new key input device to the action builder.
 
-        Parameters:
+        Attributes:
         ----------
         name : str
             The name of the key input device.
@@ -106,7 +106,7 @@ class ActionBuilder:
     def add_pointer_input(self, kind: str, name: str) -> PointerInput:
         """Add a new pointer input device to the action builder.
 
-        Parameters:
+        Attributes:
         ----------
         kind : str
             The kind of pointer input device.
@@ -132,7 +132,7 @@ class ActionBuilder:
     def add_wheel_input(self, name: str) -> WheelInput:
         """Add a new wheel input device to the action builder.
 
-        Parameters:
+        Attributes:
         ----------
         name : str
             The name of the wheel input device.
@@ -184,7 +184,7 @@ class ActionBuilder:
     def _add_input(self, new_input: Union[KeyInput, PointerInput, WheelInput]) -> None:
         """Add a new input device to the action builder.
 
-        Parameters:
+        Attributes:
         ----------
         new_input : Union[KeyInput, PointerInput, WheelInput]
             The new input device to add.
