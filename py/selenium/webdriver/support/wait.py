@@ -95,7 +95,7 @@ class WebDriverWait(Generic[D]):
         Calls the method provided with the driver as an argument until the
         return value does not evaluate to ``False``.
 
-        Attributes:
+        Parameters:
         ----------
         method: callable(WebDriver)
             - A callable object that takes a WebDriver instance as an argument.
@@ -147,7 +147,7 @@ class WebDriverWait(Generic[D]):
         Calls the method provided with the driver as an argument until the
         return value does not evaluate to ``False``.
 
-        Attributes:
+        Parameters:
         ----------
         method: callable(WebDriver)
             - A callable object that takes a WebDriver instance as an argument.
