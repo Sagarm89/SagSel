@@ -20,6 +20,7 @@ package org.openqa.selenium;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -60,8 +61,10 @@ public class PersistentCapabilities implements Capabilities {
 
   @Override
   public Map<String, Object> asMap() {
-    return getCapabilityNames().stream()
-        .collect(toUnmodifiableMap(Function.identity(), this::getCapability));
+    Map<String, Object> toReturn = new TreeMap<>();
+    toReturn.putAll(caps.asMap());
+    toReturn.putAll(overrides.asMap());
+    return Collections.unmodifiableMap(toReturn);
   }
 
   @Override

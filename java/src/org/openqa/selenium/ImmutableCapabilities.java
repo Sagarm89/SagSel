@@ -148,10 +148,9 @@ public class ImmutableCapabilities implements Capabilities {
     capabilities.forEach(
         (key, value) -> {
           Require.argument("Capability key", key).instanceOf(String.class);
-          Object v = capabilities.get(key);
           Require.nonNull("Capability value", value);
 
-          setCapability(delegate, (String) key, v);
+          setCapability(delegate, (String) key, value);
         });
 
     this.delegate = Collections.unmodifiableMap(delegate);
