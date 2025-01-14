@@ -126,15 +126,16 @@ public class JdkHttpClient implements HttpClient {
 
       // Remove credentials from URL
       try {
-        config = config.baseUri(
-            new URI(
-                config.baseUri().getScheme(),
-                null,
-                config.baseUri().getHost(),
-                config.baseUri().getPort(),
-                config.baseUri().getPath(),
-                config.baseUri().getQuery(),
-                config.baseUri().getFragment()));
+        config =
+            config.baseUri(
+                new URI(
+                    config.baseUri().getScheme(),
+                    null,
+                    config.baseUri().getHost(),
+                    config.baseUri().getPort(),
+                    config.baseUri().getPath(),
+                    config.baseUri().getQuery(),
+                    config.baseUri().getFragment()));
       } catch (URISyntaxException e) {
         LOG.log(Level.WARNING, "Could not strip credentials from URI", e);
       }
