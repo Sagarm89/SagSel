@@ -20,9 +20,48 @@ from typing import Dict
 from typing import Literal
 from typing import Optional
 
-
 class By:
-    """Set of supported locator strategies."""
+    """Set of supported locator strategies.
+    
+    Attributes
+    ----------
+    - ID: 
+    - XPATH: 
+    - LINK_TEXT: 
+    - PARTIAL_LINK_TEXT: 
+    - NAME: 
+    - TAG_NAME: 
+    - CLASS_NAME: 
+    - CSS_SELECTOR: 
+
+    Examples
+    --------
+    
+    ## ID: 
+
+
+    ## XPATH: 
+
+
+    ## LINK_TEXT: 
+
+
+    ## PARTIAL_LINK_TEXT: 
+
+
+    ## NAME: 
+
+
+    ## TAG_NAME: 
+
+
+    ## CLASS_NAME: 
+
+
+    ## CSS_SELECTOR: 
+
+    
+    """
 
     ID = "id"
     XPATH = "xpath"
