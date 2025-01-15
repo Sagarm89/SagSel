@@ -38,8 +38,8 @@ module Selenium
           network.continue_request(
             id: id,
             body: body,
-            cookies: cookies.serialize,
-            headers: headers.serialize,
+            cookies: cookies.as_json,
+            headers: headers.as_json,
             method: method,
             url: url
           )

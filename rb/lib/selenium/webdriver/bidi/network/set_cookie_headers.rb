@@ -26,7 +26,7 @@ module Selenium
           merge!(set_cookie_headers)
         end
 
-        def serialize
+        def as_json
           map do |name, data|
             data = {value: data} unless data.is_a?(Hash)
 

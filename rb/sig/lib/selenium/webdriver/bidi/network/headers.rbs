@@ -4,7 +4,7 @@ module Selenium
       class Headers
         def initialize: () -> void
 
-        def serialize: () -> Array[Hash[Symbol, String]]
+        def as_json: () -> Array[Hash[Symbol, String]]
       end
     end
   end

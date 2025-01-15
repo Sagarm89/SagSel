@@ -52,22 +52,22 @@ module Selenium
           end
         end
 
-        describe '#serialize' do
+        describe '#as_json' do
           it 'returns nil if username is missing' do
             creds = described_class.new(password: 'secret')
-            expect(creds.serialize).to be_nil
+            expect(creds.as_json).to be_nil
           end
 
           it 'returns nil if password is missing' do
             creds = described_class.new(username: 'alice')
-            expect(creds.serialize).to be_nil
+            expect(creds.as_json).to be_nil
           end
 
           it 'returns a hash of the credentials when both username and password are present' do
             creds = described_class.new(username: 'alice', password: 'secret')
-            serialized = creds.serialize
+            formatted_creds = creds.as_json
 
-            expect(serialized).to eq(
+            expect(formatted_creds).to eq(
               type: 'password',
               username: 'alice',
               password: 'secret'

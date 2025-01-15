@@ -28,7 +28,7 @@ module Selenium
           @password = password
         end
 
-        def serialize
+        def as_json
           return nil unless username && password
 
           {

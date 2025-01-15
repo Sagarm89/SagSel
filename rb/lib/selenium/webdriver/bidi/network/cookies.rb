@@ -26,7 +26,7 @@ module Selenium
           merge!(cookies)
         end
 
-        def serialize
+        def as_json
           map do |name, value|
             {
               name: name.to_s,

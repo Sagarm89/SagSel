@@ -35,9 +35,9 @@ module Selenium
         def continue
           network.continue_response(
             id: id,
-            cookies: set_cookie_headers.serialize,
-            headers: headers.serialize,
-            credentials: credentials.serialize,
+            cookies: set_cookie_headers.as_json,
+            headers: headers.as_json,
+            credentials: credentials.as_json,
             reason: reason
           )
         end

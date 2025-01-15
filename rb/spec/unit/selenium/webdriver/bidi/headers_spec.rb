@@ -26,21 +26,21 @@ module Selenium
       describe Headers do
         let(:headers) { described_class.new }
 
-        it 'returns an array of serialized array of header hashes' do
+        it 'returns headers formatted as json' do
           headers['Accept'] = 'application/json'
           headers['User-Agent'] = 'MyAgent/1.0'
 
-          serialized = headers.serialize
-          expect(serialized).to be_an(Array)
-          expect(serialized.size).to eq(2)
+          formatted_headers = headers.as_json
+          expect(formatted_headers).to be_an(Array)
+          expect(formatted_headers.size).to eq(2)
 
-          accept_item = serialized.find { |h| h[:name] == 'Accept' }
+          accept_item = formatted_headers.find { |h| h[:name] == 'Accept' }
           expect(accept_item).not_to be_nil
-          expect(accept_item[:value]).to eq({ type: 'string', value: 'application/json' })
+          expect(accept_item[:value]).to eq({type: 'string', value: 'application/json'})
 
-          ua_item = serialized.find { |h| h[:name] == 'User-Agent' }
+          ua_item = formatted_headers.find { |h| h[:name] == 'User-Agent' }
           expect(ua_item).not_to be_nil
-          expect(ua_item[:value]).to eq({ type: 'string', value: 'MyAgent/1.0' })
+          expect(ua_item[:value]).to eq({type: 'string', value: 'MyAgent/1.0'})
         end
       end
     end

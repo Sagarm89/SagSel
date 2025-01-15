@@ -4,7 +4,7 @@ module Selenium
       class SetCookieHeaders
         def initialize: (Hash[Symbol, untyped] set_cookie_headers) -> void
 
-        def serialize: () -> Array[Hash[Symbol, untyped]]
+        def as_json: () -> Array[Hash[Symbol, untyped]]
       end
     end
   end

@@ -26,20 +26,20 @@ module Selenium
       describe SetCookieHeaders do
         let(:set_cookie_headers) { described_class.new }
 
-        it 'returns an array of serialized array of set-cookie header hashes' do
+        it 'returns set cookie headers as json' do
           set_cookie_headers['key4'] = 'value4'
           set_cookie_headers['session_id'] = 'xyz123'
 
-          serialized = set_cookie_headers.serialize
-          expect(serialized).to be_an(Array)
-          expect(serialized.size).to eq(2)
+          formatted_set_cookie_headers = set_cookie_headers.as_json
+          expect(formatted_set_cookie_headers).to be_an(Array)
+          expect(formatted_set_cookie_headers.size).to eq(2)
 
-          key4_item = serialized.find { |h| h[:name] == 'key4' }
+          key4_item = formatted_set_cookie_headers.find { |h| h[:name] == 'key4' }
           expect(key4_item).not_to be_nil
           expect(key4_item[:value][:type]).to eq('string')
           expect(key4_item[:value][:value]).to eq('value4')
 
-          session_item = serialized.find { |h| h[:name] == 'session_id' }
+          session_item = formatted_set_cookie_headers.find { |h| h[:name] == 'session_id' }
           expect(session_item).not_to be_nil
           expect(session_item[:value][:value]).to eq('xyz123')
         end

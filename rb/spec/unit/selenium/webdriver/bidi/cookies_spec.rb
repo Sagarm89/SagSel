@@ -26,20 +26,20 @@ module Selenium
       describe Cookies do
         let(:cookies) { described_class.new }
 
-        it 'returns a serialized array of cookie hashes' do
+        it 'returns the cookies as json' do
           cookies['key4'] = 'value4'
           cookies['session_id'] = 'xyz123'
 
-          serialized = cookies.serialize
-          expect(serialized).to be_an(Array)
-          expect(serialized.size).to eq(2)
+          formatted_cookies = cookies.as_json
+          expect(formatted_cookies).to be_an(Array)
+          expect(formatted_cookies.size).to eq(2)
 
-          key4_item = serialized.find { |h| h[:name] == 'key4' }
+          key4_item = formatted_cookies.find { |h| h[:name] == 'key4' }
           expect(key4_item).not_to be_nil
           expect(key4_item[:value][:type]).to eq('string')
           expect(key4_item[:value][:value]).to eq('value4')
 
-          session_item = serialized.find { |h| h[:name] == 'session_id' }
+          session_item = formatted_cookies.find { |h| h[:name] == 'session_id' }
           expect(session_item).not_to be_nil
           expect(session_item[:value][:value]).to eq('xyz123')
         end

@@ -21,7 +21,7 @@ module Selenium
   module WebDriver
     class BiDi
       class Headers < Hash
-        def serialize
+        def as_json
           map do |name, val|
             {
               name: name.to_s,
