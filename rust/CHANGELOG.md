@@ -1,26 +1,10 @@
 0.4.28
 ======
---> [rust] xz uncompressor for Firefox Linux nightlies (#14832)
-* [rust] Add xz2 dependency
-The xz2 crate is already in the dependency tree,
-so use it for implementing a xz uncompressor.
-* [rust] Add XZ uncompressor
-Refactor the BZ uncompressor to be a generic tar uncompressor.
-Implement a new XZ uncompressor based on it so selenium-manager
-can deal with the new Firefox nightly builds for Linux.
---> [rust] Fix Edge updates API deserialization (#14851)
-* [selenium manager]: fix edge artifact deserialisation
-* add alias attr to all edge structs
-* add newline
---> [rust] Use file lock to protect concurrent accesses to cache (fix #13511 and #13686)
-* [rust] Use file lock to protect concurrent accesses to cache
-* [rust] Fix several problems related to file manipulation
-* [rust] Improve logic for handling unstable edge bad links
-* [rust] Ensure lock file exists and content of target folder after acquiring lock
-* [rust] Refactor lock logic in a separate module
-* [rust] Acquire file lock before downloading driver and browser
---> [ci] Run format script
---> [rust] Use tax.xz for Firefox package starting in version 135
+
+* [rust] xz uncompressor for Firefox Linux nightlies (#14832)
+* [rust] Fix Edge updates API deserialization (#14851)
+* [rust] Use file lock to protect concurrent accesses to cache (fix #13511 and #13686)
+* [rust] Use tax.xz for Firefox package starting in version 135
 
 0.4.27
 ======

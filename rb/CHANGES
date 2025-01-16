@@ -1,22 +1,11 @@
 4.28.0 (2025-01-16)
 =========================
---> [ci] Bumping versions for nightly
---> [rb] Add tests for the cookie named, and updates type (#14843)
-* add tests for the cookie named, and updates type
-* update gemfile lock
---> [rb] Update note for return value of Hash (#14845)
-Update note for return value of Hash
---> [rb] BiDi Network: add_request_handler, remove_request_handler, clear_request_handlers (#14751)
-* Start the work on add_request_handler
-* add delete and clear request handlers
-* Update test expectation
-* Implement single type of callbacks
-* Update types
-* Update types
-* Simplify methods and have general callbacks
-* Add removed guard
-* add skip for flaky test
---> Update supported versions for Chrome DevTools
+* Add CDP for Chrome 132 and remove 129
+* [ci] Bumping versions for nightly
+* [rb] Add tests for the cookie named, and updates type (#14843)
+* [rb] Update note for return value of Hash (#14845)
+* [rb] BiDi Network: add_request_handler, remove_request_handler, clear_request_handlers (#14751)
+* Update supported versions for Chrome DevTools
 
 4.27.0 (2024-11-21)
 =========================

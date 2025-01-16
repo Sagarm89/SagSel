@@ -1,62 +1,20 @@
 Selenium 4.28.0
---> [py] fix packaging (#14823)
-Ensure `selenium.webdriver.common.fedcm` gets packaged in.
---> [py] Typing package import enhancement (#14283)
---> [py] moved all getters in `fedcm/account.py` into descriptor object. (#14858)
---> [py] add execute_cdp_cmd to Remote (#14809)
-* [py] add execute_cdp_cmd to Remote
-* use inherited method
---> Added more detailed docstrings to find_element() (#14930)
-* Added more detailed docstrings to find_element()
-* formatting
-* undo commenting
---> [py] Refactored `remote/client_config.py` by moving `properties` into `descriptor` object (#14899)
-* Refactored remote/client_config.py
-* fixed linting issues
-* fixed docformatter linting issue
---> py: Ensure DRIVER_PATH_ENV_KEY defaults to string (#14862)
-[py] Avoid os.getenv error if driver_path_env_key is not set
-Follow up to PR #14528, to avoid `os.getenv` raising `TypeError`
-in `env_path` when `driver_path_env_key` is not passed to `Service`
-constructor.
---> [py] add doc for driver_path_env_key (#14997)
-* Revert "add alias attr to all edge structs"
-This reverts commit f17dd08dd32998a310510f0abc44e5b484202a4d.
-* Reapply "add alias attr to all edge structs"
-This reverts commit cc16e3fe18971d5ecb37e26a37bcda76cda7c48b.
-oops
-* [py] add doc for driver_path_env_key
-[skip ci]
---> [py] Fix WebKitGTK driver name check (#15046)
-py: Fix WebKitGTK driver name.
-Similar to WPEWebKit changes from 24d88d73636e33, WebKitGTK does not
-follow the simple capitalization scheme for the driver name.
-This commit also changes the default `WebKitWebDriver` binary to the
-first one in `PATH` through shutil.which, instead of just the binary
-name.
-(Note: The effort to move to `pathlib` instead of `shutil`[1] is more
-related to shutil's functions that work on files and directories, like
-copy and move, instead of `which`, which just searches the executable
-paths for the given command.)
-[1] https://discuss.python.org/t/incrementally-move-high-level-path-operations-from-shutil-to-pathlib/19208
---> [py] Upgraded WebDriverWait Docstrings (#15054)
-* Improved WebDriverWait Docstrings
-* format.sh
-* Revert "format.sh"
- extra liting done
-This reverts commit 32214b69116da53833a611ff073ed022daf21b6a.
-* linting
-* Update wait.py
-* formatted again
-* ugh, format.sh again?
-* Update format.sh
-* Change Parameters to Attributes
-* accidentally replaced all
---> [py] Added Docstrings to ActionBuilder (#15065)
---> [py] Upgraded WebElement Docstrings (#15056)
---> [py] Upgraded WebDriver Docstrings (#15055)
---> [java][js][py] Add straight relative-by locators (#14482)
---> [py] Added Docstrings to RelativeBy Class and Added Missing Deprecation Warning to with_tag_name() (#15097)
+* Add CDP for Chrome 132 and remove 129
+* [py] fix packaging (#14823)
+* [py] Typing package import enhancement (#14283)
+* [py] moved all getters in `fedcm/account.py` into descriptor object. (#14858)
+* [py] add execute_cdp_cmd to Remote (#14809)
+* Added more detailed docstrings to find_element() (#14930)
+* [py] Refactored `remote/client_config.py` by moving `properties` into `descriptor` object (#14899)
+* py: Ensure DRIVER_PATH_ENV_KEY defaults to string (#14862)
+* [py] add doc for driver_path_env_key (#14997)
+* [py] Fix WebKitGTK driver name check (#15046)
+* [py] Upgraded WebDriverWait Docstrings (#15054)
+* [py] Added Docstrings to ActionBuilder (#15065)
+* [py] Upgraded WebElement Docstrings (#15056)
+* [py] Upgraded WebDriver Docstrings (#15055)
+* [java][js][py] Add straight relative-by locators (#14482)
+* [py] Added Docstrings to RelativeBy Class and Added Missing Deprecation Warning to with_tag_name() (#15097)
 
 Selenium 4.27.1
 * Fix `pyproject.toml` for installable from sdist (#14806)
