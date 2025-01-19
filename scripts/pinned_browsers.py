@@ -405,7 +405,7 @@ def firefox():
 
     beta_firefox = firefox_versions["LATEST_FIREFOX_RELEASED_DEVEL_VERSION"]
     if latest_firefox != beta_firefox:
-        sha_linux = calculate_hash(firefox_linux(beta_firefox))
+        sha_linux = calculate_hash(firefox_linux_beta(beta_firefox))
         sha_mac = calculate_hash(firefox_mac(beta_firefox))
     return content + print_firefox(beta_firefox, "beta_", sha_linux, sha_mac)
 
@@ -417,6 +417,9 @@ def firefox_version_data():
 
 def firefox_linux(version):
     return "https://ftp.mozilla.org/pub/firefox/releases/%s/linux-x86_64/en-US/firefox-%s.tar.bz2" % (version, version)
+
+def firefox_linux_beta(version):
+    return "https://ftp.mozilla.org/pub/firefox/releases/%s/linux-x86_64/en-US/firefox-%s.tar.xz" % (version, version)
 
 
 def firefox_mac(version):
