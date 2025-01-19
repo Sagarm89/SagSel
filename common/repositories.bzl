@@ -50,7 +50,7 @@ js_library(
 
     http_archive(
         name = "linux_beta_firefox",
-        url = "https://ftp.mozilla.org/pub/firefox/releases/135.0b6/linux-x86_64/en-US/firefox-135.0b6.tar.bz2",
+        url = "https://ftp.mozilla.org/pub/firefox/releases/135.0b6/linux-x86_64/en-US/firefox-135.0b6.tar.xz",
         sha256 = "104ae2f77c52f428ca0e037b0167e147d508b822e77543b26530dbef6764a018",
         build_file_content = """
 load("@aspect_rules_js//js:defs.bzl", "js_library")
