@@ -19,7 +19,7 @@ namespace {{rootNamespace}}.{{domain.Name}}
         /// Initializes a new instance of the {{dehumanize domain.Name}}Adapter class.
         /// </summary>
         /// <param name="session">The IDevToolsSession to be used with this adapter.</param>
-        /// <exception cref="ArgumentNullException">If <paramref="session"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="session"/> is <see langword="null"/>.</exception>
         public {{dehumanize domain.Name}}Adapter(IDevToolsSession session)
         {
             Session = session ?? throw new ArgumentNullException(nameof(session));
