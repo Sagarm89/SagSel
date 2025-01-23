@@ -220,7 +220,8 @@ suite(
         const browsingContext = await BrowsingContext(driver, {
           type: 'tab',
         })
-        await network.setCacheBehavior('bypass', [browsingContext])
+        const contextId = browsingContext.id
+        await network.setCacheBehavior('bypass', [contextId])
       })
 
       it('can set cache behavior to default for a context', async function () {
@@ -228,7 +229,8 @@ suite(
         const browsingContext = await BrowsingContext(driver, {
           type: 'tab',
         })
-        await network.setCacheBehavior('default', [browsingContext])
+        const contextId = browsingContext.id
+        await network.setCacheBehavior('default', [contextId])
       })
 
       it('can set cache behavior to default/bypass with no context id', async function () {

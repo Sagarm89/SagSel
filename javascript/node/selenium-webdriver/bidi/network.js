@@ -364,7 +364,7 @@ class Network {
    * @throws {Error} If behavior is invalid or context IDs are invalid
    */
   async setCacheBehavior(behavior, contexts = null) {
-    if (behavior !== 'default' && behavior !== 'bypass') {
+    if (!['default', 'bypass'].includes(behavior)) {
       throw new Error('Cache behavior must be either "default" or "bypass"')
     }
 
