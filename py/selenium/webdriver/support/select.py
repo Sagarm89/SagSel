@@ -115,7 +115,7 @@ class Select:
         matched = False
         for opt in opts:
             if not self._has_css_property_and_visible(opt):
-                raise NoSuchElementException(f"Could not locate element with visible text: {text}")
+                raise NoSuchElementException(f"Invisible option with text: {text}")
             self._set_selected(opt)
             if not self.is_multiple:
                 return
@@ -130,6 +130,8 @@ class Select:
                 candidates = self._el.find_elements(By.XPATH, xpath)
             for candidate in candidates:
                 if text == candidate.text:
+                    if not self._has_css_property_and_visible(candidate):
+                        raise NoSuchElementException(f"Invisible option with text: {text}")
                     self._set_selected(candidate)
                     if not self.is_multiple:
                         return
@@ -205,7 +207,7 @@ class Select:
         opts = self._el.find_elements(By.XPATH, xpath)
         for opt in opts:
             if not self._has_css_property_and_visible(opt):
-                raise NoSuchElementException(f"Could not locate element with visible text: {text}")
+                raise NoSuchElementException(f"Invisible option with text: {text}")
             self._unset_selected(opt)
             matched = True
         if not matched:
