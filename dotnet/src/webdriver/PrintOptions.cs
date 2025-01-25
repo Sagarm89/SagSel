@@ -50,23 +50,36 @@ namespace OpenQA.Selenium
         private const double DefaultPageHeight = 21.59;
         private const double DefaultPageWidth = 27.94;
         private const double CentimetersPerInch = 2.54;
-        public static PageSize A4 { get; } = new PageSize { Width = 21.0, Height = 29.7 }; // cm
-        public static PageSize Legal { get; } = new PageSize { Width = 21.59, Height = 35.56 }; // cm
-        public static PageSize Letter { get; } = new PageSize { Width = 21.59, Height = 27.94 }; // cm
-        public static PageSize Tabloid { get; } = new PageSize { Width = 27.94, Height = 43.18 }; // cm
         private double scale = 1.0;
         private PageSize pageSize = new PageSize();
         private Margins margins = new Margins();
         private readonly HashSet<object> pageRanges = new HashSet<object>();
 
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="PrintOptions"/> class with default values.
-        /// Default page size is set to A4.
+        /// Represents the A4 paper size.
+        /// Width: 21.0 cm, Height: 29.7 cm
         /// </summary>
-        public PrintOptions()
-        {
-        this.PageDimensions = A4; // Default to A4 page size
-        }
+        public static PageSize A4 => new PageSize { Width = 21.0, Height = 29.7 }; // cm
+
+        /// <summary>
+        /// Represents the Legal paper size.
+        /// Width: 21.59 cm, Height: 35.56 cm
+        /// </summary>
+        public static PageSize Legal => new PageSize { Width = 21.59, Height = 35.56 }; // cm
+
+        /// <summary>
+        /// Represents the Letter paper size.
+        /// Width: 21.59 cm, Height: 27.94 cm
+        /// </summary>
+        public static PageSize Letter => new PageSize { Width = 21.59, Height = 27.94 }; // cm
+
+        /// <summary>
+        /// Represents the Tabloid paper size.
+        /// Width: 27.94 cm, Height: 43.18 cm
+        /// </summary>
+        public static PageSize Tabloid => new PageSize { Width = 27.94, Height = 43.18 }; // cm
+
 
         /// <summary>
         /// Gets or sets the orientation of the pages in the printed document.
@@ -77,6 +90,9 @@ namespace OpenQA.Selenium
         /// Gets or sets the amount which the printed content is zoomed. Valid values are 0.1 to 2.0.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">If the value is not set between 0.1 and 2.0.</exception>
+
+
+
         public double ScaleFactor
         {
             get => this.scale;
