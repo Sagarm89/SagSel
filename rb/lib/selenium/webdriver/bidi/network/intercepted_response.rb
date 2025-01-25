@@ -49,8 +49,8 @@ module Selenium
         def provide_response
           network.provide_response(
             id: id,
-            cookies: set_cookie_headers.serialize,
-            headers: headers.serialize,
+            cookies: cookies.as_json,
+            headers: headers.as_json,
             body: body,
             reason: reason,
             status: status
@@ -67,6 +67,13 @@ module Selenium
 
         def cookies(cookies = {})
           @cookies ||= Cookies.new(cookies)
+        end
+
+        def body=(value)
+          @body = {
+            type: 'string',
+            value: value.to_json
+          }
         end
       end
     end # BiDi
