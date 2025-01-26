@@ -50,7 +50,7 @@ namespace OpenQA.Selenium
         private const double DefaultPageHeight = 21.59;
         private const double DefaultPageWidth = 27.94;
         private const double CentimetersPerInch = 2.54;
-        
+
         private double scale = 1.0;
         private PageSize pageSize = new PageSize();
         private Margins margins = new Margins();
