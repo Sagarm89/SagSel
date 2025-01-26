@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenQA.Selenium.BiDi.Communication.Json;
@@ -11,10 +12,12 @@ namespace OpenQA.Selenium.BiDi.Communication.Json;
 [JsonSerializable(typeof(Modules.Script.EvaluateResult.Exception))]
 
 [JsonSerializable(typeof(Modules.Script.RemoteValue.Number), TypeInfoPropertyName = "Script_RemoteValue_Number")]
+[JsonSerializable(typeof(Modules.Script.RemoteValue.Boolean), TypeInfoPropertyName = "Script_RemoteValue_Boolean")]
 [JsonSerializable(typeof(Modules.Script.RemoteValue.String), TypeInfoPropertyName = "Script_RemoteValue_String")]
 [JsonSerializable(typeof(Modules.Script.RemoteValue.Null), TypeInfoPropertyName = "Script_RemoteValue_Null")]
 [JsonSerializable(typeof(Modules.Script.RemoteValue.Undefined), TypeInfoPropertyName = "Script_RemoteValue_Undefined")]
 [JsonSerializable(typeof(Modules.Script.RemoteValue.Symbol))]
+[JsonSerializable(typeof(Modules.Script.RemoteValue.Array), TypeInfoPropertyName = "Script_RemoteValue_Array")]
 [JsonSerializable(typeof(Modules.Script.RemoteValue.Object), TypeInfoPropertyName = "Script_RemoteValue_Object")]
 [JsonSerializable(typeof(Modules.Script.RemoteValue.Function))]
 [JsonSerializable(typeof(Modules.Script.RemoteValue.RegExp), TypeInfoPropertyName = "Script_RemoteValue_RegExp")]
@@ -60,8 +63,8 @@ namespace OpenQA.Selenium.BiDi.Communication.Json;
 [JsonSerializable(typeof(Modules.Session.NewResult))]
 
 [JsonSerializable(typeof(Modules.Browser.CloseCommand), TypeInfoPropertyName = "Browser_CloseCommand")]
-[JsonSerializable(typeof(Modules.Browser.UserContextInfo))]
 [JsonSerializable(typeof(Modules.Browser.GetUserContextsResult))]
+[JsonSerializable(typeof(IReadOnlyList<Modules.Browser.UserContextInfo>))]
 
 [JsonSerializable(typeof(Modules.BrowsingContext.CloseCommand), TypeInfoPropertyName = "BrowsingContext_CloseCommand")]
 [JsonSerializable(typeof(Modules.BrowsingContext.CreateResult))]
@@ -75,6 +78,7 @@ namespace OpenQA.Selenium.BiDi.Communication.Json;
 [JsonSerializable(typeof(Modules.BrowsingContext.PrintResult))]
 [JsonSerializable(typeof(Modules.BrowsingContext.UserPromptOpenedEventArgs))]
 [JsonSerializable(typeof(Modules.BrowsingContext.UserPromptClosedEventArgs))]
+[JsonSerializable(typeof(Modules.BrowsingContext.Origin), TypeInfoPropertyName = "BrowsingContext_Origin")]
 
 [JsonSerializable(typeof(Modules.Network.BytesValue.String), TypeInfoPropertyName = "Network_BytesValue_String")]
 [JsonSerializable(typeof(Modules.Network.UrlPattern.String), TypeInfoPropertyName = "Network_UrlPattern_String")]
@@ -90,10 +94,25 @@ namespace OpenQA.Selenium.BiDi.Communication.Json;
 [JsonSerializable(typeof(Modules.Script.AddPreloadScriptResult))]
 [JsonSerializable(typeof(Modules.Script.EvaluateResult))]
 [JsonSerializable(typeof(Modules.Script.GetRealmsResult))]
+[JsonSerializable(typeof(Modules.Script.MessageEventArgs))]
+[JsonSerializable(typeof(Modules.Script.RealmDestroyedEventArgs))]
+[JsonSerializable(typeof(IReadOnlyList<Modules.Script.RealmInfo>))]
 
 [JsonSerializable(typeof(Modules.Log.Entry))]
 
 [JsonSerializable(typeof(Modules.Storage.GetCookiesResult))]
 [JsonSerializable(typeof(Modules.Storage.DeleteCookiesResult))]
 [JsonSerializable(typeof(Modules.Storage.SetCookieResult))]
+
+[JsonSerializable(typeof(Modules.Input.PerformActionsCommand))]
+[JsonSerializable(typeof(Modules.Input.Pointer.Down), TypeInfoPropertyName = "Input_Pointer_Down")]
+[JsonSerializable(typeof(Modules.Input.Pointer.Up), TypeInfoPropertyName = "Input_Pointer_Up")]
+[JsonSerializable(typeof(Modules.Input.Pointer.Move), TypeInfoPropertyName = "Input_Pointer_Move")]
+[JsonSerializable(typeof(Modules.Input.Key.Down), TypeInfoPropertyName = "Input_Key_Down")]
+[JsonSerializable(typeof(Modules.Input.Key.Up), TypeInfoPropertyName = "Input_Key_Up")]
+[JsonSerializable(typeof(IEnumerable<Modules.Input.IPointerSourceAction>))]
+[JsonSerializable(typeof(IEnumerable<Modules.Input.IKeySourceAction>))]
+[JsonSerializable(typeof(IEnumerable<Modules.Input.INoneSourceAction>))]
+[JsonSerializable(typeof(IEnumerable<Modules.Input.IWheelSourceAction>))]
+
 internal partial class BiDiSerializerContext: JsonSerializerContext;
