@@ -61,6 +61,11 @@ namespace OpenQA.Selenium.DevTools
 
         private readonly static ILogger logger = Internal.Logging.Log.GetLogger<DevToolsSession>();
 
+        private static readonly JsonSerializerOptions s_devToolsSerializerOptions = new()
+        {
+            TypeInfoResolver = CdpSerializationContext.Default,
+        }
+
         /// <summary>
         /// Initializes a new instance of the DevToolsSession class, using the specified WebSocket endpoint.
         /// </summary>
@@ -190,7 +195,7 @@ namespace OpenQA.Selenium.DevTools
                 throw new ArgumentNullException(nameof(command));
             }
 
-            var result = await SendCommand(command.CommandName, sessionId, JsonSerializer.SerializeToNode(command, CdpSerializationContext.Default.GetTypeInfo(typeof(TCommand))), cancellationToken, millisecondsTimeout, throwExceptionIfResponseNotReceived).ConfigureAwait(false);
+            var result = await SendCommand(command.CommandName, sessionId, JsonSerializer.SerializeToNode(command, s_devToolsSerializerOptions), cancellationToken, millisecondsTimeout, throwExceptionIfResponseNotReceived).ConfigureAwait(false);
 
             if (result == null)
             {
@@ -202,8 +207,7 @@ namespace OpenQA.Selenium.DevTools
                 throw new InvalidOperationException($"Type {typeof(TCommand)} does not correspond to a known command response type.");
             }
 
-            var commandResponseSerialization = CdpSerializationContext.Default.GetTypeInfo(commandResponseType);
-            return (ICommandResponse<TCommand>)result.Value.Deserialize(commandResponseType, commandResponseSerialization);
+            return (ICommandResponse<TCommand>)result.Value.Deserialize(commandResponseType, s_devToolsSerializerOptions);
         }
 
         /// <summary>
