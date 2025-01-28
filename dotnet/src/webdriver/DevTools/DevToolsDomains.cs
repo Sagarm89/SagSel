@@ -20,6 +20,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace OpenQA.Selenium.DevTools
 {
@@ -67,6 +69,15 @@ namespace OpenQA.Selenium.DevTools
         /// Gets the object used for manipulating the browser's logs.
         /// </summary>
         public abstract Log Log { get; }
+
+        internal abstract JsonNode SerializeToNode<TCommand>(TCommand command)
+            where TCommand : ICommand;
+
+        internal abstract ICommandResponse<TCommand> DeserializeCommandResponse<TCommand>(JsonElement responseJson)
+            where TCommand : ICommand;
+
+        internal abstract TCommandResponse Deserialize<TCommandResponse>(JsonElement responseJson)
+            where TCommandResponse : ICommandResponse;
 
         /// <summary>
         /// Initializes the supplied DevTools session's domains for the specified browser version.

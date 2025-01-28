@@ -2,6 +2,7 @@ using Humanizer;
 using OpenQA.Selenium.DevToolsGenerator.ProtocolDefinition;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenQA.Selenium.DevToolsGenerator.CodeGen
 {
@@ -33,7 +34,8 @@ namespace OpenQA.Selenium.DevToolsGenerator.CodeGen
                 className = className,
                 domain = context.Domain,
                 rootNamespace = Settings.RootNamespace,
-                context = context
+                context = context,
+                protocolVersion = Settings.RootNamespace.Split('.').Last()
             });
 
             var outputPath = Utility.ReplaceTokensInPath(Settings.DefinitionTemplates.CommandTemplate.OutputPath, className, context, Settings);
