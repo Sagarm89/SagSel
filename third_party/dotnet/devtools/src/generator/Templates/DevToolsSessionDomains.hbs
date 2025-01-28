@@ -43,4 +43,10 @@ namespace {{rootNamespace}}
 {{/each}}
         }
     }
+
+{{#each commands}}
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof({{FullTypeName}}))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof({{FullResponseTypeName}}))]
+{{/each}}
+    internal sealed partial class {{protocolVersion}}JsonSerializationContext;
 }
