@@ -56,6 +56,11 @@ namespace {{rootNamespace}}
 {{#each events}}
     [global::System.Text.Json.Serialization.JsonSerializable(typeof({{FullTypeName}}), TypeInfoPropertyName = "{{FullSnakeTypeName}}")]
 {{/each}}
+{{#each types}}
+{{#unless IsPrimitive}}
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof({{Namespace}}.{{TypeName}}), TypeInfoPropertyName = "{{FullSnakeTypeName}}")]
+{{/unless}}
+{{/each}}
     [global::System.Text.Json.Serialization.JsonSourceGenerationOptions(Converters = [typeof(OpenQA.Selenium.DevTools.Json.StringConverter)])]
     internal sealed partial class {{protocolVersion}}JsonSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext;
 }

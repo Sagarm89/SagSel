@@ -14,5 +14,18 @@ namespace OpenQA.Selenium.DevToolsGenerator.CodeGen
         public string TypeName { get; } = typeName;
 
         public string? SourcePath { get; set; }
+
+        public string FullSnakeTypeName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Namespace))
+                {
+                    return TypeName.Replace(".", "_");
+                }
+
+                return $"{Namespace.Replace(".", "_")}_{TypeName.Replace(".", "_")}";
+            }
+        }
     }
 }
