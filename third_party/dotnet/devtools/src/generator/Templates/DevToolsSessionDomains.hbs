@@ -50,11 +50,11 @@ namespace {{rootNamespace}}
     }
 
 {{#each commands}}
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof({{FullTypeName}}))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof({{FullResponseTypeName}}))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof({{FullTypeName}}), TypeInfoPropertyName = "{{FullSnakeTypeName}}")]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof({{FullResponseTypeName}}), TypeInfoPropertyName = "{{FullSnakeResponseTypeName}}")]
 {{/each}}
 {{#each events}}
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof({{fullTypeName}}))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof({{FullTypeName}}), TypeInfoPropertyName = "{{FullSnakeTypeName}}")]
 {{/each}}
     [global::System.Text.Json.Serialization.JsonSourceGenerationOptions(Converters = [typeof(OpenQA.Selenium.DevTools.Json.StringConverter)])]
     internal sealed partial class {{protocolVersion}}JsonSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext;
