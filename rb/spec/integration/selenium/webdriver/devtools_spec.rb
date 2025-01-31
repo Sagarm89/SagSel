@@ -112,19 +112,9 @@ module Selenium
         expect(logs).to include(
           an_object_having_attributes(type: :log, args: [hash_including('type' => 'object')])
         )
-      end
-
-      it 'notifies about document log messages' do
-        logs = []
-        driver.on_log_event(:console) { |log| logs.push(log) }
-        driver.navigate.to url_for('javascriptPage.html')
-
-        driver.execute_script('console.log(document);')
-        wait.until { !logs.empty? }
-
         expect(logs).to include(
-          an_object_having_attributes(type: :log, args: [hash_including('location')])
-        )
+                          an_object_having_attributes(type: :log, args: [hash_including('location')])
+                        )
       end
 
       it 'notifies about exceptions' do

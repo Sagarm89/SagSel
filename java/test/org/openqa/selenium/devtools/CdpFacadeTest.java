@@ -61,7 +61,6 @@ class CdpFacadeTest extends DevToolsTestBase {
   }
 
   @Test
-  @NotYetImplemented(value = Browser.FIREFOX, reason = "Network interception not yet supported")
   public void networkInterceptorAndAuthHandlersDoNotFight() {
     assumeThat(driver).isInstanceOf(HasAuthentication.class);
 
@@ -95,7 +94,6 @@ class CdpFacadeTest extends DevToolsTestBase {
   }
 
   @Test
-  @NotYetImplemented(value = Browser.FIREFOX, reason = "Network interception not yet supported")
   public void canAuthenticate() {
     assumeThat(driver).isInstanceOf(HasAuthentication.class);
 
