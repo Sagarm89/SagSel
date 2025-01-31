@@ -35,7 +35,7 @@ namespace OpenQA.Selenium.DevTools
 
         // This is the list of known supported DevTools version implementation.
         // When new versions are implemented for support, new types must be
-        // added to this dictionary.
+        // added to this array and to the method below.
         private static int[] SupportedDevToolsVersions =>
         [
             130,
