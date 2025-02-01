@@ -41,6 +41,7 @@ namespace OpenQA.Selenium.DevTools.V132
         /// </summary>
         /// <param name="network">The adapter for the Network domain.</param>
         /// <param name="fetch">The adapter for the Fetch domain.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="network"/> or <paramref name="fetch"/> are <see langword="null"/>.</exception>
         public V132Network(NetworkAdapter network, FetchAdapter fetch)
         {
             this.network = network ?? throw new ArgumentNullException(nameof(network));
