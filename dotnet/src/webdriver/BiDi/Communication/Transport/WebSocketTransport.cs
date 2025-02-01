@@ -63,7 +63,7 @@ class WebSocketTransport(Uri _uri) : ITransport, IDisposable
 
         if (_logger.IsEnabled(LogEventLevel.Trace))
         {
-            _logger.Trace($"BiDi RCV << {Encoding.UTF8.GetString(ms.ToArray())}");
+            _logger.Trace($"BiDi RCV <-- {Encoding.UTF8.GetString(ms.ToArray())}");
         }
 
         var res = await JsonSerializer.DeserializeAsync(ms, typeof(T), jsonSerializerContext, cancellationToken).ConfigureAwait(false);
@@ -82,7 +82,7 @@ class WebSocketTransport(Uri _uri) : ITransport, IDisposable
         {
             if (_logger.IsEnabled(LogEventLevel.Trace))
             {
-                _logger.Trace($"BiDi SND >> {Encoding.UTF8.GetString(buffer)}");
+                _logger.Trace($"BiDi SND --> {Encoding.UTF8.GetString(buffer)}");
             }
 
             await _webSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, cancellationToken).ConfigureAwait(false);
