@@ -21,12 +21,12 @@ using OpenQA.Selenium.Internal;
 using OpenQA.Selenium.Internal.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -114,7 +114,7 @@ namespace OpenQA.Selenium.Remote
 
         /// <summary>
         /// Gets or sets the user agent string used for HTTP communication
-        /// batween this <see cref="HttpCommandExecutor"/> and the remote end
+        /// between this <see cref="HttpCommandExecutor"/> and the remote end
         /// WebDriver implementation
         /// </summary>
         public string UserAgent { get; set; }
@@ -133,9 +133,9 @@ namespace OpenQA.Selenium.Remote
         /// Attempts to add a command to the repository of commands known to this executor.
         /// </summary>
         /// <param name="commandName">The name of the command to attempt to add.</param>
-        /// <param name="info">The <see cref="CommandInfo"/> describing the commnd to add.</param>
+        /// <param name="info">The <see cref="CommandInfo"/> describing the command to add.</param>
         /// <returns><see langword="true"/> if the new command has been added successfully; otherwise, <see langword="false"/>.</returns>
-        public bool TryAddCommand(string commandName, CommandInfo info)
+        public bool TryAddCommand(string commandName, [NotNullWhen(true)] CommandInfo? info)
         {
             if (info is not HttpCommandInfo commandInfo)
             {
@@ -150,6 +150,7 @@ namespace OpenQA.Selenium.Remote
         /// </summary>
         /// <param name="commandToExecute">The command you wish to execute.</param>
         /// <returns>A response from the browser.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="commandToExecute"/> is <see langword="null"/>.</exception>
         public virtual Response Execute(Command commandToExecute)
         {
             return Task.Run(() => this.ExecuteAsync(commandToExecute)).GetAwaiter().GetResult();
@@ -160,6 +161,7 @@ namespace OpenQA.Selenium.Remote
         /// </summary>
         /// <param name="commandToExecute">The command you wish to execute.</param>
         /// <returns>A task object representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="commandToExecute"/> is <see langword="null"/>.</exception>
         public virtual async Task<Response> ExecuteAsync(Command commandToExecute)
         {
             if (commandToExecute == null)
@@ -169,7 +171,7 @@ namespace OpenQA.Selenium.Remote
 
             if (_logger.IsEnabled(LogEventLevel.Debug))
             {
-                _logger.Debug($"Executing command: {commandToExecute}");
+                _logger.Debug($"Executing command: [{commandToExecute.SessionId}]: {commandToExecute.Name} {commandToExecute.ParametersAsJsonString}");
             }
 
             HttpCommandInfo? info = this.commandInfoRepository.GetCommandInfo<HttpCommandInfo>(commandToExecute.Name);
