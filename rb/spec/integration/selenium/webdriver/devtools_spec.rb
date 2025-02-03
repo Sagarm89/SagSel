@@ -113,8 +113,8 @@ module Selenium
           an_object_having_attributes(type: :log, args: [hash_including('type' => 'object')])
         )
         expect(logs).to include(
-                          an_object_having_attributes(type: :log, args: [hash_including('location')])
-                        )
+          an_object_having_attributes(type: :log, args: [hash_including('location')])
+        )
       end
 
       it 'notifies about exceptions' do
