@@ -28,8 +28,8 @@ using System.Text.Json.Serialization;
 
 namespace OpenQA.Selenium.DevTools.Json
 {
-    internal sealed class JsonEnumMemberConverter<TEnum>
-        : JsonConverter<TEnum> where TEnum : struct, Enum
+    internal sealed class JsonEnumMemberConverter<TEnum> : JsonConverter<TEnum>
+        where TEnum : struct, Enum
     {
         private readonly Dictionary<TEnum, string> _enumToString = new Dictionary<TEnum, string>();
         private readonly Dictionary<string, TEnum> _stringToEnum = new Dictionary<string, TEnum>();
@@ -42,10 +42,9 @@ namespace OpenQA.Selenium.DevTools.Json
 #else
             Array values = Enum.GetValues(type);
 #endif
-
             foreach (var value in values)
             {
-                var enumMember = type.GetField(value.ToString())!;
+                var enumMember = type.GetField(value.ToString());
                 var attr = enumMember.GetCustomAttributes(typeof(EnumMemberAttribute), false)
                   .Cast<EnumMemberAttribute>()
                   .FirstOrDefault();
