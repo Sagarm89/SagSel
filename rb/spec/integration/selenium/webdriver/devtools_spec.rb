@@ -108,7 +108,7 @@ module Selenium
 
         driver.execute_script('console.log(document);')
         wait.until { !logs.empty? }
-
+ 
         expect(logs).to include(
           an_object_having_attributes(type: :log, args: [hash_including('type' => 'object')])
         )
