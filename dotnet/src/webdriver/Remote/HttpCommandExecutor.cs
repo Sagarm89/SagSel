@@ -169,7 +169,7 @@ namespace OpenQA.Selenium.Remote
                 throw new ArgumentNullException(nameof(commandToExecute), "commandToExecute cannot be null");
             }
 
-            if (_logger.IsEnabled(LogEventLevel.Trace))
+            if (_logger.IsEnabled(LogEventLevel.Debug))
             {
                 _logger.Debug($"Executing command: [{commandToExecute.SessionId}]: {commandToExecute.Name}");
             }
