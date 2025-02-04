@@ -61,8 +61,6 @@ namespace OpenQA.Selenium
         /// </summary>
         public IWebDriver WrappedDriver => this.driver;
 
-#nullable restore
-
         /// <summary>
         /// Gets the tag name of this element.
         /// </summary>
@@ -81,7 +79,11 @@ namespace OpenQA.Selenium
 
                 Response commandResponse = this.Execute(DriverCommand.GetElementTagName, parameters);
 
-                return commandResponse.Value.ToString();
+                if (commandResponse.Value is not Dictionary<string, object?> rawSize)
+                {
+                    throw new WebDriverException($"GetElementTagName command was successful, but response was not an object: {commandResponse.Value}");
+                }
+                return commandResponse.Value.ToString()!;
             }
         }
 
@@ -99,11 +101,14 @@ namespace OpenQA.Selenium
 
                 Response commandResponse = this.Execute(DriverCommand.GetElementText, parameters);
 
-                return commandResponse.Value.ToString();
+                if (commandResponse.Value is not Dictionary<string, object?> rawSize)
+                {
+                    throw new WebDriverException($"GetElementText command was successful, but response was not an object: {commandResponse.Value}");
+                }
+
+                return commandResponse.Value.ToString()!;
             }
         }
-
-#nullable enable
 
         /// <summary>
         /// Gets a value indicating whether or not this element is enabled.
@@ -231,8 +236,6 @@ namespace OpenQA.Selenium
             }
         }
 
-#nullable restore
-
         /// <summary>
         /// Gets the computed accessible label of this element.
         /// </summary>
@@ -245,7 +248,12 @@ namespace OpenQA.Selenium
 
                 Response commandResponse = this.Execute(DriverCommand.GetComputedAccessibleLabel, parameters);
 
-                return commandResponse.Value.ToString();
+                if (commandResponse.Value is null)
+                {
+                    throw new WebDriverException("GetComputedAccessibleLabel command returned a successful result, but contained no data");
+                }
+
+                return commandResponse.Value.ToString()!;
             }
         }
 
@@ -256,20 +264,20 @@ namespace OpenQA.Selenium
         {
             get
             {
-                // TODO: Returning this as a string is incorrect. The W3C WebDriver Specification
-                // needs to be updated to more thoroughly document the structure of what is returned
-                // by this command. Once that is done, a type-safe class will be created, and will
-                // be returned by this property.
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("id", this.Id);
 
                 Response commandResponse = this.Execute(DriverCommand.GetComputedAccessibleRole, parameters);
 
+#nullable disable
+                // TODO: Returning this as a string is incorrect. The W3C WebDriver Specification
+                // needs to be updated to more thoroughly document the structure of what is returned
+                // by this command. Once that is done, a type-safe class will be created, and will
+                // be returned by this property.
                 return commandResponse.Value.ToString();
+#nullable enable
             }
         }
-
-#nullable enable
 
         /// <summary>
         /// Gets the coordinates identifying the location of this element using
@@ -331,6 +339,8 @@ namespace OpenQA.Selenium
             this.Execute(DriverCommand.ClickElement, parameters);
         }
 
+#nullable restore
+
         /// <summary>
         /// Finds the first <see cref="IWebElement"/> using the given method.
         /// </summary>
@@ -348,7 +358,7 @@ namespace OpenQA.Selenium
             return by.FindElement(this);
         }
 
-#nullable restore
+#nullable enable
 
         /// <summary>
         /// Finds a child element matching the given mechanism and value.
@@ -368,6 +378,8 @@ namespace OpenQA.Selenium
             return this.driver.GetElementFromResponse(commandResponse);
         }
 
+#nullable restore
+
         /// <summary>
         /// Finds all <see cref="IWebElement">IWebElements</see> within the current context
         /// using the given mechanism.
@@ -384,6 +396,8 @@ namespace OpenQA.Selenium
 
             return by.FindElements(this);
         }
+
+#nullable enable
 
         /// <summary>
         /// Finds all child elements matching the given mechanism and value.
@@ -402,8 +416,6 @@ namespace OpenQA.Selenium
 
             return this.driver.GetElementsFromResponse(commandResponse);
         }
-
-#nullable enable
 
         /// <summary>
         /// Gets the value of the specified attribute or property for this element.
