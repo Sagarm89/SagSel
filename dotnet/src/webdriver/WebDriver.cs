@@ -558,13 +558,15 @@ namespace OpenQA.Selenium
             return toReturn.AsReadOnly();
         }
 
+#nullable restore
+
         /// <summary>
         /// Executes commands with the driver
         /// </summary>
         /// <param name="driverCommandToExecute">Command that needs executing</param>
         /// <param name="parameters">Parameters needed for the command</param>
         /// <returns>WebDriver Response</returns>
-        internal Response InternalExecute(string driverCommandToExecute, Dictionary<string, object?>? parameters)
+        internal Response InternalExecute(string driverCommandToExecute, Dictionary<string, object> parameters)
         {
             return Task.Run(() => this.InternalExecuteAsync(driverCommandToExecute, parameters)).GetAwaiter().GetResult();
         }
@@ -576,7 +578,7 @@ namespace OpenQA.Selenium
         /// <param name="parameters">Parameters needed for the command</param>
         /// <returns>A task object representing the asynchronous operation</returns>
         internal Task<Response> InternalExecuteAsync(string driverCommandToExecute,
-            Dictionary<string, object?>? parameters)
+            Dictionary<string, object> parameters)
         {
             return this.ExecuteAsync(driverCommandToExecute, parameters);
         }
@@ -588,7 +590,7 @@ namespace OpenQA.Selenium
         /// <param name="parameters">A <see cref="Dictionary{K, V}"/> containing the names and values of the parameters of the command.</param>
         /// <returns>A <see cref="Response"/> containing information about the success or failure of the command and any data returned by the command.</returns>
         protected virtual Response Execute(string driverCommandToExecute,
-            Dictionary<string, object?>? parameters)
+            Dictionary<string, object> parameters)
         {
             return Task.Run(() => this.ExecuteAsync(driverCommandToExecute, parameters)).GetAwaiter().GetResult();
         }
@@ -599,7 +601,7 @@ namespace OpenQA.Selenium
         /// <param name="driverCommandToExecute">A <see cref="DriverCommand"/> value representing the command to execute.</param>
         /// <param name="parameters">A <see cref="Dictionary{K, V}"/> containing the names and values of the parameters of the command.</param>
         /// <returns>A <see cref="Response"/> containing information about the success or failure of the command and any data returned by the command.</returns>
-        protected virtual async Task<Response> ExecuteAsync(string driverCommandToExecute, Dictionary<string, object?>? parameters)
+        protected virtual async Task<Response> ExecuteAsync(string driverCommandToExecute, Dictionary<string, object> parameters)
         {
             Command commandToExecute = new Command(SessionId, driverCommandToExecute, parameters);
 
@@ -612,8 +614,6 @@ namespace OpenQA.Selenium
 
             return commandResponse;
         }
-
-#nullable restore
 
         /// <summary>
         /// Starts a session with the driver
@@ -873,7 +873,7 @@ namespace OpenQA.Selenium
         {
             object?[] convertedArgs = ConvertArgumentsToJavaScriptObjects(args);
 
-            Dictionary<string, object?> parameters = new Dictionary<string, object?>();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("script", script);
 
             if (convertedArgs != null && convertedArgs.Length > 0)
@@ -1057,7 +1057,7 @@ namespace OpenQA.Selenium
                 throw new ArgumentNullException(nameof(authenticatorId));
             }
 
-            Dictionary<string, object?> parameters = new Dictionary<string, object?>();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("authenticatorId", authenticatorId);
 
             this.Execute(DriverCommand.RemoveVirtualAuthenticator, parameters);
@@ -1084,7 +1084,7 @@ namespace OpenQA.Selenium
 
             string authenticatorId = this.AuthenticatorId ?? throw new InvalidOperationException("Virtual Authenticator needs to be added before it can perform operations");
 
-            Dictionary<string, object?> parameters = new Dictionary<string, object?>(credential.ToDictionary());
+            Dictionary<string, object> parameters = new Dictionary<string, object>(credential.ToDictionary());
             parameters.Add("authenticatorId", authenticatorId);
 
             this.Execute(driverCommandToExecute: DriverCommand.AddCredential, parameters);
@@ -1099,7 +1099,7 @@ namespace OpenQA.Selenium
         {
             string authenticatorId = this.AuthenticatorId ?? throw new InvalidOperationException("Virtual Authenticator needs to be added before it can perform operations");
 
-            Dictionary<string, object?> parameters = new Dictionary<string, object?>();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("authenticatorId", authenticatorId);
 
             Response getCredentialsResponse = this.Execute(driverCommandToExecute: DriverCommand.GetCredentials, parameters);
@@ -1145,7 +1145,7 @@ namespace OpenQA.Selenium
 
             string authenticatorId = this.AuthenticatorId ?? throw new InvalidOperationException("Virtual Authenticator needs to be added before it can perform operations");
 
-            Dictionary<string, object?> parameters = new Dictionary<string, object?>();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("authenticatorId", authenticatorId);
             parameters.Add("credentialId", credentialId);
 
@@ -1160,7 +1160,7 @@ namespace OpenQA.Selenium
         {
             string authenticatorId = this.AuthenticatorId ?? throw new InvalidOperationException("Virtual Authenticator needs to be added before it can perform operations");
 
-            Dictionary<string, object?> parameters = new Dictionary<string, object?>();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("authenticatorId", authenticatorId);
 
             this.Execute(driverCommandToExecute: DriverCommand.RemoveAllCredentials, parameters);
@@ -1174,7 +1174,7 @@ namespace OpenQA.Selenium
         {
             string authenticatorId = this.AuthenticatorId ?? throw new InvalidOperationException("Virtual Authenticator needs to be added before it can perform operations");
 
-            Dictionary<string, object?> parameters = new Dictionary<string, object?>();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("authenticatorId", authenticatorId);
             parameters.Add("isUserVerified", verified);
 
