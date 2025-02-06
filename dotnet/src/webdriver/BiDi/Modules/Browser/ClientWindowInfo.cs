@@ -1,4 +1,4 @@
-// <copyright file="BrowsingContextInfo.cs" company="Selenium Committers">
+// <copyright file="ClientWindowInfo.cs" company="Selenium Committers">
 // Licensed to the Software Freedom Conservancy (SFC) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17,17 +17,18 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-
 #nullable enable
 
-namespace OpenQA.Selenium.BiDi.Modules.BrowsingContext;
+using System.Text.Json.Serialization;
 
-// TODO: Split it to separate class with just info and event args
-public record BrowsingContextInfo(BiDi BiDi, IReadOnlyList<BrowsingContextInfo> Children, Browser.ClientWindow ClientWindow, BrowsingContext Context, BrowsingContext OriginalOpener, string Url, Browser.UserContext UserContext)
-    : BrowsingContextEventArgs(BiDi, Context)
+namespace OpenQA.Selenium.BiDi.Modules.Browser;
+
+public record ClientWindowInfo([property: JsonPropertyName("active")] bool IsActive, ClientWindow ClientWindow, ClientWindowState State, int Height, int Width, int X, int Y);
+
+public enum ClientWindowState
 {
-    [JsonInclude]
-    public BrowsingContext? Parent { get; internal set; }
+    Fullscreen,
+    Maximized,
+    Minimized,
+    Normal
 }
