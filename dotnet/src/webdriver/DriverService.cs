@@ -37,7 +37,6 @@ namespace OpenQA.Selenium
     public abstract class DriverService : ICommandServer
     {
         private bool isDisposed;
-        private readonly object driverServiceProcessLock = new object();
         private Process? driverServiceProcess;
 
         /// <summary>
