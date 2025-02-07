@@ -1,4 +1,4 @@
-// <copyright file="ITransport.cs" company="Selenium Committers">
+// <copyright file="ClientWindowInfo.cs" company="Selenium Committers">
 // Licensed to the Software Freedom Conservancy (SFC) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17,19 +17,18 @@
 // under the License.
 // </copyright>
 
-using System.Threading.Tasks;
-using System.Threading;
-using System;
-
 #nullable enable
 
-namespace OpenQA.Selenium.BiDi.Communication.Transport;
+using System.Text.Json.Serialization;
 
-interface ITransport : IDisposable
+namespace OpenQA.Selenium.BiDi.Modules.Browser;
+
+public record ClientWindowInfo([property: JsonPropertyName("active")] bool IsActive, ClientWindow ClientWindow, ClientWindowState State, int Height, int Width, int X, int Y);
+
+public enum ClientWindowState
 {
-    Task ConnectAsync(CancellationToken cancellationToken);
-
-    Task<byte[]> ReceiveAsync(CancellationToken cancellationToken);
-
-    Task SendAsync(byte[] data, CancellationToken cancellationToken);
+    Fullscreen,
+    Maximized,
+    Minimized,
+    Normal
 }

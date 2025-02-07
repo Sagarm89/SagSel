@@ -1,4 +1,4 @@
-// <copyright file="ITransport.cs" company="Selenium Committers">
+// <copyright file="ClientWindow.cs" company="Selenium Committers">
 // Licensed to the Software Freedom Conservancy (SFC) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17,19 +17,16 @@
 // under the License.
 // </copyright>
 
-using System.Threading.Tasks;
-using System.Threading;
-using System;
-
 #nullable enable
 
-namespace OpenQA.Selenium.BiDi.Communication.Transport;
+namespace OpenQA.Selenium.BiDi.Modules.Browser;
 
-interface ITransport : IDisposable
+public record ClientWindow
 {
-    Task ConnectAsync(CancellationToken cancellationToken);
+    internal ClientWindow(string id)
+    {
+        Id = id;
+    }
 
-    Task<byte[]> ReceiveAsync(CancellationToken cancellationToken);
-
-    Task SendAsync(byte[] data, CancellationToken cancellationToken);
+    internal string Id { get; }
 }
