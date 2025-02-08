@@ -18,6 +18,7 @@
 // </copyright>
 
 using OpenQA.Selenium.BiDi.Communication;
+using System;
 using System.Collections.Generic;
 
 #nullable enable
@@ -32,6 +33,16 @@ internal class UnsubscribeByAttributesCommand(UnsubscribeByAttributesCommandPara
 
 internal record UnsubscribeByIdCommandParameters(IEnumerable<Subscription> Subscriptions) : CommandParameters;
 
-internal record UnsubscribeByAttributesCommandParameters : CommandParameters;
+public record UnsubscribeByIdOptions : CommandOptions;
 
-public record UnsubscribeOptions : SubscribeOptions;
+internal record UnsubscribeByAttributesCommandParameters(IEnumerable<string> Events) : CommandParameters
+{
+    [Obsolete("Contexts param is deprecated and will be removed in the future versions")]
+    // https://w3c.github.io/webdriver-bidi/#type-session-UnsubscribeByAttributesRequest
+    public IEnumerable<BrowsingContext.BrowsingContext>? Contexts { get; set; }
+}
+
+public record UnsubscribeByAttributesOptions : CommandOptions
+{
+    public IEnumerable<BrowsingContext.BrowsingContext>? Contexts { get; set; }
+}
