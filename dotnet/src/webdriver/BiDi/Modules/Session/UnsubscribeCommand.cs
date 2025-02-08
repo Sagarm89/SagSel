@@ -35,12 +35,11 @@ internal record UnsubscribeByIdCommandParameters(IEnumerable<Subscription> Subsc
 
 public record UnsubscribeByIdOptions : CommandOptions;
 
-internal record UnsubscribeByAttributesCommandParameters(IEnumerable<string> Events) : CommandParameters
-{
-    [Obsolete("Contexts param is deprecated and will be removed in the future versions")]
+internal record UnsubscribeByAttributesCommandParameters(
+    IEnumerable<string> Events,
+    [property: Obsolete("Contexts param is deprecated and will be removed in the future versions")]
     // https://w3c.github.io/webdriver-bidi/#type-session-UnsubscribeByAttributesRequest
-    public IEnumerable<BrowsingContext.BrowsingContext>? Contexts { get; set; }
-}
+    IEnumerable<BrowsingContext.BrowsingContext>? Contexts) : CommandParameters;
 
 public record UnsubscribeByAttributesOptions : CommandOptions
 {
