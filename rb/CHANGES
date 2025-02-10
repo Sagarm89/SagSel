@@ -1,3 +1,47 @@
+4.29.0 (2025-02-10)
+=========================
+--> Bumping version for nightly
+--> [rb] Add Bidi Network Response Handler (#14900)
+--> [java][js][rb][py][dotnet] Remove firefox cdp (#15200)
+Related to #11736
+--> [rb][BiDi] Add support for provide response command (#15080)
+* Add response handler
+* Update auth handlers and improve the :on method
+* Request and response working as expected
+* Add test for continue without auth and cancel auth
+* Finish implementation
+* Correct rubocop offenses
+* Add alias for user to do network.bidi instead of network.network
+* Fix rust file causing formatting error
+* Handle requests and responses in block
+* Add ability to pass handlers to each different intercepted element
+* Headers working
+* All tests passing and signatures simplified
+* remove unnecessary changes
+* remove unnecessary changes
+* Added credentials and set cookie header to intercepted response
+* Fix rubocop issues
+* Make auth handler more user friendly
+* Add filtering an url pattern support
+* Fix formatting issues
+* Modify tests to avoid element related failures on firefox
+* Fix styling of comments
+* Improve types and hash consistency
+* Update all the places that use 9.4.8.0
+* Serialize request values
+* Refactor cookies, headers and set cookie headers
+* Simplify serialization
+* Add extra type support
+* remove unnecessary comment
+* Improve typing
+* add provide response support
+* Correct rubocop offenses
+* Remove set cookie headers
+* Remove set cookie headers
+* Fix failing tests
+* Add negative scenario
+--> Update supported versions for Chrome DevTools
+
 4.28.0 (2025-01-16)
 =========================
 * Add CDP for Chrome 132 and remove 129

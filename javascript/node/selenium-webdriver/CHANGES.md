@@ -1,3 +1,24 @@
+## 4.29.0
+--> [javascript] Bumping version to nightly
+--> [javascript] Fixing changelog
+[skip ci]
+--> [java][js][rb][py][dotnet] Remove firefox cdp (#15200)
+Related to #11736
+--> [bazel] Remove empty globs
+In Bazel 8, the default is to disallow empty globs. Rather
+than make more changes as we update, instead we'll flip the
+flag now and fix up any issues. This will make the Bazel 8
+update simpler.
+--> [js][bidi]: implement bidi `setCacheBehavior` command (#15136)
+* implement js bidi command `setCacheBehavior`
+* add bidi tests for `setCacheBehavior`
+* updated tests
+* add input validation for context IDs
+* use enum like structure (CacheBehavior)
+* use named import in other network test files
+* fix lib/network.js
+--> Update supported versions for Chrome DevTools
+
 ## 4.28.1
 
 - [JS] specify min required node versiton to 18.20.5
