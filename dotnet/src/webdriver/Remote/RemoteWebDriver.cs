@@ -512,7 +512,7 @@ namespace OpenQA.Selenium.Remote
         public IReadOnlyList<string> GetDownloadableFiles()
         {
             var enableDownloads = this.Capabilities.GetCapability(CapabilityType.EnableDownloads);
-            if (enableDownloads is not true)
+            if (enableDownloads == null || !(bool)enableDownloads)
             {
                 throw new WebDriverException("You must enable downloads in order to work with downloadable files.");
             }
@@ -536,7 +536,7 @@ namespace OpenQA.Selenium.Remote
         public void DownloadFile(string fileName, string targetDirectory)
         {
             var enableDownloads = this.Capabilities.GetCapability(CapabilityType.EnableDownloads);
-            if (enableDownloads is not true)
+            if (enableDownloads == null || !(bool)enableDownloads)
             {
                 throw new WebDriverException("You must enable downloads in order to work with downloadable files.");
             }
@@ -547,11 +547,11 @@ namespace OpenQA.Selenium.Remote
             };
 
             Response commandResponse = this.Execute(DriverCommand.DownloadFile, parameters);
-
             if (commandResponse.Value is not Dictionary<string, object?> value)
             {
                 throw new WebDriverException("DownloadFile returned successfully, but response content was not an object: " + commandResponse.Value);
             }
+
             string contents = value["contents"]!.ToString()!;
             byte[] fileData = Convert.FromBase64String(contents);
 
@@ -577,7 +577,7 @@ namespace OpenQA.Selenium.Remote
         public void DeleteDownloadableFiles()
         {
             var enableDownloads = this.Capabilities.GetCapability(CapabilityType.EnableDownloads);
-            if (enableDownloads is not true)
+            if (enableDownloads == null || !(bool)enableDownloads)
             {
                 throw new WebDriverException("You must enable downloads in order to work with downloadable files.");
             }
