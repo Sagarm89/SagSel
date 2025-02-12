@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import uuid
 from .session import session_subscribe
 from .session import session_unsubscribe
 
@@ -46,7 +47,7 @@ class Network:
 
     def command_iterator(self, command):
         """Generator to yield command."""
-        yield command
+        yield command.to_json()
 
     def has_callbacks(self):
         """Checks if there are any callbacks set."""
@@ -235,6 +236,10 @@ class Request:
         command = {'method': 'network.continueRequest', 'params': params}
         self.network.conn.execute(self.command_iterator(command))
 
+    def command_iterator(self, command):
+        """Generator to yield command."""
+        yield command.to_json()
+
 class Response:
     def __init__(self, request_id, url, status_code, headers, body, network: Network):
         self.request_id = request_id
@@ -256,3 +261,7 @@ class Response:
             params['body'] = self.body
         command = {'method': 'network.continueResponse', 'params': params}
         self.network.conn.execute(self.command_iterator(command))
+
+    def command_iterator(self, command):
+        """Generator to yield command."""
+        yield command.to_json()
