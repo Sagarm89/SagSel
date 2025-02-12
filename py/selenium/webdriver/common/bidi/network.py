@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import json
 import uuid
 
 from .session import session_subscribe
@@ -47,7 +48,7 @@ class Network:
 
     def command_iterator(self, command):
         """Generator to yield command."""
-        yield command.to_json()
+        yield command
 
     def has_callbacks(self):
         """Checks if there are any callbacks set."""
@@ -231,7 +232,7 @@ class Request:
 
     def command_iterator(self, command):
         """Generator to yield command."""
-        yield command.to_json()
+        yield command
 
 
 class Response:
@@ -255,4 +256,4 @@ class Response:
 
     def command_iterator(self, command):
         """Generator to yield command."""
-        yield command.to_json()
+        yield command
