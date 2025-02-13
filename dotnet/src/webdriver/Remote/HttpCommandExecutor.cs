@@ -223,7 +223,7 @@ namespace OpenQA.Selenium.Remote
 
         /// <summary>
         /// Creates an instance of <see cref="HttpClientHandler"/> as underlying handler,
-        /// used by <see cref="CreateHttpClient"/>.
+        /// used by <see cref="CreateHttpClient"/>. Invoked only once when required.
         /// </summary>
         /// <returns>An instance of <see cref="HttpClientHandler"/>.</returns>
         protected virtual HttpClientHandler CreateHttpClientHandler()
@@ -244,6 +244,7 @@ namespace OpenQA.Selenium.Remote
 
         /// <summary>
         /// Creates an instance of <see cref="HttpClient"/> used by making all HTTP calls to remote end.
+        /// Invoked only once when required.
         /// </summary>
         /// <returns>An instance of <see cref="HttpClient"/>.</returns>
         protected virtual HttpClient CreateHttpClient()
