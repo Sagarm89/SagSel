@@ -28,7 +28,12 @@ use std::path::Path;
 
 #[allow(dead_code)]
 pub fn get_selenium_manager() -> Command {
-    Command::new(env!("CARGO_BIN_EXE_selenium-manager"))
+    Command::new(get_sm_binary())
+}
+
+#[allow(dead_code)]
+pub fn get_sm_binary() -> String {
+    env!("CARGO_BIN_EXE_selenium-manager").to_string()
 }
 
 #[allow(dead_code)]

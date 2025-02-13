@@ -155,6 +155,14 @@ struct Cli {
     /// Not using browsers found in the PATH
     #[clap(long)]
     skip_browser_in_path: bool,
+
+    /// Manage FFMPEG static build. If version is not provided, release 7.1 is downloaded
+    #[clap(long, value_parser, num_args = 0..=1, default_missing_value = "", value_name = "FFMPEG_VERSION")]
+    ffmpeg: Option<String>,
+
+    /// Record desktop (using FFMPEG)
+    #[clap(long)]
+    record: bool,
 }
 
 fn main() {
@@ -164,9 +172,11 @@ fn main() {
 
     let debug = cli.debug || BooleanKey("debug", false).get_value();
     let trace = cli.trace || BooleanKey("trace", false).get_value();
+    let record = cli.record || BooleanKey("record", false).get_value();
     let log_level = StringKey(vec!["log-level"], &cli.log_level.unwrap_or_default()).get_value();
     let log = Logger::create(&cli.output, debug, trace, &log_level);
     let grid = cli.grid;
+    let ffmpeg = cli.ffmpeg;
     let mut browser_name: String = cli.browser.unwrap_or_default();
     let mut driver_name: String = cli.driver.unwrap_or_default();
     if browser_name.is_empty() {
@@ -174,6 +184,12 @@ fn main() {
     }
     if driver_name.is_empty() {
         driver_name = StringKey(vec!["driver"], "").get_value();
+    }
+    if record {
+        // If record is set, we actually don't need a browser or driver, but still we need a manager
+        // to be coherent with the SM setup. Therefore, we use Chrome Manager by default, although
+        // the browser or driver will not be resolved
+        browser_name = "chrome".to_string();
     }
 
     let mut selenium_manager: Box<dyn SeleniumManager> = if !browser_name.is_empty() {
@@ -239,6 +255,7 @@ fn main() {
     selenium_manager
         .set_timeout(cli.timeout)
         .and_then(|_| selenium_manager.set_proxy(cli.proxy.unwrap_or_default()))
+        .and_then(|_| selenium_manager.record_desktop(ffmpeg, record))
         .and_then(|_| selenium_manager.stats())
         .and_then(|_| selenium_manager.setup())
         .map(|driver_path| {

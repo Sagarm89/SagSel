@@ -176,10 +176,9 @@ pub fn uncompress_sfx(compressed_file: &str, target: &Path, log: &Logger) -> Res
     let index_7z = header.ok_or(anyhow!("Incorrect SFX (self extracting exe) file"))?;
     let file_reader = Cursor::new(&file_bytes[index_7z..]);
     sevenz_rust::decompress(file_reader, zip_parent).unwrap();
-
     let zip_parent_str = path_to_string(zip_parent);
     let core_str = format!(r"{}\core", zip_parent_str);
-    move_folder_content(&core_str, &target, &log)?;
+    move_folder_content(&core_str, target, log)?;
 
     Ok(())
 }
@@ -294,7 +293,7 @@ pub fn uncompress_deb(
         fs::remove_file(Path::new(&link)).unwrap_or_default();
     }
 
-    move_folder_content(&opt_edge_str, &target, &log)?;
+    move_folder_content(&opt_edge_str, target, log)?;
 
     Ok(())
 }
@@ -506,10 +505,10 @@ pub fn compose_driver_path_in_cache(
         .join(driver_name)
         .join(arch_folder)
         .join(driver_version)
-        .join(get_driver_filename(driver_name, os))
+        .join(get_filename_with_extension(driver_name, os))
 }
 
-pub fn get_driver_filename(driver_name: &str, os: &str) -> String {
+pub fn get_filename_with_extension(driver_name: &str, os: &str) -> String {
     format!("{}{}", driver_name, get_binary_extension(os))
 }
 

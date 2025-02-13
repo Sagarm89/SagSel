@@ -20,9 +20,13 @@ use crate::config::OS::{MACOS, WINDOWS};
 use crate::config::{str_to_os, ManagerConfig};
 use crate::downloads::download_to_tmp_folder;
 use crate::edge::{EdgeManager, EDGEDRIVER_NAME, EDGE_NAMES, WEBVIEW2_NAME};
+use crate::ffmpeg::{
+    download_ffmpeg, get_ffmpeg_path_in_cache, get_ffmpeg_version, record_desktop_with_ffmpeg,
+    FFMPEG_NAME,
+};
 use crate::files::{
     capitalize, collect_files_from_cache, create_path_if_not_exists, default_cache_folder,
-    find_latest_from_cache, get_binary_extension, path_to_string,
+    find_latest_from_cache, get_binary_extension, get_filename_with_extension, path_to_string,
 };
 use crate::files::{parse_version, uncompress, BrowserPath};
 use crate::firefox::{FirefoxManager, FIREFOX_NAME, GECKODRIVER_NAME};
@@ -55,6 +59,7 @@ pub mod chrome;
 pub mod config;
 pub mod downloads;
 pub mod edge;
+pub mod ffmpeg;
 pub mod files;
 pub mod firefox;
 pub mod grid;
@@ -189,7 +194,7 @@ pub trait SeleniumManager {
         let driver_name_with_extension = self.get_driver_name_with_extension();
 
         let mut lock = Lock::acquire(
-            &self.get_logger(),
+            self.get_logger(),
             &driver_path_in_cache,
             Some(driver_name_with_extension.clone()),
         )?;
@@ -322,7 +327,7 @@ pub trait SeleniumManager {
             }
 
             let browser_path_in_cache = self.get_browser_path_in_cache()?;
-            let mut lock = Lock::acquire(&self.get_logger(), &browser_path_in_cache, None)?;
+            let mut lock = Lock::acquire(self.get_logger(), &browser_path_in_cache, None)?;
             if !lock.exists() && browser_binary_path.exists() {
                 self.get_logger().debug(format!(
                     "Browser already in cache: {}",
@@ -347,7 +352,7 @@ pub trait SeleniumManager {
             uncompress(
                 &driver_zip_file,
                 &browser_path_in_cache,
-                &self.get_logger(),
+                self.get_logger(),
                 self.get_os(),
                 None,
                 browser_label_for_download,
@@ -896,6 +901,23 @@ pub trait SeleniumManager {
         Ok(())
     }
 
+    fn record_desktop(&self, ffmpeg_version: Option<String>, record: bool) -> Result<(), Error> {
+        let mut ffmpeg_path: Option<PathBuf> = None;
+        if ffmpeg_version.is_some() {
+            ffmpeg_path = Some(self.get_or_download_ffmpeg(ffmpeg_version.clone())?);
+        }
+        if record {
+            let cache_path = self.get_cache_path()?.unwrap_or_default();
+            record_desktop_with_ffmpeg(
+                ffmpeg_path.unwrap_or(self.get_or_download_ffmpeg(ffmpeg_version.clone())?),
+                self.get_os(),
+                self.get_logger(),
+                cache_path,
+            )?;
+        }
+        Ok(())
+    }
+
     fn check_error_with_driver_in_path(
         &mut self,
         is_driver_in_path: &bool,
@@ -1052,19 +1074,11 @@ pub trait SeleniumManager {
     }
 
     fn get_driver_name_with_extension(&self) -> String {
-        format!(
-            "{}{}",
-            self.get_driver_name(),
-            get_binary_extension(self.get_os())
-        )
+        get_filename_with_extension(self.get_driver_name(), self.get_os())
     }
 
     fn get_browser_name_with_extension(&self) -> String {
-        format!(
-            "{}{}",
-            self.get_browser_name(),
-            get_binary_extension(self.get_os())
-        )
+        get_filename_with_extension(self.get_browser_name(), self.get_os())
     }
 
     fn general_request_browser_version(
@@ -1581,6 +1595,29 @@ pub trait SeleniumManager {
 
     fn set_fallback_driver_from_cache(&mut self, fallback_driver_from_cache: bool) {
         self.get_config_mut().fallback_driver_from_cache = fallback_driver_from_cache;
+    }
+
+    fn get_or_download_ffmpeg(&self, version: Option<String>) -> Result<PathBuf, Error> {
+        let ffmpeg_version = get_ffmpeg_version(version);
+        let cache_path = self.get_cache_path()?.unwrap_or_default();
+        let ffmpeg_path_in_cache =
+            get_ffmpeg_path_in_cache(&ffmpeg_version, self.get_os(), cache_path.clone())?;
+
+        if ffmpeg_path_in_cache.exists() {
+            self.get_logger().debug(format!(
+                "{} {} already in the cache",
+                FFMPEG_NAME, ffmpeg_version
+            ));
+        } else {
+            download_ffmpeg(
+                ffmpeg_version,
+                self.get_http_client(),
+                self.get_os(),
+                self.get_logger(),
+                cache_path,
+            )?;
+        }
+        Ok(ffmpeg_path_in_cache)
     }
 }
 
