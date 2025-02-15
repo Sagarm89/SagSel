@@ -73,7 +73,18 @@ module Selenium
           expect(handles).to include(window1)
           expect(handles).not_to include(window2)
         end
+
+        it 'sets the viewport' do
+          reset_driver!(web_socket_url: true) do |driver|
+            browsing_context = described_class.new(driver)
+            browsing_context.set_viewport(width: 800, height: 600, device_pixel_ratio: 2)
+            expect(driver.execute_script('return [window.innerWidth, window.innerHeight]')).to eq([800, 600])
+            expect(driver.execute_script('return window.devicePixelRatio')).to eq(2)
+          end
+        end
       end
-    end # BiDi
+    end
+
+    # BiDi
   end # WebDriver
 end # Selenium
