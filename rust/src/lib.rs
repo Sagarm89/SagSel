@@ -99,6 +99,7 @@ pub const SINGLE_QUOTE: &str = "'";
 pub const ENV_PROGRAM_FILES: &str = "PROGRAMFILES";
 pub const ENV_PROGRAM_FILES_X86: &str = "PROGRAMFILES(X86)";
 pub const ENV_LOCALAPPDATA: &str = "LOCALAPPDATA";
+pub const ENV_DISPLAY: &str = "DISPLAY";
 pub const ENV_X86: &str = " (x86)";
 pub const ARCH_X86: &str = "x86";
 pub const ARCH_AMD64: &str = "amd64";
@@ -1698,6 +1699,14 @@ pub fn format_three_args(string: &str, arg1: &str, arg2: &str, arg3: &str) -> St
         .replacen("{}", arg1, 1)
         .replacen("{}", arg2, 1)
         .replacen("{}", arg3, 1)
+}
+
+pub fn format_four_args(string: &str, arg1: &str, arg2: &str, arg3: &str, arg4: &str) -> String {
+    string
+        .replacen("{}", arg1, 1)
+        .replacen("{}", arg2, 1)
+        .replacen("{}", arg3, 1)
+        .replacen("{}", arg4, 1)
 }
 
 // ----------------------------------------------------------

@@ -24,12 +24,15 @@ use crate::files::{
 use crate::lock::Lock;
 use crate::logger::Logger;
 use crate::shell::Command;
-use crate::{format_one_arg, format_three_args, format_two_args, run_shell_command_with_log};
+use crate::{
+    format_four_args, format_one_arg, format_three_args, format_two_args,
+    run_shell_command_with_log, ENV_DISPLAY,
+};
 use anyhow::Error;
 use reqwest::Client;
-use std::fs;
 use std::fs::File;
 use std::path::{Path, PathBuf};
+use std::{env, fs};
 use xz2::read::XzDecoder;
 
 pub const FFMPEG_NAME: &str = "ffmpeg";
@@ -40,9 +43,8 @@ const FFMPEG_LINUX_RELEASE_URL: &str = "https://github.com/BtbN/FFmpeg-Builds/re
 const FFMPEG_MACOS_RELEASE_URL: &str = "https://evermeet.cx/ffmpeg/ffmpeg-{}.zip";
 const FFMPEG_RECORD_FRAME_RATE: &str = "30";
 const FFMPEG_RECORD_DESKTOP_WINDOWS_COMMAND: &str = "{} -f gdigrab -i desktop -r {} -q:v 1 -y {}";
-const FFMPEG_RECORD_DESKTOP_LINUX_COMMAND: &str =
-    "{} -f x11grab -i $DISPLAY -r {} -vcodec huffyuv -y {}";
-const FFMPEG_RECORD_DESKTOP_MACOS_COMMAND: &str = "{} -f avfoundation -i $DISPLAY -r {} -y {}";
+const FFMPEG_RECORD_DESKTOP_LINUX_COMMAND: &str = "{} -f x11grab -i {} -r {} -vcodec huffyuv -y {}";
+const FFMPEG_RECORD_DESKTOP_MACOS_COMMAND: &str = "{} -f avfoundation -i {} -r {} -y {}";
 const FFMPEG_RECORDING_EXTENSION: &str = "avi";
 const FFMPEG_RECORDING_FOLDER: &str = "recordings";
 
@@ -207,12 +209,23 @@ pub fn record_desktop_with_ffmpeg(
         "Recording desktop with {} to {}",
         FFMPEG_NAME, &recording_name
     ));
-    let command = Command::new_single(format_three_args(
-        get_recording_command(os),
-        &path_to_string(&ffmpeg_path),
-        FFMPEG_RECORD_FRAME_RATE,
-        &recording_name,
-    ));
+    let command = if WINDOWS.is(os) {
+        Command::new_single(format_three_args(
+            get_recording_command(os),
+            &path_to_string(&ffmpeg_path),
+            FFMPEG_RECORD_FRAME_RATE,
+            &recording_name,
+        ))
+    } else {
+        let env_display = env::var(ENV_DISPLAY).unwrap_or_default();
+        Command::new_single(format_four_args(
+            get_recording_command(os),
+            &path_to_string(&ffmpeg_path),
+            &env_display,
+            FFMPEG_RECORD_FRAME_RATE,
+            &recording_name,
+        ))
+    };
     run_shell_command_with_log(log, os, command).unwrap();
     Ok(())
 }

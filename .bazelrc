@@ -107,8 +107,6 @@ test:windows --test_env=PATH
 test:windows --test_env=LOCALAPPDATA
 test:windows --test_env=PROGRAMFILES="C:\\Program Files"
 test:windows --test_env=PROGRAMFILES(X86)="C:\\Program Files (x86)"
-test:linux --test_env=DISPLAY
-test:macos --test_env=DISPLAY
 
 test --test_timeout=1800
 
