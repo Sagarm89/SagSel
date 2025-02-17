@@ -191,23 +191,20 @@ jobs:
         if: inputs.save-recordings && inputs.os == 'windows'
         uses: actions/upload-artifact@v4
         with:
-          name: win-recordings
-          path: |
-            C:\Users\runneradmin\.cache\selenium\recordings\*.avi
+          name: recordings-win
+          path: C:\Users\runneradmin\.cache\selenium\recordings\*.avi
           retention-days: 6
       - name: Save recordings (Linux)
         if: inputs.save-recordings && inputs.os == 'ubuntu'
         uses: actions/upload-artifact@v4
         with:
-          name: linux-recordings
-          path: |
-            /home/runner/.cache/selenium/recordings/*.avi
+          name: recordings-linux
+          path: ~/.cache/selenium/recordings/*.avi
           retention-days: 6
       - name: Save recordings (macOS)
         if: inputs.save-recordings && inputs.os == 'macos'
         uses: actions/upload-artifact@v4
         with:
-          name: macos-recordings
-          path: |
-            /home/runner/.cache/selenium/recordings/*.avi
+          name: recordings-macos
+          path: ~/.cache/selenium/recordings/*.avi
           retention-days: 6
