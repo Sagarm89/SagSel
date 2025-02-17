@@ -471,7 +471,7 @@ namespace :node do
 
   desc 'Update JavaScript changelog'
   task :changelog do
-    header = "## #{node_version}"
+    header = "## #{node_version}\n"
     update_changelog(node_version, 'javascript', 'javascript/node/selenium-webdriver/',
                      'javascript/node/selenium-webdriver/CHANGES.md', header)
   end
