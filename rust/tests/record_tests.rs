@@ -45,5 +45,4 @@ fn test_record() {
         }
     };
     println!("Recording test status code: {:?}", status_code);
-    panic!("Forced error");
 }
