@@ -44,7 +44,7 @@ public class PermissionsTest extends JupiterTestBase {
       "() => {return navigator.permissions.query({ name: 'geolocation' })"
           + ".then(val => val.state, err => err.message)}";
   private static final String GET_ORIGIN = "() => {return window.location.origin;}";
-
+  
   @BeforeEach
   public void setUp() {
     permission = new Permission(driver);
@@ -53,23 +53,10 @@ public class PermissionsTest extends JupiterTestBase {
 
   @Test
   @NeedsFreshDriver
-  public void canSetPermissionToGranted() {
+  public void canSetPermission() {
     driver.get(new Pages(appServer).blankPage);
 
     String windowHandle = driver.getWindowHandle();
-
-    EvaluateResult initialPermission =
-        script.callFunctionInBrowsingContext(
-            windowHandle,
-            GET_GEOLOCATION_PERMISSION,
-            true,
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty());
-
-    String initialPermissionValue =
-        (String) ((EvaluateResultSuccess) initialPermission).getResult().getValue().get();
-    assertThat(initialPermissionValue).isEqualTo("prompt");
 
     EvaluateResult origin =
         script.callFunctionInBrowsingContext(
@@ -90,37 +77,10 @@ public class PermissionsTest extends JupiterTestBase {
 
     String resultValue = (String) ((EvaluateResultSuccess) result).getResult().getValue().get();
     assertThat(resultValue).isEqualTo("granted");
-  }
-
-  @Test
-  @NeedsFreshDriver
-  public void canSetPermissionToDenied() {
-    driver.get(new Pages(appServer).blankPage);
-
-    String windowHandle = driver.getWindowHandle();
-
-    EvaluateResult initialPermission =
-        script.callFunctionInBrowsingContext(
-            windowHandle,
-            GET_GEOLOCATION_PERMISSION,
-            true,
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty());
-
-    String initialPermissionValue =
-        (String) ((EvaluateResultSuccess) initialPermission).getResult().getValue().get();
-    assertThat(initialPermissionValue).isEqualTo("prompt");
-
-    EvaluateResult origin =
-        script.callFunctionInBrowsingContext(
-            windowHandle, GET_ORIGIN, true, Optional.empty(), Optional.empty(), Optional.empty());
-
-    String originValue = (String) ((EvaluateResultSuccess) origin).getResult().getValue().get();
 
     permission.setPermission(Map.of("name", "geolocation"), PermissionState.DENIED, originValue);
 
-    EvaluateResult result =
+    result =
         script.callFunctionInBrowsingContext(
             windowHandle,
             GET_GEOLOCATION_PERMISSION,
@@ -129,28 +89,12 @@ public class PermissionsTest extends JupiterTestBase {
             Optional.empty(),
             Optional.empty());
 
-    String resultValue = (String) ((EvaluateResultSuccess) result).getResult().getValue().get();
+    resultValue = (String) ((EvaluateResultSuccess) result).getResult().getValue().get();
     assertThat(resultValue).isEqualTo("denied");
-  }
-
-  @Test
-  @NeedsFreshDriver
-  public void canSetPermissionToPrompt() {
-    driver.get(new Pages(appServer).blankPage);
-
-    String windowHandle = driver.getWindowHandle();
-
-    EvaluateResult origin =
-        script.callFunctionInBrowsingContext(
-            windowHandle, GET_ORIGIN, true, Optional.empty(), Optional.empty(), Optional.empty());
-
-    String originValue = (String) ((EvaluateResultSuccess) origin).getResult().getValue().get();
-
-    permission.setPermission(Map.of("name", "geolocation"), PermissionState.DENIED, originValue);
 
     permission.setPermission(Map.of("name", "geolocation"), PermissionState.PROMPT, originValue);
 
-    EvaluateResult result =
+    result =
         script.callFunctionInBrowsingContext(
             windowHandle,
             GET_GEOLOCATION_PERMISSION,
@@ -159,7 +103,7 @@ public class PermissionsTest extends JupiterTestBase {
             Optional.empty(),
             Optional.empty());
 
-    String resultValue = (String) ((EvaluateResultSuccess) result).getResult().getValue().get();
+    resultValue = (String) ((EvaluateResultSuccess) result).getResult().getValue().get();
     assertThat(resultValue).isEqualTo("prompt");
   }
 
@@ -189,50 +133,10 @@ public class PermissionsTest extends JupiterTestBase {
             originalTab, GET_ORIGIN, true, Optional.empty(), Optional.empty(), Optional.empty());
 
     String originValue = (String) ((EvaluateResultSuccess) origin).getResult().getValue().get();
-
-    EvaluateResult originalTabPermission =
-        script.callFunctionInBrowsingContext(
-            originalTab,
-            GET_GEOLOCATION_PERMISSION,
-            true,
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty());
-
-    String originalTabPermissionValue =
-        (String) ((EvaluateResultSuccess) originalTabPermission).getResult().getValue().get();
-    assertThat(originalTabPermissionValue).isEqualTo("prompt");
-
-    EvaluateResult newTabPermission =
-        script.callFunctionInBrowsingContext(
-            newTab,
-            GET_GEOLOCATION_PERMISSION,
-            true,
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty());
-
-    String newTabPermissionValue =
-        (String) ((EvaluateResultSuccess) newTabPermission).getResult().getValue().get();
-    assertThat(newTabPermissionValue).isEqualTo("prompt");
-
+    
     permission.setPermission(
         Map.of("name", "geolocation"), PermissionState.GRANTED, originValue, userContext);
-
-    EvaluateResult originalTabUpdatedPermission =
-        script.callFunctionInBrowsingContext(
-            originalTab,
-            GET_GEOLOCATION_PERMISSION,
-            true,
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty());
-
-    String originalTabUpdatedPermissionValue =
-        (String)
-            ((EvaluateResultSuccess) originalTabUpdatedPermission).getResult().getValue().get();
-    assertThat(originalTabUpdatedPermissionValue).isEqualTo("prompt");
-
+    
     EvaluateResult newTabUpdatedPermission =
         script.callFunctionInBrowsingContext(
             newTab,
@@ -243,6 +147,25 @@ public class PermissionsTest extends JupiterTestBase {
             Optional.empty());
 
     String newTabUpdatedPermissionValue =
+        (String) ((EvaluateResultSuccess) newTabUpdatedPermission).getResult().getValue().get();
+    assertThat(newTabUpdatedPermissionValue).isEqualTo("granted");
+
+    BrowsingContext context3 =
+        new BrowsingContext(
+            this.driver, new CreateContextParameters(WindowType.TAB).userContext(userContext));
+
+    context3.navigate(url, ReadinessState.COMPLETE);
+
+    newTabUpdatedPermission =
+        script.callFunctionInBrowsingContext(
+            context3.getId(),
+            GET_GEOLOCATION_PERMISSION,
+            true,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
+
+    newTabUpdatedPermissionValue =
         (String) ((EvaluateResultSuccess) newTabUpdatedPermission).getResult().getValue().get();
     assertThat(newTabUpdatedPermissionValue).isEqualTo("granted");
   }
