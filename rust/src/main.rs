@@ -156,9 +156,9 @@ struct Cli {
     #[clap(long)]
     skip_browser_in_path: bool,
 
-    /// Manage FFMPEG static build. If version is not provided, release 7.1 is downloaded
-    #[clap(long, value_parser, num_args = 0..=1, default_missing_value = "", value_name = "FFMPEG_VERSION")]
-    ffmpeg: Option<String>,
+    /// Manage FFMPEG static build
+    #[clap(long)]
+    ffmpeg: bool,
 
     /// Record desktop (using FFMPEG)
     #[clap(long)]
@@ -172,11 +172,11 @@ fn main() {
 
     let debug = cli.debug || BooleanKey("debug", false).get_value();
     let trace = cli.trace || BooleanKey("trace", false).get_value();
+    let ffmpeg = cli.ffmpeg || BooleanKey("ffmpeg", false).get_value();
     let record = cli.record || BooleanKey("record", false).get_value();
     let log_level = StringKey(vec!["log-level"], &cli.log_level.unwrap_or_default()).get_value();
     let log = Logger::create(&cli.output, debug, trace, &log_level);
     let grid = cli.grid;
-    let ffmpeg = cli.ffmpeg;
     let mut browser_name: String = cli.browser.unwrap_or_default();
     let mut driver_name: String = cli.driver.unwrap_or_default();
     if browser_name.is_empty() {

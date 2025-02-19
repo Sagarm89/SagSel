@@ -902,15 +902,15 @@ pub trait SeleniumManager {
         Ok(())
     }
 
-    fn record_desktop(&self, ffmpeg_version: Option<String>, record: bool) -> Result<(), Error> {
+    fn record_desktop(&self, ffmpeg: bool, record: bool) -> Result<(), Error> {
         let mut ffmpeg_path: Option<PathBuf> = None;
-        if ffmpeg_version.is_some() {
-            ffmpeg_path = Some(self.get_or_download_ffmpeg(ffmpeg_version.clone())?);
+        if ffmpeg {
+            ffmpeg_path = Some(self.get_or_download_ffmpeg()?);
         }
         if record {
             let cache_path = self.get_cache_path()?.unwrap_or_default();
             record_desktop_with_ffmpeg(
-                ffmpeg_path.unwrap_or(self.get_or_download_ffmpeg(ffmpeg_version.clone())?),
+                ffmpeg_path.unwrap_or(self.get_or_download_ffmpeg()?),
                 self.get_os(),
                 self.get_logger(),
                 cache_path,
@@ -1598,8 +1598,8 @@ pub trait SeleniumManager {
         self.get_config_mut().fallback_driver_from_cache = fallback_driver_from_cache;
     }
 
-    fn get_or_download_ffmpeg(&self, version: Option<String>) -> Result<PathBuf, Error> {
-        let ffmpeg_version = get_ffmpeg_version(version);
+    fn get_or_download_ffmpeg(&self) -> Result<PathBuf, Error> {
+        let ffmpeg_version = get_ffmpeg_version();
         let cache_path = self.get_cache_path()?.unwrap_or_default();
         let ffmpeg_path_in_cache =
             get_ffmpeg_path_in_cache(&ffmpeg_version, self.get_os(), cache_path.clone())?;

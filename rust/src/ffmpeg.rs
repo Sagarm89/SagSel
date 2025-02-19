@@ -91,13 +91,8 @@ pub fn download_ffmpeg(
     Ok(())
 }
 
-pub fn get_ffmpeg_version(ffmpeg_version: Option<String>) -> String {
-    let ffmpeg_version = ffmpeg_version.unwrap_or(FFMPEG_DEFAULT_VERSION.to_string());
-    if ffmpeg_version.is_empty() {
-        FFMPEG_DEFAULT_VERSION.to_string()
-    } else {
-        ffmpeg_version
-    }
+pub fn get_ffmpeg_version() -> String {
+    FFMPEG_DEFAULT_VERSION.to_string()
 }
 
 pub fn get_ffmpeg_path_in_cache(
