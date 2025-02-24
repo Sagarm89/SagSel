@@ -74,7 +74,7 @@ namespace OpenQA.Selenium.Edge
         /// </summary>
         /// <param name="driverPath">The directory containing the EdgeDriver executable.</param>
         /// <returns>An EdgeDriverService using a random port.</returns>
-        public static EdgeDriverService CreateDefaultService(string driverPath)
+        public static EdgeDriverService CreateDefaultService(string? driverPath)
         {
             string fileName;
             if (File.Exists(driverPath))
@@ -96,7 +96,7 @@ namespace OpenQA.Selenium.Edge
         /// <param name="driverPath">The directory containing the EdgeDriver executable.</param>
         /// <param name="driverExecutableFileName">The name of the EdgeDriver executable file.</param>
         /// <returns>A EdgeDriverService using a random port.</returns>
-        public static EdgeDriverService CreateDefaultService(string driverPath, string driverExecutableFileName)
+        public static EdgeDriverService CreateDefaultService(string? driverPath, string? driverExecutableFileName)
         {
             return new EdgeDriverService(driverPath, driverExecutableFileName, PortUtilities.FindFreePort());
         }

@@ -63,7 +63,7 @@ namespace OpenQA.Selenium.Chrome
         /// </summary>
         /// <param name="driverPath">The path to the executable or the directory containing the ChromeDriver executable.</param>
         /// <returns>A ChromeDriverService using a random port.</returns>
-        public static ChromeDriverService CreateDefaultService(string driverPath)
+        public static ChromeDriverService CreateDefaultService(string? driverPath)
         {
             string fileName;
             if (File.Exists(driverPath))
@@ -85,7 +85,7 @@ namespace OpenQA.Selenium.Chrome
         /// <param name="driverPath">The directory containing the ChromeDriver executable.</param>
         /// <param name="driverExecutableFileName">The name of the ChromeDriver executable file.</param>
         /// <returns>A ChromeDriverService using a random port.</returns>
-        public static ChromeDriverService CreateDefaultService(string driverPath, string driverExecutableFileName)
+        public static ChromeDriverService CreateDefaultService(string? driverPath, string? driverExecutableFileName)
         {
             return new ChromeDriverService(driverPath, driverExecutableFileName, PortUtilities.FindFreePort());
         }

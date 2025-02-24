@@ -194,7 +194,7 @@ namespace OpenQA.Selenium.Firefox
         /// </summary>
         /// <param name="driverPath">The path to the executable or the directory containing the Firefox driver executable.</param>
         /// <returns>A FirefoxDriverService using a random port.</returns>
-        public static FirefoxDriverService CreateDefaultService(string driverPath)
+        public static FirefoxDriverService CreateDefaultService(string? driverPath)
         {
             string fileName;
             if (File.Exists(driverPath))
@@ -216,7 +216,7 @@ namespace OpenQA.Selenium.Firefox
         /// <param name="driverPath">The directory containing the Firefox driver executable.</param>
         /// <param name="driverExecutableFileName">The name of the Firefox driver executable file.</param>
         /// <returns>A FirefoxDriverService using a random port.</returns>
-        public static FirefoxDriverService CreateDefaultService(string driverPath, string driverExecutableFileName)
+        public static FirefoxDriverService CreateDefaultService(string? driverPath, string? driverExecutableFileName)
         {
             return new FirefoxDriverService(driverPath, driverExecutableFileName, PortUtilities.FindFreePort());
         }
