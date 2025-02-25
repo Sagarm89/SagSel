@@ -14,12 +14,15 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+
+from typing import Optional
+
 from .interaction import Interaction
 from .wheel_input import WheelInput
 
 
 class WheelActions(Interaction):
-    def __init__(self, source: WheelInput = None):
+    def __init__(self, source: Optional[WheelInput] = None):
         if not source:
             source = WheelInput("wheel")
         super().__init__(source)

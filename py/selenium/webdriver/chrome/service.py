@@ -40,7 +40,7 @@ class Service(service.ChromiumService):
         executable_path=None,
         port: int = 0,
         service_args: Optional[List[str]] = None,
-        log_output: SubprocessStdAlias = None,
+        log_output: Optional[SubprocessStdAlias] = None,
         env: Optional[Mapping[str, str]] = None,
         **kwargs,
     ) -> None:

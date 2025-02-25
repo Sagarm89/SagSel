@@ -30,6 +30,7 @@ from base64 import urlsafe_b64encode
 from contextlib import asynccontextmanager
 from contextlib import contextmanager
 from importlib import import_module
+from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -401,7 +402,7 @@ class WebDriver(BaseWebDriver):
         """
         return self.execute("executeCdpCommand", {"cmd": cmd, "params": cmd_args})["value"]
 
-    def execute(self, driver_command: str, params: dict = None) -> dict:
+    def execute(self, driver_command: str, params: dict[str, Any]) -> dict[str, Any]:
         """Sends a command to be executed by a command.CommandExecutor.
 
         Parameters:
