@@ -24,7 +24,7 @@ using System.IO;
 namespace OpenQA.Selenium.Internal.Logging
 {
     /// <summary>
-    /// Represents a log handler that writes log events to the console.
+    /// Represents a log handler that writes log events to the given text writer.
     /// </summary>
     public class TextWriterHandler(TextWriter writer) : ILogHandler
     {
@@ -32,7 +32,7 @@ namespace OpenQA.Selenium.Internal.Logging
         private static readonly string[] _levels = { "TRACE", "DEBUG", " INFO", " WARN", "ERROR" };
 
         /// <summary>
-        /// Handles a log event by writing it to the console.
+        /// Handles a log event by writing it to the text writer.
         /// </summary>
         /// <param name="logEvent">The log event to handle.</param>
         public void Handle(LogEvent logEvent)
