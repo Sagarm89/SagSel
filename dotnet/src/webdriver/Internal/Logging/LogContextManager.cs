@@ -31,9 +31,9 @@ namespace OpenQA.Selenium.Internal.Logging
 
         public LogContextManager()
         {
-            var defaulConsoleLogHandler = new TextWriterHandler(Console.Error);
+            var defaulLogHandler = new TextWriterHandler(Console.Error);
 
-            GlobalContext = new LogContext(LogEventLevel.Info, null, null, [defaulConsoleLogHandler]);
+            GlobalContext = new LogContext(LogEventLevel.Info, null, null, [defaulLogHandler]);
         }
 
         public ILogContext GlobalContext { get; }
