@@ -20,6 +20,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
+#nullable enable
+
 namespace OpenQA.Selenium.DevTools
 {
     /// <summary>
@@ -45,6 +47,7 @@ namespace OpenQA.Selenium.DevTools
         /// </summary>
         /// <param name="options">The options for the DevToolsSession to use.</param>
         /// <returns>The active session to use to communicate with the Developer Tools debugging protocol.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="options"/> is <see langword="null"/>.</exception>
         [RequiresUnreferencedCode("CDP is not compatible with trimming or AOT.")]
         [RequiresDynamicCode("CDP is not compatible with trimming or AOT.")]
         DevToolsSession GetDevToolsSession(DevToolsOptions options);

@@ -25,6 +25,8 @@ using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+#nullable enable
+
 namespace OpenQA.Selenium.DevTools.Json
 {
     internal sealed class JsonEnumMemberConverter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] TEnum> : JsonConverter<TEnum>
@@ -43,7 +45,7 @@ namespace OpenQA.Selenium.DevTools.Json
 #endif
             foreach (var value in values)
             {
-                var enumMember = type.GetField(value.ToString());
+                var enumMember = type.GetField(value.ToString())!;
                 var attr = enumMember.GetCustomAttributes(typeof(EnumMemberAttribute), false)
                   .Cast<EnumMemberAttribute>()
                   .FirstOrDefault();
@@ -64,7 +66,7 @@ namespace OpenQA.Selenium.DevTools.Json
 
         public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var stringValue = reader.GetString();
+            var stringValue = reader.GetString() ?? throw new JsonException("Could not read an enum string from \"null\"");
 
             if (_stringToEnum.TryGetValue(stringValue, out var enumValue))
             {
