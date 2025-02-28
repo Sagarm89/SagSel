@@ -184,12 +184,12 @@ namespace OpenQA.Selenium
         /// </summary>
         public bool IsActionExecutor => true;
 
+#nullable enable
+
         /// <summary>
-        /// Gets the <see cref="SessionId"/> for the current session of this driver.
+        /// Gets the <see cref="Selenium.SessionId"/> for the current session of this driver.
         /// </summary>
         public SessionId SessionId { get; private set; }
-
-#nullable enable
 
         /// <summary>
         /// Gets or sets the <see cref="IFileDetector"/> responsible for detecting
@@ -715,8 +715,6 @@ namespace OpenQA.Selenium
             return this.RegisterDriverCommand(commandName, commandInfo, true);
         }
 
-#nullable restore
-
         /// <summary>
         /// Stops the client from running
         /// </summary>
@@ -746,8 +744,6 @@ namespace OpenQA.Selenium
 
             this.CommandExecutor.Dispose();
         }
-
-#nullable enable
 
         private static void UnpackAndThrowOnError(Response errorResponse, string commandToExecute)
         {
