@@ -22,8 +22,7 @@ require_relative '../spec_helper'
 module Selenium
   module WebDriver
     class BiDi
-      describe BrowsingContext, exclusive: {bidi: true, reason: 'only executed when bidi is enabled'},
-                                only: {browser: %i[chrome edge firefox]} do
+      describe BrowsingContext do
         after { |example| reset_driver!(example: example) }
 
         let(:bridge) { driver.instance_variable_get(:@bridge) }
@@ -72,6 +71,17 @@ module Selenium
           handles = driver.window_handles
           expect(handles).to include(window1)
           expect(handles).not_to include(window2)
+        end
+
+        it 'activates a browser context' do
+          reset_driver!(web_socket_url: true) do |driver|
+            browsing_context = described_class.new(driver)
+            browsing_context.create
+
+            expect(driver.execute_script('return document.hasFocus();')).to be_falsey
+            browsing_context.activate
+            expect(driver.execute_script('return document.hasFocus();')).to be_truthy
+          end
         end
       end
     end # BiDi

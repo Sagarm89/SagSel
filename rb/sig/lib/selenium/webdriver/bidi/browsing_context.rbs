@@ -8,6 +8,8 @@ module Selenium
 
         def initialize: (Remote::Bridge bridge) -> void
 
+        def activate: (String? context_id) -> Hash[nil, nil]
+
         def navigate: (String url, String? context_id) -> void
 
         def traverse_history: (Integer delta, String? context_id) -> void
