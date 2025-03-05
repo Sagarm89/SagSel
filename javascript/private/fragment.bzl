@@ -1,6 +1,6 @@
 load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_binary", "closure_js_library")
 
-EXPORT_FUNCTION_NAME = '___exportedFunc___'
+EXPORT_FUNCTION_NAME = "se_exportedFunctionSymbol"
 
 def _internal_closure_fragment_export_impl(ctx):
     ctx.actions.write(
