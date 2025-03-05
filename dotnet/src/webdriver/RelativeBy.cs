@@ -33,7 +33,7 @@ namespace OpenQA.Selenium
     {
         private readonly string wrappedAtom;
         private readonly object root;
-        private readonly List<object> filters;
+        private readonly List<object> filters = new List<object>();
 
         private static string GetWrappedAtom()
         {
@@ -53,7 +53,10 @@ namespace OpenQA.Selenium
         {
             this.wrappedAtom = GetWrappedAtom();
             this.root = GetSerializableRoot(root);
-            this.filters = filters is null ? [] : [.. filters]; // Clone filters
+            if (filters != null)
+            {
+                this.filters.AddRange(filters);
+            }
         }
 
         /// <summary>
