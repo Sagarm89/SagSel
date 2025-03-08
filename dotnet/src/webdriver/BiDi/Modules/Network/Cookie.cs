@@ -17,7 +17,6 @@
 // under the License.
 // </copyright>
 
-using OpenQA.Selenium.BiDi.Communication.Json.Converters;
 using System;
 using System.Text.Json.Serialization;
 
@@ -29,7 +28,6 @@ public record Cookie(string Name, BytesValue Value, string Domain, string Path, 
     public DateTimeOffset? Expiry { get; internal set; }
 }
 
-[JsonConverter(typeof(CamelCaseJsonEnumStringConverter<SameSite>))]
 public enum SameSite
 {
     Strict,

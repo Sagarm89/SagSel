@@ -18,9 +18,7 @@
 // </copyright>
 
 using OpenQA.Selenium.BiDi.Communication;
-using OpenQA.Selenium.BiDi.Communication.Json.Converters;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace OpenQA.Selenium.BiDi.Modules.Network;
 
@@ -50,7 +48,6 @@ public record BrowsingContextAddInterceptOptions
 
 public record AddInterceptResult(Intercept Intercept);
 
-[JsonConverter(typeof(CamelCaseJsonEnumStringConverter<InterceptPhase>))]
 public enum InterceptPhase
 {
     BeforeRequestSent,

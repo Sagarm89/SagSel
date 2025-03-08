@@ -17,10 +17,8 @@
 // under the License.
 // </copyright>
 
-using OpenQA.Selenium.BiDi.Communication.Json.Converters;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenQA.Selenium.BiDi.Modules.Script;
@@ -270,7 +268,6 @@ public abstract record RemoteValue
 
 public abstract record PrimitiveProtocolRemoteValue : RemoteValue;
 
-[JsonConverter(typeof(CamelCaseJsonEnumStringConverter<Mode>))]
 public enum Mode
 {
     Open,

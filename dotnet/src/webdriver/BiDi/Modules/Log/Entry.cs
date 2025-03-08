@@ -17,10 +17,8 @@
 // under the License.
 // </copyright>
 
-using OpenQA.Selenium.BiDi.Communication.Json.Converters;
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace OpenQA.Selenium.BiDi.Modules.Log;
 
@@ -40,7 +38,6 @@ public abstract record Entry(BiDi BiDi, Level Level, Script.Source Source, strin
         : Entry(BiDi, Level, Source, Text, Timestamp);
 }
 
-[JsonConverter(typeof(CamelCaseJsonEnumStringConverter<Level>))]
 public enum Level
 {
     Debug,

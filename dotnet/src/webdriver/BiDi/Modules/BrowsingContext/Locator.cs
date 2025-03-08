@@ -17,7 +17,6 @@
 // under the License.
 // </copyright>
 
-using OpenQA.Selenium.BiDi.Communication.Json.Converters;
 using System.Text.Json.Serialization;
 
 namespace OpenQA.Selenium.BiDi.Modules.BrowsingContext;
@@ -52,7 +51,6 @@ public abstract record Locator
     public record XPath(string Value) : Locator;
 }
 
-[JsonConverter(typeof(CamelCaseJsonEnumStringConverter<MatchType>))]
 public enum MatchType
 {
     Full,
