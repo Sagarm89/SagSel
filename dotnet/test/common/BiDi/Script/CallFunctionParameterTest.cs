@@ -256,7 +256,6 @@ class CallFunctionParameterTest : BiDiTestFixture
         else if (response.Result is RemoteValue.Date actualDate && expected is RemoteValue.Date expectedDate)
         {
             var actualDateParsed = DateTime.SpecifyKind(DateTime.Parse(actualDate.Value, CultureInfo.InvariantCulture), DateTimeKind.Utc);
-            Assert.That(actualDateParsed.Kind, Is.EqualTo(DateTimeKind.Utc));
             Assert.That(actualDateParsed, Is.EqualTo(DateTime.Parse(expectedDate.Value)).Within(TimeSpan.FromMilliseconds(1)));
         }
         else
