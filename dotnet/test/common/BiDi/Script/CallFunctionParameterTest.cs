@@ -269,11 +269,11 @@ class CallFunctionParameterTest : BiDiTestFixture
 
         yield return new TestCaseData(new LocalValue.Null(), new RemoteValue.Null(), "arg === null")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Null)"
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Null)"
         };
         yield return new TestCaseData(new LocalValue.Undefined(), new RemoteValue.Undefined(), "typeof arg === 'undefined'")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Undefined)",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Undefined)",
         };
         //yield return new TestCaseData(new LocalValue.Boolean(true), new RemoteValue.Boolean(true), "typeof arg === true")
         //{
@@ -285,39 +285,39 @@ class CallFunctionParameterTest : BiDiTestFixture
         //};
         yield return new TestCaseData(new LocalValue.String("whoa"), new RemoteValue.String("whoa"), "arg === 'whoa'")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(String('whoa'))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(String('whoa'))",
         };
         yield return new TestCaseData(new LocalValue.String(string.Empty), new RemoteValue.String(string.Empty), "arg === ''")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(String(''))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(String(''))",
         };
         yield return new TestCaseData(new LocalValue.Date(PinnedDateTimeString), new RemoteValue.Date(PinnedDateTimeString), $"arg.toISOString() === '{PinnedDateTimeString}'")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Date)",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Date)",
         };
         yield return new TestCaseData(new LocalValue.Number(5), new RemoteValue.Number(5), "arg === 5")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Number(5))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Number(5))",
         };
         yield return new TestCaseData(new LocalValue.Number(0), new RemoteValue.Number(0), "arg === 0")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Number(0))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Number(0))",
         };
         yield return new TestCaseData(new LocalValue.Number(-5), new RemoteValue.Number(-5), "arg === -5")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Number(-5))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Number(-5))",
         };
         yield return new TestCaseData(new LocalValue.Number(double.PositiveInfinity), new RemoteValue.Number(double.PositiveInfinity), "arg === Number.POSITIVE_INFINITY")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Number(Infinity))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Number(Infinity))",
         };
         yield return new TestCaseData(new LocalValue.Number(double.NegativeInfinity), new RemoteValue.Number(double.NegativeInfinity), "arg === Number.NEGATIVE_INFINITY")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Number(-Infinity))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Number(-Infinity))",
         };
         yield return new TestCaseData(new LocalValue.Number(double.NegativeZero), new RemoteValue.Number(double.NegativeZero), "arg === -0")
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Number(-0))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Number(-0))",
         };
         yield return new TestCaseData(
             new LocalValue.RegExp(new LocalValue.RegExp.RegExpValue("foo*") { Flags = "g" }),
@@ -325,7 +325,7 @@ class CallFunctionParameterTest : BiDiTestFixture
             "arg.test('foo') && arg.source === 'foo*' && arg.global"
         )
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(RegExp(/foo/g))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(RegExp(/foo/g))",
         };
         yield return new TestCaseData(
 
@@ -334,7 +334,7 @@ class CallFunctionParameterTest : BiDiTestFixture
                 "arg.length === 1 && arg[0] === 'hi'"
             )
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Array(['hi']))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Array(['hi']))",
         };
         yield return new TestCaseData
         (
@@ -346,7 +346,7 @@ class CallFunctionParameterTest : BiDiTestFixture
             "arg.key === 'value' && Object.keys(arg).length === 1"
         )
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Object({key: 'value'}))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Object({key: 'value'}))",
         };
         yield return new TestCaseData
         (
@@ -358,7 +358,7 @@ class CallFunctionParameterTest : BiDiTestFixture
             "arg.get('key') === 'value' && arg.size === 1"
         )
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Map({'key': 'value'}))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Map({'key': 'value'}))",
         };
 
         yield return new TestCaseData
@@ -368,7 +368,7 @@ class CallFunctionParameterTest : BiDiTestFixture
             "arg.has('key') && arg.size === 1"
         )
         {
-            TestName = nameof(CanCallFunctionAndRoundtrip_Five) + "(Set({'key'}))",
+            TestName = nameof(CanCallFunctionAndRoundtripArguments) + "(Set({'key'}))",
 
         };
     }
