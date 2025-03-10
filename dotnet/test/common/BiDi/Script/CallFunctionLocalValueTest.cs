@@ -120,7 +120,7 @@ class CallFunctionLocalValueTest : BiDiTestFixture
             (arg) => {
               if (arg.toISOString() !== '{{EpochString}}') {
                 throw new Error("Assert failed: " + arg.toISOString());
-              } 
+              }
             }
             """, false, new() { Arguments = [epochDate] });
         }, Throws.Nothing);
