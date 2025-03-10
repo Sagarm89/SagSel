@@ -19,9 +19,6 @@
 
 using NUnit.Framework;
 using OpenQA.Selenium.BiDi.Modules.Script;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 
 namespace OpenQA.Selenium.BiDi.Script;
