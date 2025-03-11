@@ -123,7 +123,10 @@ public abstract record LocalValue
         }
     }
 
-    public abstract record PrimitiveProtocolLocalValue : LocalValue;
+    public abstract record PrimitiveProtocolLocalValue : LocalValue
+    {
+
+    }
 
     public record BigInt : PrimitiveProtocolLocalValue
     {
