@@ -141,6 +141,12 @@ public abstract record LocalValue
         {
             Value = value;
         }
+
+        [JsonConstructor]
+        internal BigInt(string valueAsString)
+        {
+            Value = BigInteger.Parse(valueAsString);
+        }
     }
 
     public record Boolean(bool Value) : PrimitiveProtocolLocalValue;
