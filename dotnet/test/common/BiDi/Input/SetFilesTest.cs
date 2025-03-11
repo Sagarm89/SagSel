@@ -1,4 +1,4 @@
-// <copyright file="BrowsingContextInputModule.cs" company="Selenium Committers">
+// <copyright file="SetFilesTest.cs" company="Selenium Committers">
 // Licensed to the Software Freedom Conservancy (SFC) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17,26 +17,38 @@
 // under the License.
 // </copyright>
 
+using NUnit.Framework;
+using OpenQA.Selenium.BiDi.Modules.BrowsingContext;
+using System.IO;
 using System.Threading.Tasks;
-using OpenQA.Selenium.BiDi.Modules.Input;
-using System.Collections.Generic;
 
-namespace OpenQA.Selenium.BiDi.Modules.BrowsingContext;
+namespace OpenQA.Selenium.BiDi.Input;
 
-public class BrowsingContextInputModule(BrowsingContext context, InputModule inputModule)
+class SetFilesTest : BiDiTestFixture
 {
-    public Task PerformActionsAsync(IEnumerable<SourceActions> actions, PerformActionsOptions? options = null)
+    string _tempFile;
+
+    [SetUp]
+    public void SetUp()
     {
-        return inputModule.PerformActionsAsync(context, actions, options);
+        _tempFile = Path.GetTempFileName();
     }
 
-    public Task ReleaseActionsAsync(ReleaseActionsOptions? options = null)
+    [TearDown]
+    public void TearDown()
     {
-        return inputModule.ReleaseActionsAsync(context, options);
+        File.Delete(_tempFile);
     }
 
-    public Task SetFilesAsync(Script.ISharedReference element, IEnumerable<string> files, SetFilesOptions? options = null)
+    [Test]
+    public async Task CanSetFiles()
     {
-        return inputModule.SetFilesAsync(context, element, files, options);
+        driver.Url = UrlBuilder.WhereIs("formPage.html");
+
+        var nodes = await context.LocateNodesAsync(new Locator.Css("[id='upload']"));
+
+        await context.Input.SetFilesAsync(nodes[0], [_tempFile]);
+
+        Assert.That(driver.FindElement(By.Id("upload")).GetAttribute("value"), Does.EndWith(Path.GetFileName(_tempFile)));
     }
 }

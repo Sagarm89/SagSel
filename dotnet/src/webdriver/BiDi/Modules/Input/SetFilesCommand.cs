@@ -1,4 +1,4 @@
-// <copyright file="Command.cs" company="Selenium Committers">
+// <copyright file="SetFilesCommand.cs" company="Selenium Committers">
 // Licensed to the Software Freedom Conservancy (SFC) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17,32 +17,14 @@
 // under the License.
 // </copyright>
 
-using System.Text.Json.Serialization;
+using OpenQA.Selenium.BiDi.Communication;
+using System.Collections.Generic;
 
-namespace OpenQA.Selenium.BiDi.Communication;
+namespace OpenQA.Selenium.BiDi.Modules.Input;
 
-public abstract class Command
-{
-    protected Command(string method)
-    {
-        Method = method;
-    }
+internal class SetFilesCommand(SetFilesCommandParameters @params)
+    : Command<SetFilesCommandParameters>(@params, "input.setFiles");
 
-    [JsonPropertyOrder(1)]
-    public string Method { get; }
+internal record SetFilesCommandParameters(BrowsingContext.BrowsingContext Context, Script.ISharedReference Element, IEnumerable<string> Files) : CommandParameters;
 
-    [JsonPropertyOrder(0)]
-    public int Id { get; internal set; }
-}
-
-internal abstract class Command<TCommandParameters>(TCommandParameters @params, string method) : Command(method)
-    where TCommandParameters : CommandParameters
-{
-    [JsonPropertyOrder(2)]
-    public TCommandParameters Params { get; } = @params;
-}
-
-internal record CommandParameters
-{
-    public static CommandParameters Empty { get; } = new CommandParameters();
-}
+public record SetFilesOptions : CommandOptions;

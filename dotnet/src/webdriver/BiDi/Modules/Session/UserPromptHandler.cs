@@ -1,4 +1,4 @@
-// <copyright file="Command.cs" company="Selenium Committers">
+// <copyright file="UserPromptHandler.cs" company="Selenium Committers">
 // Licensed to the Software Freedom Conservancy (SFC) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17,32 +17,26 @@
 // under the License.
 // </copyright>
 
-using System.Text.Json.Serialization;
+namespace OpenQA.Selenium.BiDi.Modules.Session;
 
-namespace OpenQA.Selenium.BiDi.Communication;
-
-public abstract class Command
+public record UserPromptHandler
 {
-    protected Command(string method)
-    {
-        Method = method;
-    }
+    public UserPromptHandlerType? Alert { get; set; }
 
-    [JsonPropertyOrder(1)]
-    public string Method { get; }
+    public UserPromptHandlerType? BeforeUnload { get; set; }
 
-    [JsonPropertyOrder(0)]
-    public int Id { get; internal set; }
+    public UserPromptHandlerType? Confirm { get; set; }
+
+    public UserPromptHandlerType? Default { get; set; }
+
+    public UserPromptHandlerType? File { get; set; }
+
+    public UserPromptHandlerType? Prompt { get; set; }
 }
 
-internal abstract class Command<TCommandParameters>(TCommandParameters @params, string method) : Command(method)
-    where TCommandParameters : CommandParameters
+public enum UserPromptHandlerType
 {
-    [JsonPropertyOrder(2)]
-    public TCommandParameters Params { get; } = @params;
-}
-
-internal record CommandParameters
-{
-    public static CommandParameters Empty { get; } = new CommandParameters();
+    Accept,
+    Dismiss,
+    Ignore
 }
