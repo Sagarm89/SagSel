@@ -92,7 +92,7 @@ public abstract record RemoteValue
         throw new BiDiException("Cannot convert .....");
     }
 
-    public record Number([property: JsonConverter(typeof(DoubleConverter))] double Value) : PrimitiveProtocolRemoteValue;
+    public record Number([property: JsonConverter(typeof(BiDiDoubleConverter))] double Value) : PrimitiveProtocolRemoteValue;
 
     public record Boolean(bool Value) : PrimitiveProtocolRemoteValue;
 

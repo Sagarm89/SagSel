@@ -1,4 +1,4 @@
-// <copyright file="DoubleConverter.cs" company="Selenium Committers">
+// <copyright file="BiDiDoubleConverter.cs" company="Selenium Committers">
 // Licensed to the Software Freedom Conservancy (SFC) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -23,9 +23,13 @@ using System.Text.Json.Serialization;
 
 namespace OpenQA.Selenium.BiDi.Communication.Json.Converters
 {
-    internal class DoubleConverter : JsonConverter<double>
+    /// <summary>
+    /// Serializes and deserializes <see cref="Double"/> into a 
+    /// <see href="https://w3c.github.io/webdriver-bidi/#type-script-PrimitiveProtocolValue">BiDi spec-compliant number value</see>.
+    /// </summary>
+    internal sealed class BiDiDoubleConverter : JsonConverter<double>
     {
-        public override double Read(ref Utf8JsonReader reader, System.Type typeToConvert, JsonSerializerOptions options)
+        public override double Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TryGetDouble(out double d))
             {
@@ -34,19 +38,19 @@ namespace OpenQA.Selenium.BiDi.Communication.Json.Converters
 
             var str = reader.GetString() ?? throw new JsonException();
 
-            if (str.Equals("-0", System.StringComparison.Ordinal))
+            if (str.Equals("-0", StringComparison.Ordinal))
             {
                 return -0.0;
             }
-            else if (str.Equals("NaN", System.StringComparison.Ordinal))
+            else if (str.Equals("NaN", StringComparison.Ordinal))
             {
                 return double.NaN;
             }
-            else if (str.Equals("Infinity", System.StringComparison.Ordinal))
+            else if (str.Equals("Infinity", StringComparison.Ordinal))
             {
                 return double.PositiveInfinity;
             }
-            else if (str.Equals("-Infinity", System.StringComparison.Ordinal))
+            else if (str.Equals("-Infinity", StringComparison.Ordinal))
             {
                 return double.NegativeInfinity;
             }
