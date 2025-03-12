@@ -118,14 +118,8 @@ public class CallFunctionRemoteValueTest : BiDiTestFixture
         Assert.That(response.Result, Is.AssignableTo<RemoteValue.Number>());
 
         var actualNumberValue = ((RemoteValue.Number)response.Result).Value;
-        Assert.That(IsNegativeZero(actualNumberValue));
-
-        static bool IsNegativeZero(double d)
-        {
-            // '== double.NegativeZero' does not work, -0 == 0 is considered true
-            // Need special verification to tell if a double is -0
-            return double.IsNegative(d) && d == 0;
-        }
+        Assert.That(actualNumberValue, Is.EqualTo(0));
+        Assert.That(double.IsNegative(actualNumberValue), Is.True);
     }
 
     [Test]
