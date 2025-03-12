@@ -127,7 +127,7 @@ class CallFunctionLocalValueTest : BiDiTestFixture
     }
 
     [Test]
-    public void CanCallFunctionWithArgumentNumber5()
+    public void CanCallFunctionWithArgumentNumberFive()
     {
         var number5 = new LocalValue.Number(5);
 
@@ -144,7 +144,7 @@ class CallFunctionLocalValueTest : BiDiTestFixture
     }
 
     [Test]
-    public void CanCallFunctionWithArgumentNumberNegative5()
+    public void CanCallFunctionWithArgumentNumberNegativeFive()
     {
         var numberMinus5 = new LocalValue.Number(-5);
 
@@ -161,7 +161,7 @@ class CallFunctionLocalValueTest : BiDiTestFixture
     }
 
     [Test]
-    public void CanCallFunctionWithArgumentNumber0()
+    public void CanCallFunctionWithArgumentNumberZero()
     {
         var number0 = new LocalValue.Number(0);
 
@@ -180,7 +180,7 @@ class CallFunctionLocalValueTest : BiDiTestFixture
     [Test]
     [IgnoreBrowser(Selenium.Browser.Edge, "Chromium can't handle -0 argument as a number: https://github.com/w3c/webdriver-bidi/issues/887")]
     [IgnoreBrowser(Selenium.Browser.Chrome, "Chromium can't handle -0 argument as a number: https://github.com/w3c/webdriver-bidi/issues/887")]
-    public void CanCallFunctionWithArgumentNumberNegative0()
+    public void CanCallFunctionWithArgumentNumberNegativeZero()
     {
         var minus0 = new LocalValue.Number(double.NegativeZero);
 
@@ -188,7 +188,7 @@ class CallFunctionLocalValueTest : BiDiTestFixture
         {
             await context.Script.CallFunctionAsync($$"""
             (arg) => {
-              if (arg !== 0 || arg.toLocaleString()[0] !== '-') {
+              if (!Object.is(arg, -0)) {
                 throw new Error("Assert failed: " + arg.toLocaleString());
               }
             }

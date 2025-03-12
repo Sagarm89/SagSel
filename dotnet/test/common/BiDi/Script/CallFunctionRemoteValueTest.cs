@@ -84,7 +84,7 @@ public class CallFunctionRemoteValueTest : BiDiTestFixture
     }
 
     [Test]
-    public async Task CanCallFunctionAndReturnNumber5()
+    public async Task CanCallFunctionAndReturnNumberFive()
     {
         var response = await context.Script.CallFunctionAsync("() => { return 5; }", false);
 
@@ -93,7 +93,7 @@ public class CallFunctionRemoteValueTest : BiDiTestFixture
     }
 
     [Test]
-    public async Task CanCallFunctionAndReturnNumberNegative5()
+    public async Task CanCallFunctionAndReturnNumberNegativeFive()
     {
         var response = await context.Script.CallFunctionAsync("() => { return -5; }", false);
 
@@ -102,7 +102,7 @@ public class CallFunctionRemoteValueTest : BiDiTestFixture
     }
 
     [Test]
-    public async Task CanCallFunctionAndReturnNumber0()
+    public async Task CanCallFunctionAndReturnNumberZero()
     {
         var response = await context.Script.CallFunctionAsync("() => { return 0; }", false);
 
@@ -111,7 +111,7 @@ public class CallFunctionRemoteValueTest : BiDiTestFixture
     }
 
     [Test]
-    public async Task CanCallFunctionAndReturnNumberNegative0()
+    public async Task CanCallFunctionAndReturnNumberNegativeZero()
     {
         var response = await context.Script.CallFunctionAsync("() => { return -0; }", false);
 
