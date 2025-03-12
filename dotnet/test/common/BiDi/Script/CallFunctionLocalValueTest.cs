@@ -89,8 +89,6 @@ class CallFunctionLocalValueTest : BiDiTestFixture
     }
 
     [Test]
-    [IgnoreBrowser(Selenium.Browser.Edge, "Chromium can't handle -0 argument as a number: https://github.com/w3c/webdriver-bidi/issues/887")]
-    [IgnoreBrowser(Selenium.Browser.Chrome, "Chromium can't handle -0 argument as a number: https://github.com/w3c/webdriver-bidi/issues/887")]
     public void CanCallFunctionWithArgumentRecentDate()
     {
         const string PinnedDateTimeString = "2025-03-09T00:30:33.083Z";
@@ -180,6 +178,8 @@ class CallFunctionLocalValueTest : BiDiTestFixture
     }
 
     [Test]
+    [IgnoreBrowser(Selenium.Browser.Edge, "Chromium can't handle -0 argument as a number: https://github.com/w3c/webdriver-bidi/issues/887")]
+    [IgnoreBrowser(Selenium.Browser.Chrome, "Chromium can't handle -0 argument as a number: https://github.com/w3c/webdriver-bidi/issues/887")]
     public void CanCallFunctionWithArgumentNumberNegative0()
     {
         var minus0 = new LocalValue.Number(double.NegativeZero);
