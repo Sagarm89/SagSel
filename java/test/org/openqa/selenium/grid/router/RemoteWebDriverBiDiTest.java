@@ -86,7 +86,6 @@ class RemoteWebDriverBiDiTest {
   @Test
   @Ignore(IE)
   @Ignore(SAFARI)
-  @NotYetImplemented(EDGE)
   void ensureBiDiSessionCreation() {
     try (BiDi biDi = ((HasBiDi) driver).getBiDi()) {
       BiDiSessionStatus status =
@@ -100,7 +99,6 @@ class RemoteWebDriverBiDiTest {
   @Test
   @Ignore(IE)
   @Ignore(SAFARI)
-  @NotYetImplemented(EDGE)
   void canListenToLogs() throws ExecutionException, InterruptedException, TimeoutException {
     driver = new Augmenter().augment(driver);
 
@@ -128,7 +126,6 @@ class RemoteWebDriverBiDiTest {
   @Test
   @Ignore(IE)
   @Ignore(SAFARI)
-  @NotYetImplemented(EDGE)
   void canNavigateToUrl() {
     BrowsingContext browsingContext = new BrowsingContext(driver, WindowType.TAB);
 
