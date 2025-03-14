@@ -10,6 +10,10 @@ from pathlib import Path
 import urllib3
 from packaging.version import parse
 
+# Find the current stable versions of each browser we
+# support and the sha256 of these. That's useful for
+# updating `//common:repositories.bzl`
+
 http = urllib3.PoolManager()
 
 
@@ -32,11 +36,13 @@ def get_chrome_milestone(channel=None):
         "GET", f"https://chromiumdash.appspot.com/fetch_releases?channel={channel}&num=1&platform=Mac,Linux"
     )
     all_versions = json.loads(r.data)
+    # use the same milestone for all chrome releases, so pick the lowest
     milestone = min([version["milestone"] for version in all_versions if version["milestone"]])
     r = http.request(
         "GET", "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
     )
     versions = json.loads(r.data)["versions"]
+
     return sorted(
         filter(lambda v: v["version"].split(".")[0] == str(milestone), versions), key=lambda v: parse(v["version"])
     )[-1]
@@ -44,7 +50,9 @@ def get_chrome_milestone(channel=None):
 
 def chromedriver(selected_version, workspace_prefix=""):
     content = ""
+
     drivers = selected_version["downloads"]["chromedriver"]
+
     linux = [d["url"] for d in drivers if d["platform"] == "linux64"][0]
     sha = calculate_hash(linux)
     content = content + """    http_archive(
@@ -91,8 +99,10 @@ js_library(
 
 def chrome(selected_version, workspace_prefix=""):
     chrome_downloads = selected_version["downloads"]["chrome"]
+
     linux = [d["url"] for d in chrome_downloads if d["platform"] == "linux64"][0]
     sha = calculate_hash(linux)
+
     content = """
     http_archive(
         name = "linux_%schrome",
@@ -163,11 +173,13 @@ def edge():
     content = ""
     r = http.request("GET", "https://edgeupdates.microsoft.com/api/products")
     all_data = case_insensitive_json_loads(r.data)
+
     linux = None
     linux_hash = None
     mac = None
     mac_hash = None
     version = None
+
     for data in all_data:
         if not "Stable" == data.get("product"):
             continue
@@ -183,6 +195,7 @@ def edge():
                     if "deb" == artifact["artifactname"]:
                         linux = artifact["location"]
                         linux_hash = artifact["hash"]
+
     if mac and mac_hash:
         content += """
     pkg_archive(
@@ -238,7 +251,9 @@ def edgedriver():
     major_version = stable_version.split('.')[0]
     r = http.request("GET", f"https://msedgedriver.azureedge.net/LATEST_RELEASE_{major_version}_LINUX")
     linux_version = r.data.decode("utf-16").strip()
+
     content = ""
+
     linux = "https://msedgedriver.azureedge.net/%s/edgedriver_linux64.zip" % linux_version
     sha = calculate_hash(linux)
     content = content + """
@@ -286,6 +301,7 @@ js_library(
 
 def geckodriver():
     content = ""
+
     r = http.request("GET", "https://api.github.com/repos/mozilla/geckodriver/releases/latest")
     for a in json.loads(r.data)["assets"]:
         if a["name"].endswith("-linux64.tar.gz"):
@@ -334,10 +350,12 @@ js_library(
 
 def firefox():
     firefox_versions = json.loads(firefox_version_data())
+
     latest_firefox = firefox_versions["LATEST_FIREFOX_VERSION"]
     sha_linux = calculate_hash(firefox_linux(latest_firefox))
     sha_mac = calculate_hash(firefox_mac(latest_firefox))
     content = print_firefox(latest_firefox, "", sha_linux, sha_mac)
+
     beta_firefox = firefox_versions["LATEST_FIREFOX_RELEASED_DEVEL_VERSION"]
     if latest_firefox != beta_firefox:
         sha_linux = calculate_hash(firefox_linux(beta_firefox))
