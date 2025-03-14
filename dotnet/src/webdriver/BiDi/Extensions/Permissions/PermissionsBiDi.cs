@@ -1,4 +1,4 @@
-// <copyright file="ScriptEvaluateException.cs" company="Selenium Committers">
+// <copyright file="PermissionsBiDi.cs" company="Selenium Committers">
 // Licensed to the Software Freedom Conservancy (SFC) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17,19 +17,29 @@
 // under the License.
 // </copyright>
 
+using OpenQA.Selenium.BiDi.Communication;
 using System;
+using System.Threading.Tasks;
 
-namespace OpenQA.Selenium.BiDi.Modules.Script;
+namespace OpenQA.Selenium.BiDi.Extensions.Permissions;
 
-public class ScriptEvaluateException(EvaluateResult.Exception evaluateResultException) : Exception
+public class PermissionsBiDi : BiDi
 {
-    private readonly EvaluateResult.Exception _evaluateResultException = evaluateResultException;
+    private readonly Lazy<PermissionsModule> _permissionsModule;
 
-    public string Text => _evaluateResultException.ExceptionDetails.Text;
+    public PermissionsModule Permissions => _permissionsModule.Value;
 
-    public long ColumNumber => _evaluateResultException.ExceptionDetails.ColumnNumber;
+    private PermissionsBiDi(string url)
+        : base(url)
+    {
+        Broker.ProvideCustomSerializationContext(PermissionsModule.SerializerContext);
+        _permissionsModule = new Lazy<PermissionsModule>(() => new PermissionsModule(Broker));
+    }
 
-    public override string Message => $"{Text}{Environment.NewLine}{_evaluateResultException.ExceptionDetails.StackTrace}";
-
-    public override string? StackTrace => base.StackTrace;
+    public static async Task<PermissionsBiDi> ConnectAsync(string webSocketUrl)
+    {
+        var bidi = new PermissionsBiDi(webSocketUrl);
+        await bidi.Broker.ConnectAsync();
+        return bidi;
+    }
 }
