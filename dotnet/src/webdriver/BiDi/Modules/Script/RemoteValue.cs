@@ -27,35 +27,35 @@ namespace OpenQA.Selenium.BiDi.Modules.Script;
 
 // https://github.com/dotnet/runtime/issues/72604
 //[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-//[JsonDerivedType(typeof(RemoteNumberValue), "number")]
-//[JsonDerivedType(typeof(RemoteBooleanValue), "boolean")]
-//[JsonDerivedType(typeof(RemoteBigIntValue), "bigint")]
-//[JsonDerivedType(typeof(RemoteStringValue), "string")]
-//[JsonDerivedType(typeof(RemoteNullValue), "null")]
-//[JsonDerivedType(typeof(RemoteUndefinedValue), "undefined")]
-//[JsonDerivedType(typeof(RemoteSymbolValue), "symbol")]
-//[JsonDerivedType(typeof(RemoteArrayValue), "array")]
-//[JsonDerivedType(typeof(RemoteObjectValue), "object")]
-//[JsonDerivedType(typeof(RemoteFunctionValue), "function")]
-//[JsonDerivedType(typeof(RemoteRegExpValue), "regexp")]
-//[JsonDerivedType(typeof(RemoteDateValue), "date")]
-//[JsonDerivedType(typeof(RemoteMapValue), "map")]
-//[JsonDerivedType(typeof(RemoteSetValue), "set")]
-//[JsonDerivedType(typeof(RemoteWeakMapValue), "weakmap")]
-//[JsonDerivedType(typeof(RemoteWeakSetValue), "weakset")]
-//[JsonDerivedType(typeof(RemoteGeneratorValue), "generator")]
-//[JsonDerivedType(typeof(RemoteErrorValue), "error")]
-//[JsonDerivedType(typeof(RemoteProxyValue), "proxy")]
-//[JsonDerivedType(typeof(RemotePromiseValue), "promise")]
-//[JsonDerivedType(typeof(RemoteTypedArrayValue), "typedarray")]
-//[JsonDerivedType(typeof(RemoteArrayBufferValue), "arraybuffer")]
-//[JsonDerivedType(typeof(RemoteNodeListValue), "nodelist")]
-//[JsonDerivedType(typeof(RemoteHtmlCollectionValue), "htmlcollection")]
-//[JsonDerivedType(typeof(RemoteNodeValue), "node")]
-//[JsonDerivedType(typeof(RemoteWindowProxyValue), "window")]
+//[JsonDerivedType(typeof(NumberRemoteValue), "number")]
+//[JsonDerivedType(typeof(BooleanRemoteValue), "boolean")]
+//[JsonDerivedType(typeof(BigIntRemoteValue), "bigint")]
+//[JsonDerivedType(typeof(StringRemoteValue), "string")]
+//[JsonDerivedType(typeof(NullRemoteValue), "null")]
+//[JsonDerivedType(typeof(UndefinedRemoteValue), "undefined")]
+//[JsonDerivedType(typeof(SymbolRemoteValue), "symbol")]
+//[JsonDerivedType(typeof(ArrayRemoteValue), "array")]
+//[JsonDerivedType(typeof(ObjectRemoteValue), "object")]
+//[JsonDerivedType(typeof(FunctionRemoteValue), "function")]
+//[JsonDerivedType(typeof(RegExpRemoteValue), "regexp")]
+//[JsonDerivedType(typeof(DateRemoteValue), "date")]
+//[JsonDerivedType(typeof(MapRemoteValue), "map")]
+//[JsonDerivedType(typeof(SetRemoteValue), "set")]
+//[JsonDerivedType(typeof(WeakMapRemoteValue), "weakmap")]
+//[JsonDerivedType(typeof(WeakSetRemoteValue), "weakset")]
+//[JsonDerivedType(typeof(GeneratorRemoteValue), "generator")]
+//[JsonDerivedType(typeof(ErrorRemoteValue), "error")]
+//[JsonDerivedType(typeof(ProxyRemoteValue), "proxy")]
+//[JsonDerivedType(typeof(PromiseRemoteValue), "promise")]
+//[JsonDerivedType(typeof(TypedArrayRemoteValue), "typedarray")]
+//[JsonDerivedType(typeof(ArrayBufferRemoteValue), "arraybuffer")]
+//[JsonDerivedType(typeof(NodeListRemoteValue), "nodelist")]
+//[JsonDerivedType(typeof(HtmlCollectionRemoteValue), "htmlcollection")]
+//[JsonDerivedType(typeof(NodeRemoteValue), "node")]
+//[JsonDerivedType(typeof(WindowProxyRemoteValue), "window")]
 public abstract record RemoteValue
 {
-    public static implicit operator double(RemoteValue remoteValue) => (double)((RemoteNumberValue)remoteValue).Value;
+    public static implicit operator double(RemoteValue remoteValue) => (double)((NumberRemoteValue)remoteValue).Value;
 
     public static implicit operator int(RemoteValue remoteValue) => (int)(double)remoteValue;
     public static implicit operator long(RemoteValue remoteValue) => (long)(double)remoteValue;
@@ -64,8 +64,8 @@ public abstract record RemoteValue
     {
         return remoteValue switch
         {
-            RemoteStringValue stringValue => stringValue.Value,
-            RemoteNullValue => null,
+            StringRemoteValue stringValue => stringValue.Value,
+            NullRemoteValue => null,
             _ => throw new InvalidCastException($"Cannot convert {remoteValue} to string")
         };
     }
@@ -77,15 +77,15 @@ public abstract record RemoteValue
 
         if (type == typeof(bool))
         {
-            return (TResult)(Convert.ToBoolean(((RemoteBooleanValue)this).Value) as object);
+            return (TResult)(Convert.ToBoolean(((BooleanRemoteValue)this).Value) as object);
         }
         if (type == typeof(int))
         {
-            return (TResult)(Convert.ToInt32(((RemoteNumberValue)this).Value) as object);
+            return (TResult)(Convert.ToInt32(((NumberRemoteValue)this).Value) as object);
         }
         else if (type == typeof(string))
         {
-            return (TResult)(((RemoteStringValue)this).Value as object);
+            return (TResult)(((StringRemoteValue)this).Value as object);
         }
         else if (type is object)
         {
@@ -97,26 +97,26 @@ public abstract record RemoteValue
     }
 }
 
-public record RemoteNumberValue(double Value) : PrimitiveProtocolRemoteValue;
+public record NumberRemoteValue(double Value) : PrimitiveProtocolRemoteValue;
 
-public record RemoteBooleanValue(bool Value) : PrimitiveProtocolRemoteValue;
+public record BooleanRemoteValue(bool Value) : PrimitiveProtocolRemoteValue;
 
-public record RemoteBigIntValue(string Value) : PrimitiveProtocolRemoteValue;
+public record BigIntRemoteValue(string Value) : PrimitiveProtocolRemoteValue;
 
-public record RemoteStringValue(string Value) : PrimitiveProtocolRemoteValue;
+public record StringRemoteValue(string Value) : PrimitiveProtocolRemoteValue;
 
-public record RemoteNullValue : PrimitiveProtocolRemoteValue;
+public record NullRemoteValue : PrimitiveProtocolRemoteValue;
 
-public record RemoteUndefinedValue : PrimitiveProtocolRemoteValue;
+public record UndefinedRemoteValue : PrimitiveProtocolRemoteValue;
 
-public record RemoteSymbolValue : RemoteValue
+public record SymbolRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemoteArrayValue : RemoteValue
+public record ArrayRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
@@ -125,7 +125,7 @@ public record RemoteArrayValue : RemoteValue
     public IReadOnlyList<RemoteValue>? Value { get; set; }
 }
 
-public record RemoteObjectValue : RemoteValue
+public record ObjectRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
@@ -134,14 +134,14 @@ public record RemoteObjectValue : RemoteValue
     public IReadOnlyList<IReadOnlyList<RemoteValue>>? Value { get; set; }
 }
 
-public record RemoteFunctionValue : RemoteValue
+public record FunctionRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemoteRegExpValue(RemoteRegExpValue.RegExpValue Value) : RemoteValue
+public record RegExpRemoteValue(RegExpRemoteValue.RegExpValue Value) : RemoteValue
 {
     public Handle? Handle { get; set; }
 
@@ -153,14 +153,14 @@ public record RemoteRegExpValue(RemoteRegExpValue.RegExpValue Value) : RemoteVal
     }
 }
 
-public record RemoteDateValue(string Value) : RemoteValue
+public record DateRemoteValue(string Value) : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemoteMapValue : RemoteValue
+public record MapRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
@@ -169,7 +169,7 @@ public record RemoteMapValue : RemoteValue
     public IReadOnlyList<IReadOnlyList<RemoteValue>>? Value { get; set; }
 }
 
-public record RemoteSetValue : RemoteValue
+public record SetRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
@@ -178,72 +178,63 @@ public record RemoteSetValue : RemoteValue
     public IReadOnlyList<RemoteValue>? Value { get; set; }
 }
 
-public record RemoteWeakMapValue : RemoteValue
+public record WeakMapRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemoteWeakSetValue : RemoteValue
+public record WeakSetRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemoteGeneratorValue : RemoteValue
+public record GeneratorRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemoteErrorValue : RemoteValue
+public record ErrorRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemoteProxyValue : RemoteValue
+public record ProxyRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemotePromiseValue : RemoteValue
+public record PromiseRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemoteTypedArrayValue : RemoteValue
+public record TypedArrayRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemoteArrayBufferValue : RemoteValue
+public record ArrayBufferRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
     public InternalId? InternalId { get; set; }
 }
 
-public record RemoteNodeListValue : RemoteValue
-{
-    public Handle? Handle { get; set; }
-
-    public InternalId? InternalId { get; set; }
-
-    public IReadOnlyList<RemoteValue>? Value { get; set; }
-}
-
-public record RemoteHtmlCollectionValue : RemoteValue
+public record NodeListRemoteValue : RemoteValue
 {
     public Handle? Handle { get; set; }
 
@@ -252,7 +243,16 @@ public record RemoteHtmlCollectionValue : RemoteValue
     public IReadOnlyList<RemoteValue>? Value { get; set; }
 }
 
-public record RemoteNodeValue : RemoteValue, ISharedReference
+public record HtmlCollectionRemoteValue : RemoteValue
+{
+    public Handle? Handle { get; set; }
+
+    public InternalId? InternalId { get; set; }
+
+    public IReadOnlyList<RemoteValue>? Value { get; set; }
+}
+
+public record NodeRemoteValue : RemoteValue, ISharedReference
 {
     [JsonInclude]
     public string? SharedId { get; internal set; }
@@ -265,7 +265,7 @@ public record RemoteNodeValue : RemoteValue, ISharedReference
     public NodeProperties? Value { get; internal set; }
 }
 
-public record RemoteWindowProxyValue(RemoteWindowProxyValue.Properties Value) : RemoteValue
+public record WindowProxyRemoteValue(WindowProxyRemoteValue.Properties Value) : RemoteValue
 {
     public Handle? Handle { get; set; }
 

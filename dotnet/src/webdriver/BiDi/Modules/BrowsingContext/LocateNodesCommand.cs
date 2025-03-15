@@ -37,20 +37,20 @@ public record LocateNodesOptions : CommandOptions
     public IEnumerable<Script.ISharedReference>? StartNodes { get; set; }
 }
 
-public record LocateNodesResult : IReadOnlyList<Script.RemoteNodeValue>
+public record LocateNodesResult : IReadOnlyList<Script.NodeRemoteValue>
 {
-    private readonly IReadOnlyList<Script.RemoteNodeValue> _nodes;
+    private readonly IReadOnlyList<Script.NodeRemoteValue> _nodes;
 
-    internal LocateNodesResult(IReadOnlyList<Script.RemoteNodeValue> nodes)
+    internal LocateNodesResult(IReadOnlyList<Script.NodeRemoteValue> nodes)
     {
         _nodes = nodes;
     }
 
-    public Script.RemoteNodeValue this[int index] => _nodes[index];
+    public Script.NodeRemoteValue this[int index] => _nodes[index];
 
     public int Count => _nodes.Count;
 
-    public IEnumerator<Script.RemoteNodeValue> GetEnumerator() => _nodes.GetEnumerator();
+    public IEnumerator<Script.NodeRemoteValue> GetEnumerator() => _nodes.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => (_nodes as IEnumerable).GetEnumerator();
 }

@@ -28,7 +28,7 @@ public record NodeProperties(long NodeType, long ChildNodeCount)
     public IReadOnlyDictionary<string, string>? Attributes { get; internal set; }
 
     [JsonInclude]
-    public IReadOnlyList<RemoteNodeValue>? Children { get; internal set; }
+    public IReadOnlyList<NodeRemoteValue>? Children { get; internal set; }
 
     [JsonInclude]
     public string? LocalName { get; internal set; }
@@ -43,5 +43,5 @@ public record NodeProperties(long NodeType, long ChildNodeCount)
     public string? NodeValue { get; internal set; }
 
     [JsonInclude]
-    public RemoteNodeValue? ShadowRoot { get; internal set; }
+    public NodeRemoteValue? ShadowRoot { get; internal set; }
 }
