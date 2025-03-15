@@ -61,7 +61,7 @@ class CombinedInputActionsTest : BiDiTestFixture
     {
         driver.Url = UrlBuilder.WhereIs("formSelectionPage.html");
 
-        var options = await context.LocateNodesAsync(new Locator.Css("option"));
+        var options = await context.LocateNodesAsync(new CssLocator("option"));
 
         await context.Input.PerformActionsAsync([
             new PointerActions

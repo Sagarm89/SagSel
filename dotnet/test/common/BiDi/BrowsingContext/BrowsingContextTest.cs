@@ -285,7 +285,7 @@ class BrowsingContextTest : BiDiTestFixture
     {
         await context.NavigateAsync(UrlBuilder.WhereIs("formPage.html"), new() { Wait = ReadinessState.Complete });
 
-        var nodes = await context.LocateNodesAsync(new Locator.Css("#checky"));
+        var nodes = await context.LocateNodesAsync(new CssLocator("#checky"));
 
         var screenshot = await context.CaptureScreenshotAsync(new()
         {
