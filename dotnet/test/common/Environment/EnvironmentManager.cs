@@ -25,6 +25,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using OpenQA.Selenium.Internal.Logging;
 
 namespace OpenQA.Selenium.Environment
 {
@@ -60,8 +61,13 @@ namespace OpenQA.Selenium.Environment
 
             string activeDriverConfig = System.Environment.GetEnvironmentVariable("ACTIVE_DRIVER_CONFIG") ?? TestContext.Parameters.Get("ActiveDriverConfig", env.ActiveDriverConfig);
             string driverServiceLocation = System.Environment.GetEnvironmentVariable("DRIVER_SERVICE_LOCATION") ?? TestContext.Parameters.Get("DriverServiceLocation", env.DriverServiceLocation);
-
             string browserLocation = System.Environment.GetEnvironmentVariable("BROWSER_LOCATION") ?? TestContext.Parameters.Get("BrowserLocation", string.Empty);
+            string enableDebugging = System.Environment.GetEnvironmentVariable("DEBUG") ?? TestContext.Parameters.Get("Debug", env.Debug);
+
+            if (!string.IsNullOrEmpty(enableDebugging))
+            {
+                Log.SetLevel(LogEventLevel.Debug);
+            }
 
             string activeWebsiteConfig = TestContext.Parameters.Get("ActiveWebsiteConfig", env.ActiveWebsiteConfig);
             DriverConfig driverConfig = env.DriverConfigs[activeDriverConfig];

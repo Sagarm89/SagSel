@@ -48,5 +48,8 @@ namespace OpenQA.Selenium.Environment
 
         [JsonProperty]
         public TestWebServerConfig TestWebServerConfig { get; set; }
+
+        [JsonProperty]
+        public string Debug { get; set; }
     }
 }
