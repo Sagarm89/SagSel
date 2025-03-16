@@ -24,6 +24,7 @@ namespace OpenQA.Selenium.BiDi.Modules.BrowsingContext;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(AccessibilityLocator), "accessibility")]
 [JsonDerivedType(typeof(CssLocator), "css")]
+[JsonDerivedType(typeof(ContextLocator), "context")]
 [JsonDerivedType(typeof(InnerTextLocator), "innerText")]
 [JsonDerivedType(typeof(XPathLocator), "xpath")]
 public abstract record Locator;
@@ -38,6 +39,11 @@ public record AccessibilityLocator(AccessibilityLocator.AccessibilityLocatorValu
 }
 
 public record CssLocator(string Value) : Locator;
+
+public record ContextLocator(ContextLocator.ContextLocatorValue Value) : Locator
+{
+    public record ContextLocatorValue(BrowsingContext Context);
+}
 
 public record InnerTextLocator(string Value) : Locator
 {
