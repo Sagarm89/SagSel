@@ -73,6 +73,22 @@ class CallFunctionLocalValueTest : BiDiTestFixture
     }
 
     [Test]
+    public void CanCallFunctionWithArgumentBigInt()
+    {
+        var arg = new BigIntLocalValue("12345");
+        Assert.That(async () =>
+        {
+            await context.Script.CallFunctionAsync($$"""
+            (arg) => {
+              if (arg !== 12345n) {
+              throw new Error("Assert failed: " + arg);
+              }
+            }
+            """, false, new() { Arguments = [arg] });
+        }, Throws.Nothing);
+    }
+
+    [Test]
     public void CanCallFunctionWithArgumentEmptyString()
     {
         var arg = new StringLocalValue(string.Empty);
