@@ -31,13 +31,32 @@ GlobalTestEnv = WebDriver::SpecSupport::TestEnvironment.new
 
 class SeleniumTestListener
   def example_finished(notification)
-    exception = notification.example.exception
+    if investigate?(notification.example) && WebDriver.logger.debug?
+      driver = GlobalTestEnv.driver_instance
+      session_id = driver.instance_variable_get(:@bridge).session_id
+
+      FileUtils.mkdir_p('bazel-logs')
+      driver.save_screenshot("bazel-logs/#{session_id}.png")
+      WebDriver.logger.info("Page Source: #{driver.page_source}")
+    end
+
+    GlobalTestEnv.reset_driver! if reset_driver?(notification.example)
+  end
+
+  private
+
+  def investigate?(example)
+    example.exception && !example.pending
+  end
+
+  def reset_driver?(example)
+    exception = example.exception
     assertion_failed = exception &&
                        (exception.is_a?(RSpec::Expectations::ExpectationNotMetError) ||
-                        exception.is_a?(RSpec::Core::Pending::PendingExampleFixedError))
-    pending_exception = exception.nil? && notification.example.pending && !notification.example.skip
+                         exception.is_a?(RSpec::Core::Pending::PendingExampleFixedError))
+    pending_exception = exception.nil? && example.pending && !example.skip
 
-    GlobalTestEnv.reset_driver! if (exception && !assertion_failed) || pending_exception
+    (exception && !assertion_failed) || pending_exception
   end
 end
 
