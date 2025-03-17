@@ -22,7 +22,7 @@ const { Pages, suite } = require('../../lib/test')
 const { Browser } = require('selenium-webdriver')
 const BrowserBiDi = require('selenium-webdriver/bidi/browser')
 const getScriptManager = require('selenium-webdriver/bidi/scriptManager')
-const { getPermissionInstance, PermissionState } = require('selenium-webdriver/bidi/permissions')
+const { getPermissionInstance, PermissionState } = require('selenium-webdriver/bidi/external/permissions')
 const BrowsingContext = require('selenium-webdriver/bidi/browsingContext')
 const { CreateContextParameters } = require('selenium-webdriver/bidi/createContextParameters')
 
