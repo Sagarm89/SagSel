@@ -222,6 +222,15 @@ public abstract record LocalValue
     public static NullLocalValue Null { get; } = new NullLocalValue();
 
     public static UndefinedLocalValue Undefined { get; } = new UndefinedLocalValue();
+    public static RegExpLocalValue Regex(string pattern, string? flags = null)
+    {
+        if (pattern is null)
+        {
+            throw new ArgumentNullException(nameof(pattern));
+        }
+
+        return new RegExpLocalValue(new RegExpValue(pattern) { Flags = flags });
+    }
 
     /// <summary>
     /// Converts a .NET Regex into a BiDi Regex
@@ -234,6 +243,11 @@ public abstract record LocalValue
     /// </remarks>
     public static RegExpLocalValue Regex(Regex regex)
     {
+        if (regex is null)
+        {
+            throw new ArgumentNullException(nameof(regex));
+        }
+
         RegexOptions options = regex.Options;
 
         if (options == RegexOptions.None)
