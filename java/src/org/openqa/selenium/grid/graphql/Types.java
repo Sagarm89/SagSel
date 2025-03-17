@@ -17,7 +17,10 @@
 
 package org.openqa.selenium.grid.graphql;
 
+import graphql.GraphQLContext;
+import graphql.execution.CoercedVariables;
 import graphql.language.StringValue;
+import graphql.language.Value;
 import graphql.schema.Coercing;
 import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
@@ -27,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Locale;
 
 class Types {
 
@@ -39,7 +43,7 @@ class Types {
         .coercing(
             new Coercing<URI, String>() {
               @Override
-              public String serialize(Object o) throws CoercingSerializeException {
+              public String serialize(Object o, GraphQLContext graphQLContext, Locale locale) throws CoercingSerializeException {
                 if (o instanceof String) {
                   return (String) o;
                 }
@@ -52,7 +56,7 @@ class Types {
               }
 
               @Override
-              public URI parseValue(Object input) throws CoercingParseValueException {
+              public URI parseValue(Object input, GraphQLContext graphQLContext, Locale locale) throws CoercingParseValueException {
                 if (input == null) {
                   return null;
                 }
@@ -77,7 +81,7 @@ class Types {
               }
 
               @Override
-              public URI parseLiteral(Object input) throws CoercingParseLiteralException {
+              public URI parseLiteral(Value<?> input, CoercedVariables variables, GraphQLContext graphQLContext, Locale locale) throws CoercingParseLiteralException {
                 if (!(input instanceof StringValue)) {
                   throw new CoercingParseLiteralException("Cannot convert to URL: " + input);
                 }
@@ -98,7 +102,7 @@ class Types {
         .coercing(
             new Coercing<URL, String>() {
               @Override
-              public String serialize(Object o) throws CoercingSerializeException {
+              public String serialize(Object o, GraphQLContext graphQLContext, Locale locale) throws CoercingSerializeException {
                 if (o instanceof String) {
                   return (String) o;
                 }
@@ -111,7 +115,7 @@ class Types {
               }
 
               @Override
-              public URL parseValue(Object input) throws CoercingParseValueException {
+              public URL parseValue(Object input, GraphQLContext graphQLContext, Locale locale) throws CoercingParseValueException {
                 if (input == null) {
                   return null;
                 }
@@ -136,7 +140,7 @@ class Types {
               }
 
               @Override
-              public URL parseLiteral(Object input) throws CoercingParseLiteralException {
+              public URL parseLiteral(Value<?> input, CoercedVariables variables, GraphQLContext graphQLContext, Locale locale) throws CoercingParseLiteralException {
                 if (!(input instanceof StringValue)) {
                   throw new CoercingParseLiteralException("Cannot convert to URL: " + input);
                 }
