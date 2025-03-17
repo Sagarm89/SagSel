@@ -172,6 +172,9 @@ module Selenium
                 .pointer_down(:left).pointer_up(:left)
                 .perform
           expect(element.attribute(:value)).to eq('DoubleClicked')
+        ensure
+          # https://issues.chromium.org/issues/400087471
+          reset_driver! if GlobalTestEnv.browser == :chrome && GlobalTestEnv.rbe?
         end
       end
 
