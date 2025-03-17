@@ -17,8 +17,6 @@
 // under the License.
 // </copyright>
 
-using System.Text.Json.Serialization;
-
 namespace OpenQA.Selenium.BiDi.Modules.Input;
 
 public abstract record Origin;
@@ -27,8 +25,4 @@ public record ViewportOrigin() : Origin;
 
 public record PointerOrigin() : Origin;
 
-public record ElementOrigin(Script.ISharedReference Element) : Origin
-{
-    [JsonInclude]
-    internal string Type { get; } = "element";
-}
+public record ElementOrigin(Script.ISharedReference Element) : Origin;
