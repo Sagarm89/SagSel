@@ -139,17 +139,20 @@ public class NodeStatus {
   }
 
   public boolean hasCapability(Capabilities caps, SlotMatcher slotMatcher) {
-    return slots.stream().anyMatch(slot -> slot.isSupporting(caps, slotMatcher));
+    return this.getAvailability() == Availability.UP
+        && slots.stream().anyMatch(slot -> slot.isSupporting(caps, slotMatcher));
   }
 
   public boolean hasCapacity() {
-    return slots.stream().filter(slot -> slot.getSession() != null).count() < maxSessionCount;
+    return this.getAvailability() == Availability.UP
+        && slots.stream().filter(slot -> slot.getSession() != null).count() < maxSessionCount;
   }
 
   // Check if the Node's max session limit is not exceeded and has a free slot that supports the
   // capability.
   public boolean hasCapacity(Capabilities caps, SlotMatcher slotMatcher) {
-    return slots.stream().filter(slot -> slot.getSession() != null).count() < maxSessionCount
+    return this.getAvailability() == Availability.UP
+        && slots.stream().filter(slot -> slot.getSession() != null).count() < maxSessionCount
         && slots.stream()
             .anyMatch(slot -> slot.getSession() == null && slot.isSupporting(caps, slotMatcher));
   }

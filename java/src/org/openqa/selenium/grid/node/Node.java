@@ -131,6 +131,7 @@ public abstract class Node implements HasReadyState, Routable {
   private final Duration sessionTimeout;
   private final Route routes;
   protected boolean draining;
+  protected boolean registered;
 
   protected Node(
       Tracer tracer, NodeId id, URI uri, Secret registrationSecret, Duration sessionTimeout) {
@@ -272,6 +273,14 @@ public abstract class Node implements HasReadyState, Routable {
 
   public boolean isDraining() {
     return draining;
+  }
+
+  public boolean isRegistered() {
+    return registered;
+  }
+
+  public void register() {
+    registered = true;
   }
 
   public abstract void drain();

@@ -130,7 +130,7 @@ public class NodeServer extends TemplateGridServerCommand {
 
     HttpHandler readinessCheck =
         req -> {
-          if (node.getStatus().hasCapacity()) {
+          if (node.isReady() && node.getStatus().hasCapacity()) {
             return new HttpResponse()
                 .setStatus(HTTP_OK)
                 .setHeader("Content-Type", MediaType.PLAIN_TEXT_UTF_8.toString())
@@ -148,6 +148,7 @@ public class NodeServer extends TemplateGridServerCommand {
             nodeId -> {
               if (node.getId().equals(nodeId)) {
                 nodeRegistered.set(true);
+                node.register();
                 LOG.info("Node has been added");
               }
             }));
