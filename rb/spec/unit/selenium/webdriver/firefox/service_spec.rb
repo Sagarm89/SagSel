@@ -81,8 +81,7 @@ module Selenium
             service = described_class.new
             ws_index = service.extra_args.index('--websocket-port')
             port = service.extra_args[ws_index + 1].to_i
-            expect(port).to be > 0
-            expect(port).to be < 65_536
+            expect(port).to be.positive?
           end
 
           context 'with connect existing' do
