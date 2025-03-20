@@ -17,7 +17,7 @@ Python documentation.
 
 .. code-block:: console
 
-    python3 -m venv
+    python3 -m venv venv
     source venv/bin/activate
     pip install tox
     git clone git@github.com:SeleniumHQ/selenium.git
