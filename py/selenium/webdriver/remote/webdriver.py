@@ -799,7 +799,7 @@ class WebDriver(BaseWebDriver):
         execute_async_script call before throwing an error.
 
         Parameters:
-        ---------
+        ----------
         time_to_wait : float
             - The amount of time to wait (in seconds)
 
@@ -814,13 +814,13 @@ class WebDriver(BaseWebDriver):
         throwing an error.
 
         Parameters:
-         ---------
-         time_to_wait : float
+        ----------
+        time_to_wait : float
              - The amount of time to wait (in seconds)
 
-         Example:
-         --------
-         >>> driver.set_page_load_timeout(30)
+        Example:
+        -------
+        >>> driver.set_page_load_timeout(30)
         """
         try:
             self.execute(Command.SET_TIMEOUTS, {"pageLoad": int(float(time_to_wait) * 1000)})
