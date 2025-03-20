@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.bidi.BiDi;
 import org.openqa.selenium.ParallelTestRunner;
 import org.openqa.selenium.ParallelTestRunner.Worker;
 import org.openqa.selenium.WebDriver;
@@ -163,5 +164,36 @@ class FirefoxDriverConcurrentTest extends JupiterTestBase {
       if (one != null) one.quit();
       if (two != null) two.quit();
     }
+  }
+
+  @Test
+  void multipleFirefoxInstancesWithBiDiEnabledCanRunSimultaneously() {
+    // Create two Firefox instances with BiDi enabled
+    FirefoxOptions options1 = new FirefoxOptions().enableBiDi();
+    FirefoxOptions options2 = new FirefoxOptions().enableBiDi();
+
+    FirefoxDriver driver1;
+    FirefoxDriver driver2;
+
+    // Start the first Firefox instance
+    driver1 = new FirefoxDriver(options1);
+    BiDi biDi1 = driver1.getBiDi();
+    assertThat(biDi1).isNotNull();
+
+    // Extract the BiDi websocket URL and port for the first instance
+    String webSocketUrl1 = (String) driver1.getCapabilities().getCapability("webSocketUrl");
+    String port1 = webSocketUrl1.replaceAll("^ws://[^:]+:(\\d+)/.*$", "$1");
+
+    // Start the second Firefox instance
+    driver2 = new FirefoxDriver(options2);
+    BiDi biDi2 = driver2.getBiDi();
+    assertThat(biDi2).isNotNull();
+
+    // Extract the BiDi websocket URL and port for the second instance
+    String webSocketUrl2 = (String) driver2.getCapabilities().getCapability("webSocketUrl");
+    String port2 = webSocketUrl2.replaceAll("^ws://[^:]+:(\\d+)/.*$", "$1");
+
+    // Verify that the ports are different
+    assertThat(port1).isNotEqualTo(port2);
   }
 }
