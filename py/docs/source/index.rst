@@ -152,7 +152,7 @@ Contributing
 
  - Create a branch for your work
  - Ensure `tox` is installed (using a `virtualenv` is recommended)
- - Run: `python -m venv venv && venv/bin/activate && pip install tox`
+ - Run: `python -m venv venv && source venv/bin/activate && pip install tox`
  - After making changes, before committing execute `tox -e linting`
  - If tox exits `0`, commit and push. Otherwise fix the newly introduced style violations.
  - `flake8` requires manual fixes
