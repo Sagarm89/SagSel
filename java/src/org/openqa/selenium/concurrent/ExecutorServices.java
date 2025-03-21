@@ -1,4 +1,4 @@
-// Licensed to the Software Freedom Conservancy (SFC) under one
+  // Licensed to the Software Freedom Conservancy (SFC) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
 // regarding copyright ownership.  The SFC licenses this file
@@ -26,18 +26,27 @@ import java.util.logging.Logger;
 public class ExecutorServices {
 
   private static final Logger LOG = Logger.getLogger(ExecutorServices.class.getName());
+  private static final int DEFAULT_SHUTDOWN_TIMEOUT = 5;
 
   public static void shutdownGracefully(String name, ExecutorService service) {
     service.shutdown();
-    try {
-      if (!service.awaitTermination(5, SECONDS)) {
-        LOG.warning(String.format("Failed to shutdown %s", name));
-        service.shutdownNow();
-      }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      LOG.log(WARNING, String.format("Failed to shutdown %s", name), e);
-      service.shutdownNow();
+    if(!awaitTermination(name, service, DEFAULT_SHUTDOWN_TIMEOUT)){
+      forceShutdown(name, service);
     }
   }
-}
+
+  private static boolean awaitTermination(String name, ExecutorService service, int timeoutSeconds){
+    
+    try {
+      return service.awaitTermination(timeoutSeconds, SECONDS);
+    }catch(InterruptedException ex){
+      Thread.currentThread().interrupt;
+      LOG.log(WARNING, String.format("Failed to shutdown %s", name), e);
+      return false;
+
+      private static void forceShutDown(String name, ExecutorService, service){
+        LOG.warning(String.format("Failed to shutdown %s", name), e);
+        service.shutdownNow();
+    
+    }
+  }
