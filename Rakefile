@@ -129,7 +129,7 @@ def verify_java_release_targets
   current_targets = []
 
   Bazel.execute('query', [], query) do |output|
-    current_targets = output.lines.map(&:strip).reject(&:empty?)
+    current_targets = output.lines.map(&:strip).reject(&:empty?).select { |line| line.start_with?('//') }
   end
 
   missing_targets = current_targets - JAVA_RELEASE_TARGETS
@@ -484,12 +484,15 @@ namespace :node do
 
   desc 'Generate Node documentation'
   task :docs, [:skip_update] do |_task, arguments|
+    abort('Aborting documentation update: nightly versions should not update docs.') if node_version.include?('nightly')
+
+    puts 'Generating Node documentation'
     FileUtils.rm_rf('build/docs/api/javascript/')
     begin
-      sh 'npm run generate-docs --prefix javascript/node/selenium-webdriver || true', verbose: true
-    rescue StandardError
-      puts 'Ensure that npm is installed on your system'
-      raise
+      sh 'npm install --prefix javascript/node/selenium-webdriver', verbose: true
+      sh 'npm run generate-docs --prefix javascript/node/selenium-webdriver', verbose: true
+    rescue StandardError => e
+      puts "Node documentation generation contains errors; continuing... #{e.message}"
     end
 
     update_gh_pages unless arguments[:skip_update]
@@ -576,6 +579,11 @@ namespace :py do
 
   desc 'Generate Python documentation'
   task :docs, [:skip_update] do |_task, arguments|
+    if python_version.match?(/^\d+\.\d+\.\d+\.\d+$/)
+      abort('Aborting documentation update: nightly versions should not update docs.')
+    end
+    puts 'Generating Python documentation'
+
     FileUtils.rm_rf('build/docs/api/py/')
     FileUtils.rm_rf('build/docs/doctrees/')
     begin
@@ -714,6 +722,9 @@ namespace :rb do
 
   desc 'Generate Ruby documentation'
   task :docs, [:skip_update] do |_task, arguments|
+    abort('Aborting documentation update: nightly versions should not update docs.') if ruby_version.include?('nightly')
+    puts 'Generating Ruby documentation'
+
     FileUtils.rm_rf('build/docs/api/rb/')
     Bazel.execute('run', [], '//rb:docs')
     FileUtils.mkdir_p('build/docs/api')
@@ -801,6 +812,11 @@ namespace :dotnet do
 
   desc 'Generate .NET documentation'
   task :docs, [:skip_update] do |_task, arguments|
+    if dotnet_version.include?('nightly')
+      abort('Aborting documentation update: nightly versions should not update docs.')
+    end
+
+    puts 'Generating .NET documentation'
     FileUtils.rm_rf('build/docs/api/dotnet/')
     begin
       # Pinning to 2.78.2 to avoid breaking changes in newer versions
@@ -907,6 +923,11 @@ namespace :java do
 
   desc 'Generate Java documentation'
   task :docs, [:skip_update] do |_task, arguments|
+    if java_version.include?('SNAPSHOT')
+      abort('Aborting documentation update: snapshot versions should not update docs.')
+    end
+
+    puts 'Generating Java documentation'
     Rake::Task['javadocs'].invoke
 
     update_gh_pages unless arguments[:skip_update]
@@ -1110,7 +1131,7 @@ namespace :all do
     commit!('Update selenium manager version', ['common/selenium_manager.bzl'])
 
     Rake::Task['java:update'].invoke
-    commit!('Update Maven Dependencies', ['java/maven_deps.bzl', 'java/maven_install.json'])
+    commit!('Update Maven Dependencies', ['MODULE.bazel', 'java/maven_install.json'])
 
     Rake::Task['authors'].invoke
     commit!('Update authors file', ['AUTHORS'])
@@ -1118,26 +1139,30 @@ namespace :all do
     # Note that this does not include Rust version changes that are handled in separate rake:version task
     # TODO: These files are all defined in other tasks; remove duplication
     Rake::Task['all:version'].invoke(version)
-    commit!("FIX CHANGELOGS BEFORE MERGING!\n\nUpdate versions and change logs to release Selenium #{java_version}",
-            ['dotnet/CHANGELOG',
-             'dotnet/selenium-dotnet-version.bzl',
-             'java/CHANGELOG',
+    commit!("Update Version in all bindings to #{java_version}",
+            ['dotnet/selenium-dotnet-version.bzl',
              'java/version.bzl',
-             'javascript/node/selenium-webdriver/CHANGES.md',
+             'javascript/node/selenium-webdriver/BUILD.bazel',
              'javascript/node/selenium-webdriver/package.json',
              'py/docs/source/conf.py',
+             'py/pyproject.toml',
              'py/selenium/__init__.py',
              'py/selenium/webdriver/__init__.py',
              'py/BUILD.bazel',
-             'py/CHANGES',
              'rb/lib/selenium/webdriver/version.rb',
-             'rb/CHANGES',
              'rb/Gemfile.lock',
-             'rust/CHANGELOG.md',
              'rust/BUILD.bazel',
              'rust/Cargo.Bazel.lock',
              'rust/Cargo.toml',
              'rust/Cargo.lock'])
+
+    commit!("FIX CHANGELOGS BEFORE MERGING! #{java_version}",
+            ['dotnet/CHANGELOG',
+             'java/CHANGELOG',
+             'javascript/node/selenium-webdriver/CHANGES.md',
+             'py/CHANGES',
+             'rb/CHANGES',
+             'rust/CHANGELOG.md'])
   end
 
   desc 'Update all versions'
@@ -1171,26 +1196,34 @@ def updated_version(current, desired = nil, nightly = nil)
   end
 end
 
-def update_gh_pages
-  @git.fetch('origin', {ref: 'gh-pages'})
-  @git.checkout('gh-pages', force: true)
+def update_gh_pages(force: true)
+  puts 'Switching to gh-pages branch...'
+  @git.fetch('https://github.com/seleniumhq/selenium.git', {ref: 'gh-pages'})
+
+  unless force
+    puts 'Stashing current changes before checkout...'
+    Git::Stash.new(@git, 'stash wip')
+  end
+
+  @git.checkout('gh-pages', force: force)
+
+  updated = false
 
   %w[java rb py dotnet javascript].each do |language|
-    next unless Dir.exist?("build/docs/api/#{language}") && !Dir.empty?("build/docs/api/#{language}")
+    source = "build/docs/api/#{language}"
+    destination = "docs/api/#{language}"
 
-    FileUtils.rm_rf("docs/api/#{language}")
-    FileUtils.mv("build/docs/api/#{language}", "docs/api/#{language}")
+    next unless Dir.exist?(source) && !Dir.empty?(source)
 
-    commit!("updating #{language} API docs", ["docs/api/#{language}/"])
+    puts "Updating documentation for #{language}..."
+    FileUtils.rm_rf(destination)
+    FileUtils.mv(source, destination)
+
+    @git.add(destination)
+    updated = true
   end
-end
 
-def restore_git(origin_reference)
-  puts 'Stashing docs changes for gh-pages'
-  Git::Stash.new(@git, 'docs changes for gh-pages')
-  puts "Checking out originating branch/tag — #{origin_reference}"
-  @git.checkout(origin_reference)
-  false
+  puts(updated ? 'Documentation staged. Ready for commit.' : 'No documentation changes found.')
 end
 
 def previous_tag(current_version, language = nil)
@@ -1214,16 +1247,25 @@ end
 
 def update_changelog(version, language, path, changelog, header)
   tag = previous_tag(version, language)
-  log = if language == 'javascript'
-          `git --no-pager log #{tag}...HEAD --pretty=format:"- %s" --reverse #{path}`
-        else
-          `git --no-pager log #{tag}...HEAD --pretty=format:"* %s" --reverse #{path}`
-        end
-  commits = log.split('>>>').map { |entry|
-    lines = entry.split("\n")
-    lines.reject! { |line| line.match?(/^(----|Co-authored|Signed-off)/) || line.empty? }
-    lines.join("\n")
-  }.join("\n>>>")
+  bullet = language == 'javascript' ? '- ' : '* '
+  commit_delimiter = '===DELIM==='
+  tags_to_remove = /\[(dotnet|rb|py|java|js|rust)\]:?\s?/
+
+  command = "git --no-pager log #{tag}...HEAD --pretty=format:\"%s%n%b#{commit_delimiter}\" --reverse #{path}"
+  puts "Executing git command: #{command}"
+
+  log = `#{command}`
+
+  commits = log.split(commit_delimiter).map { |commit|
+    lines = commit.gsub(tags_to_remove, '').strip.lines.map(&:chomp)
+    subject = "#{bullet}#{lines[0]}"
+
+    body = lines[1..]
+           .reject { |line| line.match?(/^(----|Co-authored|Signed-off)/) || line.empty? }
+           .map { |line| "    > #{line}" }
+           .join("\n")
+    body.empty? ? subject : "#{subject}\n#{body}"
+  }.join("\n")
 
   File.open(changelog, 'r+') do |file|
     new_content = "#{header}\n#{commits}\n\n#{file.read}"
