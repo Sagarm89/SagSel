@@ -157,7 +157,8 @@ class Service(ABC):
                 self.send_remote_shutdown_command()
             except TypeError:
                 pass
-            self._terminate_process()
+            finally:
+                self._terminate_process()
 
     def _terminate_process(self) -> None:
         """Terminate the child process.
