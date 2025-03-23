@@ -100,23 +100,122 @@ def pytest_ignore_collect(path, config):
 driver_instance = None
 
 
+class Driver:
+    def __init__(self, driver_class, request):
+        self._driver_class = driver_class
+        self._request = request
+        self._driver = None
+        self._options = None
+        self._platform = None
+        self._service = None
+        self.kwargs = {}
+
+    @property
+    def exe_platform(self):
+        self._platform = platform
+        return self._platform
+
+    @property
+    def browser_path(self):
+        return self._request.config.option.binary
+
+    @property
+    def browser_args(self):
+        return self._request.config.option.args
+
+    @property
+    def driver_path(self):
+        return self._request.config.option.executable
+
+    @property
+    def headless(self):
+        return bool(self._request.config.option.headless)
+
+    @property
+    def bidi(self):
+        return bool(self._request.config.option.bidi)
+
+    @property
+    def options(self):
+        if self.browser_path or self.browser_args:
+            if not self._options:
+                if self._driver_class == "Remote":
+                    self._options = getattr(webdriver, "FirefoxOptions")() or webdriver.FirefoxOptions()
+                    self._options.set_capability("moz:firefoxOptions", {})
+                    self._options.enable_downloads = True
+                elif self._driver_class.lower() == "webkitgtk":
+                    self._driver_class = "WebKitGTK"
+                    self._options = getattr(webdriver, f"{self._driver_class}Options")()
+                    self._options.overlay_scrollbars_enabled = False
+                elif self._driver_class.lower() == "wpewebkit":
+                    self._driver_class = "WPEWebKit"
+                    self._options = getattr(webdriver, f"{self._driver_class}Options")()
+                else:
+                    self._options = getattr(webdriver, f"{self._driver_class}Options")()
+
+            if self.browser_path is not None:
+                self._options.binary_location = self.browser_path.strip("'")
+            if self.browser_args is not None:
+                for arg in self.browser_args.split():
+                    self._options.add_argument(arg)
+
+        if self.headless:
+            if self._driver_class == "Chrome" or self._driver_class == "Edge":
+                self._options.add_argument("--headless=new")
+            if self._driver_class == "Firefox":
+                self._options.add_argument("-headless")
+
+        if self.bidi:
+            self._options.web_socket_url = True
+            self._options.unhandled_prompt_behavior = "ignore"
+
+        if self.driver_path:
+            self.service = self.driver_path
+        return self._options
+
+    @property
+    def service(self):
+        executable = self.driver_path
+        if executable:
+            module = getattr(webdriver, self._driver_class.lower())
+            self._service = module.service.Service(executable_path=executable)
+            return self._service
+
+    @property
+    def driver(self):
+        if not self._driver:
+            return self._initialize_driver()
+
+    def _initialize_driver(self):
+        self.kwargs["options"] = self.options
+        self.kwargs["service"] = self.service
+        self._driver = getattr(webdriver, self._driver_class)(**self.kwargs)
+        return self._driver
+
+    @property
+    def stop_driver(self):
+        def fin():
+            if self._driver is not None:
+                self._driver.quit()
+
+        return fin
+
+
 @pytest.fixture(scope="function")
 def driver(request):
-    kwargs = {}
-
-    # browser can be changed with `--driver=firefox` as an argument or to addopts in pytest.ini
+    global driver_instance
     driver_class = getattr(request, "param", "Chrome").capitalize()
+    selenium_driver = Driver(driver_class, request)
+    driver_instance = selenium_driver.driver
 
     # skip tests if not available on the platform
-    _platform = platform.system()
-    if driver_class == "Safari" and _platform != "Darwin":
+    if driver_class == "Safari" and driver_instance.exe_platform != "Darwin":
         pytest.skip("Safari tests can only run on an Apple OS")
-    if (driver_class == "Ie") and _platform != "Windows":
+    if driver_class == "Ie" and driver_instance.exe_platform != "Windows":
         pytest.skip("IE and EdgeHTML Tests can only run on Windows")
-    if "WebKit" in driver_class and _platform != "Linux":
+    if "WebKit" in driver_class and driver_instance.exe_platform != "Linux":
         pytest.skip("Webkit tests can only run on Linux")
-
-    # conditionally mark tests as expected to fail based on driver
+        # conditionally mark tests as expected to fail based on driver
     marker = request.node.get_closest_marker(f"xfail_{driver_class.lower()}")
 
     if marker is not None:
@@ -129,107 +228,9 @@ def driver(request):
             marker.kwargs.pop("raises")
         pytest.xfail(**marker.kwargs)
 
-        def fin():
-            global driver_instance
-            if driver_instance is not None:
-                driver_instance.quit()
-            driver_instance = None
+    request.addfinalizer(selenium_driver.stop_driver)
 
-        request.addfinalizer(fin)
-
-    driver_path = request.config.option.executable
-    options = None
-
-    global driver_instance
-    if driver_instance is None:
-        if driver_class == "Firefox":
-            options = get_options(driver_class, request.config)
-        if driver_class == "Chrome":
-            options = get_options(driver_class, request.config)
-        if driver_class == "Remote":
-            options = get_options("Firefox", request.config) or webdriver.FirefoxOptions()
-            options.set_capability("moz:firefoxOptions", {})
-            options.enable_downloads = True
-        if driver_class.lower() == "webkitgtk":
-            driver_class = "WebKitGTK"
-            options = get_options(driver_class, request.config)
-        if driver_class == "Edge":
-            options = get_options(driver_class, request.config)
-        if driver_class.lower() == "wpewebkit":
-            driver_class = "WPEWebKit"
-            options = get_options(driver_class, request.config)
-        if driver_path is not None:
-            kwargs["service"] = get_service(driver_class, driver_path)
-        if options is not None:
-            kwargs["options"] = options
-
-        driver_instance = getattr(webdriver, driver_class)(**kwargs)
     yield driver_instance
-
-    # Close the browser after BiDi tests. Those make event subscriptions
-    # and doesn't seems to be stable enough, causing the flakiness of the
-    # subsequent tests.
-    # Remove this when BiDi implementation and API is stable.
-    if bool(request.config.option.bidi):
-
-        def fin():
-            global driver_instance
-            if driver_instance is not None:
-                driver_instance.quit()
-            driver_instance = None
-
-        request.addfinalizer(fin)
-
-    if request.node.get_closest_marker("no_driver_after_test"):
-        driver_instance = None
-
-
-def get_options(driver_class, config):
-    browser_path = config.option.binary
-    browser_args = config.option.args
-    headless = bool(config.option.headless)
-    bidi = bool(config.option.bidi)
-    options = None
-
-    if browser_path or browser_args:
-        if not options:
-            options = getattr(webdriver, f"{driver_class}Options")()
-        if driver_class == "WebKitGTK":
-            options.overlay_scrollbars_enabled = False
-        if browser_path is not None:
-            options.binary_location = browser_path.strip("'")
-        if browser_args is not None:
-            for arg in browser_args.split():
-                options.add_argument(arg)
-
-    if headless:
-        if not options:
-            options = getattr(webdriver, f"{driver_class}Options")()
-
-        if driver_class == "Chrome" or driver_class == "Edge":
-            options.add_argument("--headless=new")
-        if driver_class == "Firefox":
-            options.add_argument("-headless")
-
-    if bidi:
-        if not options:
-            options = getattr(webdriver, f"{driver_class}Options")()
-
-        options.web_socket_url = True
-        options.unhandled_prompt_behavior = "ignore"
-
-    return options
-
-
-def get_service(driver_class, executable):
-    # Let the default behaviour be used if we don't set the driver executable
-    if not executable:
-        return None
-
-    module = getattr(webdriver, driver_class.lower())
-    service = module.service.Service(executable_path=executable)
-
-    return service
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -348,8 +349,8 @@ def clean_service(request):
         driver_class = request.config.option.drivers[0].capitalize()
     except AttributeError:
         raise Exception("This test requires a --driver to be specified.")
-
-    yield get_service(driver_class, request.config.option.executable)
+    selenium_driver = Driver(driver_class, request)
+    yield selenium_driver.service
 
 
 @pytest.fixture(scope="function")
@@ -358,7 +359,6 @@ def clean_driver(request):
         driver_class = request.config.option.drivers[0].capitalize()
     except AttributeError:
         raise Exception("This test requires a --driver to be specified.")
-
     driver_reference = getattr(webdriver, driver_class)
     yield driver_reference
 
