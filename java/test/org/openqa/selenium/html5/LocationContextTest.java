@@ -39,8 +39,8 @@ class LocationContextTest extends JupiterTestBase {
   void testShouldSetAndGetLatitude() {
     driver.get(pages.html5Page);
 
-    ((LocationContext) driver).setLocation(new Location(40.714353, -74.005973, 0.056747));
-    Location location = ((LocationContext) driver).location();
+    LocationContext locationContext = (LocationContext) driver;
+    Location location = setAndRetrieveLocation(locationContext, 40.714353, -74.005973, 0.056747);
     assertThat(location).isNotNull();
     assertThat(location.getLatitude()).isCloseTo(40.714353, byLessThan(0.000001));
   }
@@ -49,8 +49,8 @@ class LocationContextTest extends JupiterTestBase {
   void testShouldSetAndGetLongitude() {
     driver.get(pages.html5Page);
 
-    ((LocationContext) driver).setLocation(new Location(40.714353, -74.005973, 0.056747));
-    Location location = ((LocationContext) driver).location();
+    LocationContext locationContext = (LocationContext) driver;
+    Location location = setAndRetrieveLocation(locationContext, 40.714353, -74.005973, 0.056747);
     assertThat(location).isNotNull();
     assertThat(location.getLongitude()).isCloseTo(-74.005973, byLessThan(0.000001));
   }
@@ -60,9 +60,9 @@ class LocationContextTest extends JupiterTestBase {
   @NotYetImplemented(EDGE)
   public void testShouldSetAndGetAltitude() {
     driver.get(pages.html5Page);
-
-    ((LocationContext) driver).setLocation(new Location(40.714353, -74.005973, 0.056747));
-    Location location = ((LocationContext) driver).location();
+    
+    LocationContext locationContext = (LocationContext) driver;
+    Location location = setAndRetrieveLocation(locationContext, 40.714353, -74.005973, 0.056747);
     assertThat(location).isNotNull();
     assertThat(location.getAltitude()).isCloseTo(0.056747, byLessThan(0.000001));
   }
