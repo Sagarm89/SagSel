@@ -1,18 +1,17 @@
 [build-system]
-requires = ["setuptools", "setuptools-rust"]
+requires = ["setuptools>=77.0", "setuptools-rust"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "selenium"
 version = "4.31.0.202503211716"
-license = { text = "Apache 2.0" }
+license = "Apache-2.0"
 description = "Official Python bindings for Selenium WebDriver."
 readme = "README.rst"
 requires-python = "~=3.9"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: POSIX",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS :: MacOS X",
