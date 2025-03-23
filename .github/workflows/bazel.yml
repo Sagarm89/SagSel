@@ -61,11 +61,26 @@ on:
         required: false
         type: string
         default: ''
-      artifact-name:
+      download-name:
+        description: name of artifact to download
+        required: false
+        type: string
+        default: ''
+      download-path:
+        description: path of artifact to download
+        required: false
+        type: string
+        default: ''
+      upload-name:
         description: Name of artifact to upload
         required: false
         type: string
-        default: 'ignore-artifacts'
+        default: ''
+      upload-path:
+        description: path of artifact to upload
+        required: false
+        type: string
+        default: ''
 
 jobs:
   bazel:
@@ -78,6 +93,7 @@ jobs:
       TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
       TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      BAZEL_LOG_FILE: bazel-logs/bzl_${{ github.run_id }}.log
       SE_AVOID_STATS: true
     steps:
       - name: Checkout source tree
@@ -155,6 +171,12 @@ jobs:
       - name: Setup curl for Ubuntu
         if: inputs.os == 'ubuntu'
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+      - name: "Download artifact"
+        if: ${{ inputs.download-name != '' && inputs.download-path != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.download-name }}
+          path: ${{ inputs.download-path }}
       - name: Run Bazel
         run: ${{ inputs.run }}
       - name: Start SSH session
@@ -171,14 +193,10 @@ jobs:
           title: "Nightly"
           prerelease: true
           files: ${{ inputs.nightly-release-files }}
-      - name: Save changes
-        if: ${{ always() && inputs.artifact-name != 'ignore-artifacts' }}
-        run: |
-          git diff > changes.patch
-      - name: "Upload changes"
-        if: ${{ always() && inputs.artifact-name != 'ignore-artifacts' }}
+      - name: "Upload artifact"
+        if: ${{ always() && inputs.upload-name != '' && inputs.upload-path != '' }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.artifact-name }}
-          path: changes.patch
+          name: ${{ inputs.upload-name }}
+          path: ${{ inputs.upload-path }}
           retention-days: 6
