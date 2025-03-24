@@ -378,7 +378,7 @@ task ios_driver: [
 # ./go java:package['--config=release']
 desc 'Create stamped zipped assets for Java for uploading to GitHub'
 task :'java-release-zip' do
-  Rake::Task['java:package'].invoke('--config=remote_release')
+  Rake::Task['java:package'].invoke('--config=rbe_release')
 end
 
 task 'release-java': %i[java-release-zip publish-maven]
