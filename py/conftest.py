@@ -167,6 +167,8 @@ class Driver:
                 self._options.add_argument("-headless")
 
         if self.bidi:
+            if not self._options:
+                self._options = getattr(webdriver, f"{self._driver_class}Options")()
             self._options.web_socket_url = True
             self._options.unhandled_prompt_behavior = "ignore"
 
