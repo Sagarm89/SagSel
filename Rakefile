@@ -733,6 +733,26 @@ namespace :rb do
     Bazel.execute('build', args, '//rb:selenium-devtools') if devtools || !webdriver
   end
 
+  task :atoms do
+    base_dir = 'rb/lib/selenium/webdriver/atoms'
+    mkdir_p base_dir
+
+    {
+     '//javascript/atoms/fragments:find-elements': 'findElements.js',
+     '//javascript/atoms/fragments:is-displayed': 'isDisplayed.js',
+     '//javascript/webdriver/atoms:get-attribute': 'getAttribute.js',
+    }.each do |target, name|
+      puts "Generating #{target} as #{name}"
+
+      atom = Bazel.execute('build', [], target.to_s)
+
+      File.open(File.join(base_dir, name), 'w') do |f|
+        f << File.read(atom).strip
+      end
+    end
+  end
+
+
   desc 'Update generated Ruby files for local development'
   task :local_dev do
     Bazel.execute('build', [], '@bundle//:bundle')
