@@ -112,7 +112,7 @@ class Driver:
 
     @property
     def exe_platform(self):
-        self._platform = platform
+        self._platform = platform.system()
         return self._platform
 
     @property
@@ -155,6 +155,7 @@ class Driver:
 
             if self.browser_path is not None:
                 self._options.binary_location = self.browser_path.strip("'")
+
             if self.browser_args is not None:
                 for arg in self.browser_args.split():
                     self._options.add_argument(arg)
@@ -169,8 +170,6 @@ class Driver:
             self._options.web_socket_url = True
             self._options.unhandled_prompt_behavior = "ignore"
 
-        if self.driver_path:
-            self.service = self.driver_path
         return self._options
 
     @property
@@ -180,15 +179,19 @@ class Driver:
             module = getattr(webdriver, self._driver_class.lower())
             self._service = module.service.Service(executable_path=executable)
             return self._service
+        return None
 
     @property
     def driver(self):
         if not self._driver:
             return self._initialize_driver()
+        return self._driver
 
     def _initialize_driver(self):
-        self.kwargs["options"] = self.options
-        self.kwargs["service"] = self.service
+        if self.options:
+            self.kwargs["options"] = self.options
+        if self.driver_path:
+            self.kwargs["service"] = self.service
         self._driver = getattr(webdriver, self._driver_class)(**self.kwargs)
         return self._driver
 
@@ -209,11 +212,11 @@ def driver(request):
     driver_instance = selenium_driver.driver
 
     # skip tests if not available on the platform
-    if driver_class == "Safari" and driver_instance.exe_platform != "Darwin":
+    if driver_class == "Safari" and selenium_driver.exe_platform != "Darwin":
         pytest.skip("Safari tests can only run on an Apple OS")
-    if driver_class == "Ie" and driver_instance.exe_platform != "Windows":
+    if driver_class == "Ie" and selenium_driver.exe_platform != "Windows":
         pytest.skip("IE and EdgeHTML Tests can only run on Windows")
-    if "WebKit" in driver_class and driver_instance.exe_platform != "Linux":
+    if "WebKit" in driver_class and selenium_driver.exe_platform != "Linux":
         pytest.skip("Webkit tests can only run on Linux")
         # conditionally mark tests as expected to fail based on driver
     marker = request.node.get_closest_marker(f"xfail_{driver_class.lower()}")
