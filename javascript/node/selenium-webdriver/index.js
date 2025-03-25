@@ -44,6 +44,7 @@ const BrowsingContext = require('./bidi/browsingContext')
 const BrowsingContextInspector = require('./bidi/browsingContextInspector')
 const ScriptManager = require('./bidi/scriptManager')
 const NetworkInspector = require('./bidi/networkInspector')
+const portprober = require('./net/portprober')
 const version = require('./package.json').version
 
 const Browser = capabilities.Browser
@@ -676,8 +677,14 @@ class Builder {
 
       case Browser.FIREFOX: {
         let service = null
+        // Allocate a free port for the websocket only when not connecting to an existing instance
+        // This avoids conflicts when multiple Firefox instances have started
         if (this.firefoxService_) {
           service = this.firefoxService_.build()
+        }
+        if (!service?.args.includes('--connect-existing')) {
+          service?.args.append('--websocket-port')
+          service?.args.append(`${portprober.findFreePort()}`)
         }
         return createDriver(firefox.Driver, capabilities, service)
       }
