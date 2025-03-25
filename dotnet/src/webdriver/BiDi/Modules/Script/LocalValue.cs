@@ -66,6 +66,12 @@ public abstract record LocalValue
             case double d:
                 return new NumberLocalValue(d);
 
+            case long l:
+                return new NumberLocalValue(l);
+
+            case DateTime dt:
+                return new DateLocalValue(dt.ToString("o"));
+
             case BigInteger bigInt:
                 return new BigIntLocalValue(bigInt.ToString());
 
@@ -75,7 +81,6 @@ public abstract record LocalValue
             case IDictionary<string, string?> dictionary:
                 {
                     var bidiObject = new List<List<LocalValue>>(dictionary.Count);
-
                     foreach (var item in dictionary)
                     {
                         bidiObject.Add([new StringLocalValue(item.Key), ConvertFrom(item.Value)]);
@@ -87,7 +92,6 @@ public abstract record LocalValue
             case IDictionary<string, object?> dictionary:
                 {
                     var bidiObject = new List<List<LocalValue>>(dictionary.Count);
-
                     foreach (var item in dictionary)
                     {
                         bidiObject.Add([new StringLocalValue(item.Key), ConvertFrom(item.Value)]);
@@ -99,7 +103,6 @@ public abstract record LocalValue
             case IDictionary<int, object?> dictionary:
                 {
                     var bidiObject = new List<List<LocalValue>>(dictionary.Count);
-
                     foreach (var item in dictionary)
                     {
                         bidiObject.Add([ConvertFrom(item.Key), ConvertFrom(item.Value)]);
@@ -114,6 +117,7 @@ public abstract record LocalValue
             case object:
                 {
                     const System.Reflection.BindingFlags Flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance;
+
                     var properties = value.GetType().GetProperties(Flags);
 
                     var values = new List<List<LocalValue>>(properties.Length);
