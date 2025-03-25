@@ -211,14 +211,13 @@ def driver(request):
     global driver_instance
     driver_class = getattr(request, "param", "Chrome").capitalize()
     selenium_driver = Driver(driver_class, request)
-    driver_instance = selenium_driver.driver
 
     # skip tests if not available on the platform
-    if driver_class == "Safari" and selenium_driver.exe_platform != "Darwin":
+    if driver_class.lower() == "safari" and selenium_driver.exe_platform != "Darwin":
         pytest.skip("Safari tests can only run on an Apple OS")
-    if driver_class == "Ie" and selenium_driver.exe_platform != "Windows":
+    if driver_class.lower() == "ie" and selenium_driver.exe_platform != "Windows":
         pytest.skip("IE and EdgeHTML Tests can only run on Windows")
-    if "WebKit" in driver_class and selenium_driver.exe_platform != "Linux":
+    if "webkit" in driver_class.lower() and selenium_driver.exe_platform != "Linux":
         pytest.skip("Webkit tests can only run on Linux")
         # conditionally mark tests as expected to fail based on driver
     marker = request.node.get_closest_marker(f"xfail_{driver_class.lower()}")
@@ -234,6 +233,8 @@ def driver(request):
         pytest.xfail(**marker.kwargs)
 
     request.addfinalizer(selenium_driver.stop_driver)
+
+    driver_instance = selenium_driver.driver
 
     yield driver_instance
 
