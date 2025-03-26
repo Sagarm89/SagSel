@@ -15,13 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import json
-import logging
-import uuid
-
-from .session import session_subscribe
-from .session import session_unsubscribe
-
 
 class NetworkEvent:
     """Represents a network event."""
@@ -117,7 +110,7 @@ class Network:
             If intercept is None, all intercepts will be removed.
         """
         if intercept is None:
-            for intercept_id in self.intercepts:  ## remove all intercepts
+            for intercept_id in self.intercepts:  # remove all intercepts
                 self.conn.execute(self.command_builder("network.removeIntercept", {"intercept": intercept_id}))
                 self.intercepts.remove(intercept_id)
         else:
