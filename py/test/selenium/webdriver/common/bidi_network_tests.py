@@ -38,12 +38,13 @@ def test_remove_intercept(driver):
     driver.network.remove_intercept(result["intercept"])
     assert driver.network.intercepts == [], "Intercept not removed"
 
+
 @pytest.mark.xfail_safari
 def test_add_and_remove_request_handler(driver, pages):
 
     requests = []
 
-    def callback(request):
+    def callback(request: Request):
         requests.append(request)
 
     callback_id = driver.network.add_request_handler("before_request", callback)
@@ -52,6 +53,7 @@ def test_add_and_remove_request_handler(driver, pages):
     pages.load("formPage.html")
     assert not requests, "Requests intercepted"
     assert driver.find_element(By.NAME, "login").is_displayed(), "Request not continued"
+
 
 @pytest.mark.xfail_safari
 def test_continue_request(driver, pages):
@@ -66,9 +68,9 @@ def test_continue_request(driver, pages):
 
 
 @pytest.mark.xfail_safari
-def test_continue_with_auth(driver, pages):
+def test_continue_with_auth(driver):
 
-    callback_id = driver.network.add_auth_handler("test", "test")
+    callback_id = driver.network.add_auth_handler("user", "passwd")
     assert callback_id is not None, "Request handler not added"
-    pages.load("basicAuth")
-    assert driver.find_element(By.TAG_NAME, "h1").text == "authorized", "Authorization failed"
+    driver.get("https://httpbin.org/basic-auth/user/passwd")
+    assert "authenticated" in driver.page_source, "Authorization failed"
