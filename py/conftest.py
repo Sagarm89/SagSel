@@ -186,7 +186,7 @@ class Driver:
     @property
     def driver(self):
         if not self._driver:
-            return self._initialize_driver()
+            self._driver = self._initialize_driver()
         return self._driver
 
     def _initialize_driver(self):
@@ -194,16 +194,7 @@ class Driver:
             self.kwargs["options"] = self.options
         if self.driver_path:
             self.kwargs["service"] = self.service
-        self._driver = getattr(webdriver, self._driver_class)(**self.kwargs)
-        return self._driver
-
-    @property
-    def stop_driver(self):
-        def fin():
-            if self._driver is not None:
-                self._driver.quit()
-
-        return fin
+        return getattr(webdriver, self._driver_class)(**self.kwargs)
 
 
 @pytest.fixture(scope="function")
@@ -232,11 +223,11 @@ def driver(request):
             marker.kwargs.pop("raises")
         pytest.xfail(**marker.kwargs)
 
-    request.addfinalizer(selenium_driver.stop_driver)
-
     driver_instance = selenium_driver.driver
 
     yield driver_instance
+
+    driver_instance.quit()
 
 
 @pytest.fixture(scope="session", autouse=True)
