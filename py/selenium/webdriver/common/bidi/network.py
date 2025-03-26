@@ -237,35 +237,9 @@ class Network:
         event = "auth_required"
 
         def _callback(request):
-            self._continue_with_auth(request, username, password)
+            request._continue_with_auth(username, password)
 
         return self.add_request_handler(event, _callback)
-
-    def _continue_with_auth(self, request, username=None, password=None):
-        """Continue with authentication.
-
-        Parameters:
-        ----------
-            request (Request): The request to continue with.
-            username (str): The username to authenticate with.
-            password (str): The password to authenticate with.
-
-        Notes:
-        -----
-            If username or password is None, it attempts auth with no credentials
-        """
-
-        params = {}
-        params["request"] = request.request_id
-
-        if not username or not password:
-            params["action"] = "default"
-
-        else:
-            params["action"] = "provideCredentials"
-            params["credentials"] = {"type": "password", "username": username, "password": password}
-
-        self.conn.execute(self.command_builder("network.continueWithAuth", params))
 
 
 class Request:
@@ -307,22 +281,47 @@ class Request:
         cmd = yield command
         return cmd
 
-    def continue_request(self, **kwargs):
+    def continue_request(self, body=None, method=None, headers=None, cookies=None, url=None):
         """Continue after intercepting this request."""
 
         if not self.request_id:
             raise ValueError("Request not found.")
 
         params = {"request": self.request_id}
-        if "body" in kwargs:
-            params["body"] = kwargs["body"]
-        if self.method is not None:
-            params["method"] = self.method
-        if self.headers is not None:
-            params["headers"] = self.headers
-        if self.cookies is not None:
-            params["cookies"] = self.cookies
-        if self.url is not None:
-            params["url"] = self.url
+        if body is not None:
+            params["body"] = body
+        if method is not None:
+            params["method"] = method
+        if headers is not None:
+            params["headers"] = headers
+        if cookies is not None:
+            params["cookies"] = cookies
+        if url is not None:
+            params["url"] = url
 
         self.network.conn.execute(self.command_builder("network.continueRequest", params))
+
+    def _continue_with_auth(self, username=None, password=None):
+        """Continue with authentication.
+
+        Parameters:
+        ----------
+            request (Request): The request to continue with.
+            username (str): The username to authenticate with.
+            password (str): The password to authenticate with.
+
+        Notes:
+        -----
+            If username or password is None, it attempts auth with no credentials
+        """
+
+        params = {}
+        params["request"] = self.request_id
+
+        if not username or not password:  # no credentials is valid option
+            params["action"] = "default"
+        else:
+            params["action"] = "provideCredentials"
+            params["credentials"] = {"type": "password", "username": username, "password": password}
+
+        self.network.conn.execute(self.command_builder("network.continueWithAuth", params))
