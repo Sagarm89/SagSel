@@ -86,9 +86,9 @@ public class PersistentCapabilities implements Capabilities {
 
   // Needed, since we're dependent on Java 8 as a minimum version
   private <T, K, U> Collector<T, ?, Map<K, U>> toUnmodifiableMap(
-    Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends U> valueMapper) {
+      Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends U> valueMapper) {
     return Collectors.collectingAndThen(
-      Collectors.toMap(keyMapper, valueMapper), Collections::unmodifiableMap);
+        Collectors.toMap(keyMapper, valueMapper), Collections::unmodifiableMap);
   }
 
   // Needed, since we're dependent on Java 8 as a minimum version
