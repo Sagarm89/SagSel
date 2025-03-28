@@ -86,12 +86,17 @@ namespace OpenQA.Selenium
         {
             get
             {
-                if (this.Parameters == null || this.Parameters.Count <= 0)
+                string parametersString;
+                if (this.Parameters != null && this.Parameters.Count > 0)
                 {
-                    return "{}";
+                    parametersString = JsonSerializer.Serialize(this.Parameters, s_jsonSerializerOptions);
+                }
+                else
+                {
+                    parametersString = "{}";
                 }
 
-                return JsonSerializer.Serialize(this.Parameters, s_jsonSerializerOptions);
+                return parametersString;
             }
         }
 
@@ -113,7 +118,7 @@ namespace OpenQA.Selenium
         /// <exception cref="ArgumentNullException">If <paramref name="value"/> is <see langword="null"/>.</exception>
         private static Dictionary<string, object?>? ConvertParametersFromJson(string value)
         {
-            Dictionary<string, object?>? parameters = JsonSerializer.Deserialize<Dictionary<string, object?>>(value, CommandJsonSerializerContext.Default.DictionaryStringObject!);
+            Dictionary<string, object?>? parameters = JsonSerializer.Deserialize<Dictionary<string, object?>>(value, s_jsonSerializerOptions);
             return parameters;
         }
     }
@@ -162,6 +167,5 @@ namespace OpenQA.Selenium
     [JsonSerializable(typeof(Dictionary<string, short>))]
     [JsonSerializable(typeof(Dictionary<string, ushort>))]
     [JsonSerializable(typeof(Dictionary<string, string>))]
-    [JsonSourceGenerationOptions(Converters = [typeof(ResponseValueJsonConverter)])]
     internal partial class CommandJsonSerializerContext : JsonSerializerContext;
 }
