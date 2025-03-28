@@ -32,11 +32,11 @@ namespace OpenQA.Selenium
     /// </summary>
     public class Command
     {
-        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = $"All trimming-unsafe access points to {nameof(JsonSerializerOptions)} are annotated as such")]
-        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = $"All AOT-unsafe access points to {nameof(JsonSerializerOptions)} are annotated as such")]
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = $"All trimming-unsafe access points to {nameof(s_jsonSerializerOptions)} are annotated as such")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = $"All AOT-unsafe access points to {nameof(s_jsonSerializerOptions)} are annotated as such")]
         private static class JsonOptionsHolder
         {
-            public readonly static JsonSerializerOptions JsonSerializerOptions = new()
+            public readonly static JsonSerializerOptions s_jsonSerializerOptions = new()
             {
                 TypeInfoResolver = GetTypeInfoResolver(),
                 Converters = { new ResponseValueJsonConverter() }
@@ -118,7 +118,7 @@ namespace OpenQA.Selenium
                 {
                     try
                     {
-                        return JsonSerializer.Serialize(this._parameters, JsonOptionsHolder.JsonSerializerOptions);
+                        return JsonSerializer.Serialize(this._parameters, JsonOptionsHolder.s_jsonSerializerOptions);
                     }
                     catch (NotSupportedException ex)
                     {
