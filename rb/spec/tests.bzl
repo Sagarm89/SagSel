@@ -2,6 +2,7 @@ load("@rules_ruby//ruby:defs.bzl", "rb_library", "rb_test")
 load(
     "//common:browsers.bzl",
     "COMMON_TAGS",
+    "chrome_beta_data",
     "chrome_data",
     "edge_data",
     "firefox_beta_data",
@@ -33,7 +34,7 @@ BROWSERS = {
         }),
     },
     "chrome-beta": {
-        "data": chrome_data,
+        "data": chrome_beta_data,
         "deps": ["//rb/lib/selenium/webdriver:chrome"],
         "tags": [],
         "target_compatible_with": [],
