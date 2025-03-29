@@ -71,8 +71,8 @@ public class Broker : IAsyncDisposable
             Converters =
             {
                 new BrowsingContextConverter(_bidi),
-                new BrowserUserContextConverter(bidi),
-                new BrowserClientWindowConverter(),
+                new BrowserUserContextConverter(_bidi),
+                new BrowserClientWindowConverter(_bidi),
                 new NavigationConverter(),
                 new InterceptConverter(_bidi),
                 new RequestConverter(_bidi),

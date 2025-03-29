@@ -90,6 +90,7 @@ namespace OpenQA.Selenium.BiDi.Communication.Json;
 [JsonSerializable(typeof(Modules.Browser.RemoveUserContextCommand))]
 [JsonSerializable(typeof(Modules.Browser.GetClientWindowsCommand))]
 [JsonSerializable(typeof(Modules.Browser.GetClientWindowsResult))]
+[JsonSerializable(typeof(Modules.Browser.SetClientWindowStateCommand))]
 [JsonSerializable(typeof(Modules.Browser.UserContextInfo))]
 [JsonSerializable(typeof(IReadOnlyList<Modules.Browser.UserContextInfo>))]
 [JsonSerializable(typeof(IReadOnlyList<Modules.Browser.ClientWindowInfo>))]

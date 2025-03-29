@@ -71,4 +71,26 @@ class BrowserTest : BiDiTestFixture
         Assert.That(clientWindows, Has.Count.GreaterThanOrEqualTo(1));
         Assert.That(clientWindows[0].ClientWindow, Is.Not.Null);
     }
+
+    [Test]
+    public async Task CanSetClientWindowNamedState()
+    {
+        var clientWindows = await bidi.Browser.GetClientWindowsAsync();
+
+        var clientWindowInfo = await clientWindows[0].ClientWindow.SetStateAsync(Modules.Browser.ClientWindowNamedState.Fullscreen);
+
+        // TODO: Make assertion meaningfull
+        Assert.That(clientWindowInfo, Is.Not.Null);
+    }
+
+    [Test]
+    public async Task CanSetClientWindowRectState()
+    {
+        var clientWindows = await bidi.Browser.GetClientWindowsAsync();
+
+        var clientWindowInfo = await clientWindows[0].ClientWindow.SetStateAsync(new() { Width = 500, Height = 300, X = 10, Y = 10 });
+
+        // TODO: Make assertion meaningfull
+        Assert.That(clientWindowInfo, Is.Not.Null);
+    }
 }

@@ -17,7 +17,6 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using OpenQA.Selenium.BiDi.Communication;
 
@@ -50,5 +49,19 @@ public sealed class BrowserModule(Broker broker) : Module(broker)
     public async Task<GetClientWindowsResult> GetClientWindowsAsync(GetClientWindowsOptions? options = null)
     {
         return await Broker.ExecuteCommandAsync<GetClientWindowsCommand, GetClientWindowsResult>(new(), options).ConfigureAwait(false);
+    }
+
+    internal async Task<ClientWindowInfo> SetClientWindowStateAsync(ClientWindow clientWindow, ClientWindowNamedState state, SetClientWindowNamedStateOptions? options = null)
+    {
+        var @params = new SetClientWindowNamedStateCommandParameters(clientWindow, state);
+
+        return await Broker.ExecuteCommandAsync<SetClientWindowStateCommand, ClientWindowInfo>(new SetClientWindowStateCommand(@params), options).ConfigureAwait(false);
+    }
+
+    internal async Task<ClientWindowInfo> SetClientWindowStateAsync(ClientWindow clientWindow, SetClientWindowRectStateOptions? options = null)
+    {
+        var @params = new SetClientWindowRectStateCommandParameters(clientWindow, options);
+
+        return await Broker.ExecuteCommandAsync<SetClientWindowStateCommand, ClientWindowInfo>(new SetClientWindowStateCommand(@params), options).ConfigureAwait(false);
     }
 }
