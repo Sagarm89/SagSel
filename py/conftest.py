@@ -98,6 +98,7 @@ def pytest_ignore_collect(path, config):
 
 
 driver_instance = None
+selenium_driver = None
 
 
 class Driver:
@@ -185,8 +186,7 @@ class Driver:
 
     @property
     def driver(self):
-        if not self._driver:
-            self._driver = self._initialize_driver()
+        self._driver = self._initialize_driver()
         return self._driver
 
     def _initialize_driver(self):
@@ -196,12 +196,26 @@ class Driver:
             self.kwargs["service"] = self.service
         return getattr(webdriver, self._driver_class)(**self.kwargs)
 
+    @property
+    def stop_driver(self):
+        def fin():
+            global driver_instance
+            if self._driver is not None:
+                self._driver.quit()
+            self._driver = None
+            driver_instance = None
+
+        return fin
+
 
 @pytest.fixture(scope="function")
 def driver(request):
     global driver_instance
+    global selenium_driver
     driver_class = getattr(request, "param", "Chrome").capitalize()
-    selenium_driver = Driver(driver_class, request)
+
+    if selenium_driver is None:
+        selenium_driver = Driver(driver_class, request)
 
     # skip tests if not available on the platform
     if driver_class.lower() == "safari" and selenium_driver.exe_platform != "Darwin":
@@ -210,9 +224,9 @@ def driver(request):
         pytest.skip("IE and EdgeHTML Tests can only run on Windows")
     if "webkit" in driver_class.lower() and selenium_driver.exe_platform != "Linux":
         pytest.skip("Webkit tests can only run on Linux")
-        # conditionally mark tests as expected to fail based on driver
-    marker = request.node.get_closest_marker(f"xfail_{driver_class.lower()}")
 
+    # conditionally mark tests as expected to fail based on driver
+    marker = request.node.get_closest_marker(f"xfail_{driver_class.lower()}")
     if marker is not None:
         if "run" in marker.kwargs:
             if marker.kwargs["run"] is False:
@@ -223,11 +237,12 @@ def driver(request):
             marker.kwargs.pop("raises")
         pytest.xfail(**marker.kwargs)
 
-    driver_instance = selenium_driver.driver
+        selenium_driver.addfinalizer(selenium_driver.stop_driver)
+
+    if driver_instance is None:
+        driver_instance = selenium_driver.driver
 
     yield driver_instance
-
-    driver_instance.quit()
 
 
 @pytest.fixture(scope="session", autouse=True)
