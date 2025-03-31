@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # <copyright file="print_options.rb" company="Selenium Committers">
 # Licensed to the Software Freedom Conservancy (SFC) under one
 # or more contributor license agreements. See the NOTICE file
@@ -22,11 +24,11 @@ module Selenium
     # Represents options for printing a page.
     class PrintOptions
       DEFAULT_SCALE = 1.0
-      DEFAULT_ORIENTATION = 'portrait'.freeze
+      DEFAULT_ORIENTATION = 'portrait'
       DEFAULT_PAGE_SIZE = {width: 21.0, height: 29.7}.freeze # A4 size in cm
       DEFAULT_MARGINS = {top: 1.0, bottom: 1.0, left: 1.0, right: 1.0}.freeze
 
-      attr_accessor :orientation, :scale, :background, :page_ranges, :page_size, :margins
+      attr_accessor :orientation, :scale, :background, :page_ranges, :margins
 
       def initialize
         @orientation = DEFAULT_ORIENTATION
@@ -57,10 +59,17 @@ module Selenium
         options.compact
       end
 
-      # Sets the page size to a predefined size.
+      # Gets the current page size.
       #
-      # @param [Symbol] size The predefined size (:letter, :legal, :a4, :tabloid).
-      def set_page_size(size)
+      # @return [Hash] The current page size hash with :width and :height.
+      def page_size
+        @page_size
+      end
+
+      # Sets the page size. Can be a predefined symbol or custom size hash.
+      #
+      # @param [Symbol, Hash] value The predefined size (:letter, :legal, :a4, :tabloid) or a custom hash.
+      def page_size=(value)
         predefined_sizes = {
           letter: {width: 21.59, height: 27.94},
           legal: {width: 21.59, height: 35.56},
@@ -68,9 +77,47 @@ module Selenium
           tabloid: {width: 27.94, height: 43.18}
         }
 
-        raise ArgumentError, "Invalid page size: #{size}" unless predefined_sizes.key?(size)
+        case value
+        when Symbol
+          raise ArgumentError, "Invalid page size: #{value}" unless predefined_sizes.key?(value)
 
-        @page_size = predefined_sizes[size]
+          @page_size = predefined_sizes[value]
+        when Hash
+          unless value.key?(:width) && value.key?(:height)
+            raise ArgumentError, 'Custom page size must include :width and :height'
+          end
+
+          @page_size = value
+        else
+          raise ArgumentError, 'Page size must be a Symbol or a Hash'
+        end
+      end
+
+      # Sets the page size. Can be a predefined symbol or custom size hash.
+      #
+      # @param [Symbol, Hash] value The predefined size (:letter, :legal, :a4, :tabloid) or a custom hash.
+      def page_size=(value)
+        predefined_sizes = {
+          letter: {width: 21.59, height: 27.94},
+          legal: {width: 21.59, height: 35.56},
+          a4: {width: 21.0, height: 29.7},
+          tabloid: {width: 27.94, height: 43.18}
+        }
+
+        case value
+        when Symbol
+          raise ArgumentError, "Invalid page size: #{value}" unless predefined_sizes.key?(value)
+
+          @page_size = predefined_sizes[value]
+        when Hash
+          unless value.key?(:width) && value.key?(:height)
+            raise ArgumentError, 'Custom page size must include :width and :height'
+          end
+
+          @page_size = value
+        else
+          raise ArgumentError, 'Page size must be a Symbol or a Hash'
+        end
       end
     end
   end

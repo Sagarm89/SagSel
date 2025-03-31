@@ -40,22 +40,22 @@ module Selenium
         expect(options.page_size).to eq(custom_size)
       end
 
-      it 'can set predefined page sizes' do
-        options.set_page_size(:a4)
+      it 'can set predefined page sizes using symbols' do
+        options.page_size = :a4
         expect(options.page_size).to eq({ width: 21.0, height: 29.7 })
-
-        options.set_page_size(:legal)
+      
+        options.page_size = :legal
         expect(options.page_size).to eq({ width: 21.59, height: 35.56 })
-
-        options.set_page_size(:tabloid)
+      
+        options.page_size = :tabloid
         expect(options.page_size).to eq({ width: 27.94, height: 43.18 })
-
-        options.set_page_size(:letter)
+      
+        options.page_size = :letter
         expect(options.page_size).to eq({ width: 21.59, height: 27.94 })
-      end
+      end      
 
-      it 'raises an error for invalid page size' do
-        expect { options.set_page_size(:invalid) }.to raise_error(ArgumentError, /Invalid page size/)
+      it 'raises an error for unsupported predefined page size symbols' do
+        expect { options.page_size = :invalid }.to raise_error(ArgumentError, /Invalid page size/)
       end
 
       it 'can convert to a hash' do
