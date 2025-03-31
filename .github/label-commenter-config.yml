@@ -15,7 +15,7 @@ labels:
                 Triage this issue by using labels.
               </p>
               <p>
-                If information is missing, add a helpful comment and then <code>I-issue-template</code> label.
+                If information is missing, add a helpful comment and then <code>J-issue-template</code> label.
               </p>
               <p>
                 If the issue is a question, add the <code>I-question</code> label.
@@ -101,18 +101,18 @@ labels:
 
           Feel free to comment the issues that you raise back in this issue. Thank you.
         action: close
-  - name: I-issue-template
+  - name: J-issue-template
     labeled:
       issue:
         body: |
           Hi, @{{ issue.user.login }}.
-          Please follow the issue template, we need more information to reproduce the issue.
+          Please follow the issue template; we need more information to reproduce the issue.
 
           Either a complete code snippet and URL/HTML (if more than one file is needed, provide a GitHub repo and instructions to run the code), the specific versions used, or a more detailed description to help us understand the issue.
 
           Note: If you cannot share your code and URL/HTML, any complete code snippet and URL/HTML that reproduces the issue is good enough.
 
-          Reply to this issue when all information is provided, thank you.
+          Reply to this issue when all information is provided. Thank you.
   - name: I-question
     labeled:
       issue:
