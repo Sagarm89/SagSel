@@ -197,8 +197,10 @@ class Driver:
         return self._driver
 
     def _initialize_driver(self):
-        self.kwargs["options"] = self.options
-        self.kwargs["service"] = self.service
+        if self.options is not None:
+            self.kwargs["options"] = self.options
+        if self.driver_path is not None:
+            self.kwargs["service"] = self.service
         return getattr(webdriver, self._driver_class)(**self.kwargs)
 
     @property
