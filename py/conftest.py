@@ -106,10 +106,12 @@ class Driver:
         self._driver_class = driver_class
         self._request = request
         self._driver = None
-        self._options = None
         self._platform = None
         self._service = None
         self.kwargs = {}
+        self.options = driver_class
+        self.headless = driver_class
+        self.bidi = bool(self._request.config.option.bidi)
 
     @property
     def exe_platform(self):
@@ -118,62 +120,67 @@ class Driver:
 
     @property
     def browser_path(self):
-        return self._request.config.option.binary
+        if self._request.config.option.binary:
+            return self._request.config.option.binary
+        return None
 
     @property
     def browser_args(self):
-        return self._request.config.option.args
+        if self._request.config.option.args:
+            return self._request.config.option.args
+        return None
 
     @property
     def driver_path(self):
-        return self._request.config.option.executable
+        if self._request.config.option.executable:
+            return self._request.config.option.executable
+        return None
 
     @property
     def headless(self):
-        return bool(self._request.config.option.headless)
+        self._headless = bool(self._request.config.option.headless)
+        if self._headless:
+            return True
+        return False
+
+    @headless.setter
+    def headless(self, driver_class):
+        if self.headless:
+            if driver_class == "Chrome" or driver_class == "Edge":
+                self._options.add_argument("--headless=new")
+            if driver_class == "Firefox":
+                self._options.add_argument("-headless")
 
     @property
     def bidi(self):
-        return bool(self._request.config.option.bidi)
+        return self._bidi
 
-    @property
-    def options(self):
-        if self.browser_path or self.browser_args:
-            if not self._options:
-                if self._driver_class == "Remote":
-                    self._options = getattr(webdriver, "FirefoxOptions")() or webdriver.FirefoxOptions()
-                    self._options.set_capability("moz:firefoxOptions", {})
-                    self._options.enable_downloads = True
-                elif self._driver_class.lower() == "webkitgtk":
-                    self._driver_class = "WebKitGTK"
-                    self._options = getattr(webdriver, f"{self._driver_class}Options")()
-                    self._options.overlay_scrollbars_enabled = False
-                elif self._driver_class.lower() == "wpewebkit":
-                    self._driver_class = "WPEWebKit"
-                    self._options = getattr(webdriver, f"{self._driver_class}Options")()
-                else:
-                    self._options = getattr(webdriver, f"{self._driver_class}Options")()
-
-            if self.browser_path is not None:
-                self._options.binary_location = self.browser_path.strip("'")
-
-            if self.browser_args is not None:
-                for arg in self.browser_args.split():
-                    self._options.add_argument(arg)
-
-        if self.headless:
-            if self._driver_class == "Chrome" or self._driver_class == "Edge":
-                self._options.add_argument("--headless=new")
-            if self._driver_class == "Firefox":
-                self._options.add_argument("-headless")
-
-        if self.bidi:
-            if not self._options:
-                self._options = getattr(webdriver, f"{self._driver_class}Options")()
+    @bidi.setter
+    def bidi(self, value):
+        self._bidi = value
+        if self._bidi:
             self._options.web_socket_url = True
             self._options.unhandled_prompt_behavior = "ignore"
 
+    @property
+    def options(self):
         return self._options
+
+    @options.setter
+    def options(self, driver_class):
+        if driver_class == "Remote":
+            self._options = getattr(webdriver, "FirefoxOptions")()
+            self._options.set_capability("moz:firefoxOptions", {})
+            self._options.enable_downloads = True
+        elif driver_class.lower() == "webkitgtk":
+            driver_class = "WebKitGTK"
+            self._options = getattr(webdriver, f"{driver_class}Options")()
+            self._options.overlay_scrollbars_enabled = False
+        elif driver_class.lower() == "wpewebkit":
+            driver_class = "WPEWebKit"
+            self._options = getattr(webdriver, f"{driver_class}Options")()
+        else:
+            self._options = getattr(webdriver, f"{driver_class}Options")()
 
     @property
     def service(self):
@@ -190,10 +197,8 @@ class Driver:
         return self._driver
 
     def _initialize_driver(self):
-        if self.options:
-            self.kwargs["options"] = self.options
-        if self.driver_path:
-            self.kwargs["service"] = self.service
+        self.kwargs["options"] = self.options
+        self.kwargs["service"] = self.service
         return getattr(webdriver, self._driver_class)(**self.kwargs)
 
     @property
