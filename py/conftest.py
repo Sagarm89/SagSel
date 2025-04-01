@@ -110,7 +110,7 @@ class SupportedDrivers:
     edge: str = "Edge"
     ie: str = "Ie"
     webkitgtk: str = "WebKitGTK"
-    wpewebkit: str = "WPEWebkit"
+    wpewebkit: str = "WPEWebKit"
     remote: str = "Remote"
 
     def __contains__(self, name):
@@ -128,7 +128,7 @@ class SupportedOptions:
     ie: str = "IeOptions"
     remote: str = "FirefoxOptions"
     webkitgtk: str = "WebKitGTKOptions"
-    wpewebkit: str = "WPEWebkitOptions"
+    wpewebkit: str = "WPEWebKitOptions"
 
     def __contains__(self, name):
         if name in self.__dict__:
