@@ -20,6 +20,7 @@ import platform
 import socket
 import subprocess
 import time
+from dataclasses import dataclass
 from test.selenium.webdriver.common.network import get_lan_ip
 from test.selenium.webdriver.common.webserver import SimpleWebServer
 from urllib.request import urlopen
@@ -101,9 +102,46 @@ driver_instance = None
 selenium_driver = None
 
 
+@dataclass
+class SupportedDrivers:
+    chrome: str = "Chrome"
+    firefox: str = "Firefox"
+    safari: str = "Safari"
+    edge: str = "Edge"
+    ie: str = "Ie"
+    webkitgtk: str = "WebKitGTK"
+    wpewebkit: str = "WPEWebkit"
+    remote: str = "Remote"
+
+    def __contains__(self, name):
+        if name in self.__dict__:
+            return True
+        return False
+
+
+@dataclass
+class SupportedOptions:
+    chrome: str = "ChromeOptions"
+    firefox: str = "FirefoxOptions"
+    edge: str = "EdgeOptions"
+    safari: str = "SafariOptions"
+    ie: str = "IeOptions"
+    remote: str = "FirefoxOptions"
+    webkitgtk: str = "WebKitGTKOptions"
+    wpewebkit: str = "WPEWebkitOptions"
+
+    def __contains__(self, name):
+        if name in self.__dict__:
+            return True
+        return False
+
+
 class Driver:
+    _supported_drivers = SupportedDrivers()
+    _supported_options = SupportedOptions()
+
     def __init__(self, driver_class, request):
-        self._driver_class = driver_class
+        self.driver_class = driver_class
         self._request = request
         self._driver = None
         self._platform = None
@@ -112,6 +150,16 @@ class Driver:
         self.options = driver_class
         self.headless = driver_class
         self.bidi = bool(self._request.config.option.bidi)
+
+    @property
+    def driver_class(self):
+        return self._driver_class
+
+    @driver_class.setter
+    def driver_class(self, cls_name):
+        if cls_name.lower() not in self._supported_drivers:
+            raise AttributeError(f"Invalid driver class {cls_name.lower()}")
+        self._driver_class = getattr(self._supported_drivers, cls_name.lower())
 
     @property
     def exe_platform(self):
@@ -167,26 +215,21 @@ class Driver:
         return self._options
 
     @options.setter
-    def options(self, driver_class):
-        if driver_class == "Remote":
-            self._options = getattr(webdriver, "FirefoxOptions")()
+    def options(self, cls_name):
+        if cls_name.lower() not in self._supported_options:
+            raise AttributeError(f"Invalid Options class {cls_name.lower()}")
+        self._options = getattr(webdriver, getattr(self._supported_options, cls_name.lower()))()
+        if self.driver_class == self._supported_drivers.remote:
             self._options.set_capability("moz:firefoxOptions", {})
             self._options.enable_downloads = True
-        elif driver_class.lower() == "webkitgtk":
-            driver_class = "WebKitGTK"
-            self._options = getattr(webdriver, f"{driver_class}Options")()
+        if self.driver_class == self._supported_drivers.webkitgtk:
             self._options.overlay_scrollbars_enabled = False
-        elif driver_class.lower() == "wpewebkit":
-            driver_class = "WPEWebKit"
-            self._options = getattr(webdriver, f"{driver_class}Options")()
-        else:
-            self._options = getattr(webdriver, f"{driver_class}Options")()
 
     @property
     def service(self):
         executable = self.driver_path
         if executable:
-            module = getattr(webdriver, self._driver_class.lower())
+            module = getattr(webdriver, self.driver_class.lower())
             self._service = module.service.Service(executable_path=executable)
             return self._service
         return None
@@ -201,7 +244,7 @@ class Driver:
             self.kwargs["options"] = self.options
         if self.driver_path is not None:
             self.kwargs["service"] = self.service
-        return getattr(webdriver, self._driver_class)(**self.kwargs)
+        return getattr(webdriver, self.driver_class)(**self.kwargs)
 
     @property
     def stop_driver(self):
