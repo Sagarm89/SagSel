@@ -358,7 +358,7 @@ def clean_service(request):
     try:
         driver_class = get_driver_class(request.config.option.drivers[0])
     except (AttributeError, TypeError):
-        raise Exception("This test requires a --driver to be specified.")
+        raise Exception("This test requires a --driver to be specified")
 
     yield get_service(driver_class, request.config.option.executable)
 
@@ -368,7 +368,7 @@ def clean_driver(request):
     try:
         driver_class = get_driver_class(request.config.option.drivers[0])
     except (AttributeError, TypeError):
-        raise Exception("This test requires a --driver to be specified.")
+        raise Exception("This test requires a --driver to be specified")
 
     driver_reference = getattr(webdriver, driver_class)
     yield driver_reference
