@@ -17,41 +17,18 @@
 // under the License.
 // </copyright>
 
+using OpenQA.Selenium.BiDi.Communication.Json.Converters.Polymorphic.Internal;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenQA.Selenium.BiDi.Communication.Json.Converters.Polymorphic;
 
-// https://github.com/dotnet/runtime/issues/72604
 internal class MessageConverter : JsonConverter<Message>
 {
     public override Message? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        Utf8JsonReader readerClone = reader;
-
-        if (readerClone.TokenType != JsonTokenType.StartObject)
-            throw new JsonException();
-
-        string? discriminator = null;
-
-        readerClone.Read();
-        while (readerClone.TokenType == JsonTokenType.PropertyName)
-        {
-            string? propName = readerClone.GetString();
-            readerClone.Read();
-
-            if (propName == "type")
-            {
-                discriminator = readerClone.GetString();
-                break;
-            }
-
-            readerClone.Skip();
-            readerClone.Read();
-        }
-
-        return discriminator switch
+        return reader.GetDiscriminator("type") switch
         {
             "success" => JsonSerializer.Deserialize<MessageSuccess>(ref reader, options),
             "error" => JsonSerializer.Deserialize<MessageError>(ref reader, options),
