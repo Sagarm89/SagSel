@@ -178,7 +178,7 @@ def driver(request):
     # and doesn't seems to be stable enough, causing the flakiness of the
     # subsequent tests.
     # Remove this when BiDi implementation and API is stable.
-    if bool(request.config.option.bidi):
+    if request.config.option.bidi:
 
         def fin():
             global driver_instance
