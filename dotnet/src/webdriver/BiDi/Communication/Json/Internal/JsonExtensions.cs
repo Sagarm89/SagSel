@@ -23,7 +23,7 @@ namespace OpenQA.Selenium.BiDi.Communication.Json.Internal;
 
 internal static class JsonExtensions
 {
-    public static string? GetDiscriminator(this ref Utf8JsonReader reader, string name)
+    public static string GetDiscriminator(this ref Utf8JsonReader reader, string name)
     {
         Utf8JsonReader readerClone = reader;
 
@@ -48,6 +48,6 @@ internal static class JsonExtensions
             readerClone.Read();
         }
 
-        return discriminator;
+        return discriminator ?? throw new JsonException($"Couldn't determine '{name}' descriminator.");
     }
 }
