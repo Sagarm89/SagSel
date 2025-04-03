@@ -41,7 +41,7 @@ public record EvaluateOptions : CommandOptions
 //[JsonDerivedType(typeof(EvaluateResultException), "exception")]
 public abstract record EvaluateResult
 {
-    public EvaluateResultSuccess AsSuccess()
+    public EvaluateResultSuccess AsSuccessResult()
     {
         if (this is EvaluateResultSuccess success)
         {
