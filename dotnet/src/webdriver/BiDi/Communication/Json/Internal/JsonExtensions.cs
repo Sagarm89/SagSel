@@ -40,7 +40,15 @@ internal static class JsonExtensions
 
             if (propertyName == name)
             {
-                discriminator = readerClone.GetString();
+                if (readerClone.TokenType == JsonTokenType.Number)
+                {
+                    discriminator = readerClone.GetInt64().ToString();
+                }
+                else
+                {
+                    discriminator = readerClone.GetString();
+                }
+ 
                 break;
             }
 

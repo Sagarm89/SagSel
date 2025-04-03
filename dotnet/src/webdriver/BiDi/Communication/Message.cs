@@ -17,7 +17,7 @@
 // under the License.
 // </copyright>
 
-using System.Text.Json;
+using System;
 
 namespace OpenQA.Selenium.BiDi.Communication;
 
@@ -28,7 +28,7 @@ namespace OpenQA.Selenium.BiDi.Communication;
 //[JsonDerivedType(typeof(MessageEvent), "event")]
 internal abstract record Message;
 
-internal record MessageSuccess(int Id, JsonElement Result) : Message;
+internal record MessageSuccess<T>(int Id, T Result) : Message;
 
 internal record MessageError(int Id) : Message
 {
@@ -37,4 +37,5 @@ internal record MessageError(int Id) : Message
     public string? Message { get; set; }
 }
 
-internal record MessageEvent(string Method, JsonElement Params) : Message;
+internal record MessageEvent(string Method, EventArgs Params) : Message;
+

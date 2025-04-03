@@ -23,7 +23,8 @@ using System.Text.Json.Serialization;
 namespace OpenQA.Selenium.BiDi.Communication.Json;
 
 #region https://github.com/dotnet/runtime/issues/72604
-[JsonSerializable(typeof(MessageSuccess))]
+//[JsonSerializable(typeof(MessageSuccess))]
+[JsonSerializable(typeof(MessageSuccess<EmptyResult>))]
 [JsonSerializable(typeof(MessageError))]
 [JsonSerializable(typeof(MessageEvent))]
 
@@ -79,7 +80,7 @@ namespace OpenQA.Selenium.BiDi.Communication.Json;
 [JsonSerializable(typeof(Modules.Session.NewResult))]
 [JsonSerializable(typeof(Modules.Session.EndCommand))]
 [JsonSerializable(typeof(Modules.Session.SubscribeCommand))]
-[JsonSerializable(typeof(Modules.Session.SubscribeResult))]
+[JsonSerializable(typeof(MessageSuccess<Modules.Session.SubscribeResult>))]
 [JsonSerializable(typeof(Modules.Session.UnsubscribeByIdCommand))]
 [JsonSerializable(typeof(Modules.Session.UnsubscribeByAttributesCommand))]
 
@@ -97,17 +98,17 @@ namespace OpenQA.Selenium.BiDi.Communication.Json;
 
 [JsonSerializable(typeof(Modules.BrowsingContext.ActivateCommand))]
 [JsonSerializable(typeof(Modules.BrowsingContext.CaptureScreenshotCommand))]
-[JsonSerializable(typeof(Modules.BrowsingContext.CaptureScreenshotResult))]
+[JsonSerializable(typeof(MessageSuccess<Modules.BrowsingContext.CaptureScreenshotResult>))]
 [JsonSerializable(typeof(Modules.BrowsingContext.CloseCommand), TypeInfoPropertyName = "BrowsingContext_CloseCommand")]
 [JsonSerializable(typeof(Modules.BrowsingContext.CreateCommand))]
 [JsonSerializable(typeof(Modules.BrowsingContext.CreateResult))]
 [JsonSerializable(typeof(Modules.BrowsingContext.GetTreeCommand))]
-[JsonSerializable(typeof(Modules.BrowsingContext.GetTreeResult))]
+[JsonSerializable(typeof(MessageSuccess<Modules.BrowsingContext.GetTreeResult>))]
 [JsonSerializable(typeof(Modules.BrowsingContext.HandleUserPromptCommand))]
 [JsonSerializable(typeof(Modules.BrowsingContext.LocateNodesCommand))]
-[JsonSerializable(typeof(Modules.BrowsingContext.LocateNodesResult))]
+[JsonSerializable(typeof(MessageSuccess<Modules.BrowsingContext.LocateNodesResult>))]
 [JsonSerializable(typeof(Modules.BrowsingContext.NavigateCommand))]
-[JsonSerializable(typeof(Modules.BrowsingContext.NavigateResult))]
+[JsonSerializable(typeof(MessageSuccess<Modules.BrowsingContext.NavigateResult>))]
 [JsonSerializable(typeof(Modules.BrowsingContext.PrintCommand))]
 [JsonSerializable(typeof(Modules.BrowsingContext.PrintResult))]
 [JsonSerializable(typeof(Modules.BrowsingContext.ReloadCommand))]
@@ -141,7 +142,7 @@ namespace OpenQA.Selenium.BiDi.Communication.Json;
 [JsonSerializable(typeof(Modules.Script.DisownCommand))]
 [JsonSerializable(typeof(Modules.Script.CallFunctionCommand))]
 [JsonSerializable(typeof(Modules.Script.EvaluateCommand))]
-[JsonSerializable(typeof(Modules.Script.EvaluateResult))]
+[JsonSerializable(typeof(MessageSuccess<Modules.Script.EvaluateResult>))]
 [JsonSerializable(typeof(Modules.Script.GetRealmsCommand))]
 [JsonSerializable(typeof(Modules.Script.GetRealmsResult))]
 [JsonSerializable(typeof(Modules.Script.RemovePreloadScriptCommand))]
