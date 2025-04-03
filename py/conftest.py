@@ -407,8 +407,9 @@ def driver_executable(request):
 
 @pytest.fixture(scope="function")
 def clean_service(request):
+    _supported_drivers = SupportedDrivers()
     try:
-        driver_class = request.config.option.drivers[0].capitalize()
+        driver_class = getattr(_supported_drivers, request.config.option.drivers[0].lower())
     except AttributeError:
         raise Exception("This test requires a --driver to be specified.")
     selenium_driver = Driver(driver_class, request)
@@ -418,7 +419,7 @@ def clean_service(request):
 @pytest.fixture(scope="function")
 def clean_driver(request):
     try:
-        driver_class = request.config.option.drivers[0].capitalize()
+        driver_class = getattr(_supported_drivers, request.config.option.drivers[0].lower())
     except AttributeError:
         raise Exception("This test requires a --driver to be specified.")
     driver_reference = getattr(webdriver, driver_class)
