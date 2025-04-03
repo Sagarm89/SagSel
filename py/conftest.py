@@ -194,9 +194,9 @@ class Driver:
     @headless.setter
     def headless(self, driver_class):
         if self.headless:
-            if driver_class == "Chrome" or driver_class == "Edge":
+            if driver_class.lower() == "chrome" or driver_class.lower() == "edge":
                 self._options.add_argument("--headless=new")
-            if driver_class == "Firefox":
+            if driver_class == "firefox":
                 self._options.add_argument("-headless")
 
     @property
@@ -262,7 +262,7 @@ class Driver:
 def driver(request):
     global driver_instance
     global selenium_driver
-    driver_class = getattr(request, "param", "Chrome").capitalize()
+    driver_class = getattr(request, "param", "Chrome").lower()
 
     if selenium_driver is None:
         selenium_driver = Driver(driver_class, request)
@@ -418,6 +418,7 @@ def clean_service(request):
 
 @pytest.fixture(scope="function")
 def clean_driver(request):
+    _supported_drivers = SupportedDrivers()
     try:
         driver_class = getattr(_supported_drivers, request.config.option.drivers[0].lower())
     except AttributeError:
