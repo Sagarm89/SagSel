@@ -103,7 +103,7 @@ jobs:
       - name: Commit version updates
         run: git commit -m "bump versions in preparation for release"
       - name: Update changelog
-        run: ./go all:changelog
+        run: ./go all:changelogs
       - name: Commit changelog updates
         run: git commit -m "WIP - rough auto-update of changelog, please edit"
       - name: List untracked files

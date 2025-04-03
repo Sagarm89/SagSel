@@ -166,7 +166,7 @@ end
 desc 'Update Selenium Manager to latest release'
 task :update_manager do |_task, _arguments|
   puts 'Updating Selenium Manager references'
-  Bazel.execute('run', args, '//scripts:selenium_manager')
+  Bazel.execute('run', [], '//scripts:selenium_manager')
 
   @git.add('common/selenium_manager.bzl')
 end
@@ -1181,6 +1181,7 @@ namespace :all do
     Rake::Task['py:lint'].invoke
   end
 
+  # Example: `./go all:prepare 4.31.0 early-stable`
   desc 'Update everything in preparation for a release'
   task :prepare, [:version, :channel] do |_task, arguments|
     version = arguments[:version]
@@ -1206,7 +1207,7 @@ namespace :all do
     Rake::Task['rust:version'].invoke(version)
 
     unless version == 'nightly'
-      Rake::Task['all:changelogs']
+      Rake::Task['all:changelogs'].invoke
 
       major_minor = arguments[:version][/^\d+\.\d+/]
       file = '.github/ISSUE_TEMPLATE/bug-report.yml'
