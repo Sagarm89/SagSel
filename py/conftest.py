@@ -196,7 +196,7 @@ class Driver:
         if self.headless:
             if driver_class.lower() == "chrome" or driver_class.lower() == "edge":
                 self._options.add_argument("--headless=new")
-            if driver_class == "firefox":
+            if driver_class.lower() == "firefox":
                 self._options.add_argument("-headless")
 
     @property
