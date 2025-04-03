@@ -41,11 +41,11 @@ public record EvaluateOptions : CommandOptions
 //[JsonDerivedType(typeof(EvaluateResultException), "exception")]
 public abstract record EvaluateResult
 {
-    public EvaluateResultSuccess AsSuccessResult()
+    public RemoteValue AsSuccessResult()
     {
         if (this is EvaluateResultSuccess success)
         {
-            return success;
+            return success.Result;
         }
 
         var exceptionResult = (EvaluateResultException)this;
