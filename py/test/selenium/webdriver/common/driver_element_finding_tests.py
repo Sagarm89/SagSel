@@ -354,7 +354,7 @@ def test_should_be_able_to_identify_elements_by_class(driver, pages):
 
 def test_should_be_able_to_find_an_element_by_xpath_with_multiple_attributes(driver, pages):
     pages.load("formPage.html")
-    element = driver.find_element(By.XPATH, "/input[@type='email' and @id='email']")
+    element = driver.find_element(By.XPATH, "//input[@type='submit' and @value='Click!']")
     assert element.tag_name.lower() == "input"
     assert element.get_attribute("value") == "Click!"
 
