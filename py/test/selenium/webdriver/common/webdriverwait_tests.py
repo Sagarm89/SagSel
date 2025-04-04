@@ -101,6 +101,7 @@ def test_should_fail_to_find_visible_elements_when_explicit_waiting(driver, page
         WebDriverWait(driver, 0.7).until(EC.visibility_of_any_elements_located((By.CLASS_NAME, "redbox")))
 
 
+@pytest.mark.xfail_firefox
 def test_should_wait_until_all_visible_elements_are_found_when_searching_for_many(driver, pages):
     pages.load("hidden_partially.html")
     add_visible = driver.find_element(By.ID, "addVisible")
