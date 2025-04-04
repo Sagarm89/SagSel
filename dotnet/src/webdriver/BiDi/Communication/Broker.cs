@@ -130,8 +130,6 @@ public class Broker : IAsyncDisposable
                 utfJsonReader.Read();
                 var messageType = utfJsonReader.GetDiscriminator("type");
 
-                //var message = JsonSerializer.Deserialize(new ReadOnlySpan<byte>(data), _jsonSerializerContext.Message);
-
                 switch (messageType)
                 {
                     case "success":
@@ -151,7 +149,7 @@ public class Broker : IAsyncDisposable
 
                         utfJsonReader.Read();
 
-                        // TODO: Just getting type info, could be better
+                        // TODO: Just get type info from existing subscribers, should be better
                         var type = _eventHandlers[method].First().EventArgsType;
 
                         var eventArgs = (EventArgs)JsonSerializer.Deserialize(ref utfJsonReader, type, _jsonSerializerContext);
@@ -172,24 +170,9 @@ public class Broker : IAsyncDisposable
             {
                 if (!cancellationToken.IsCancellationRequested)
                 {
-                    _logger.Error($"Couldn't process received message: {ex}");
+                    _logger.Error($"Couldn't process received BiDi remote message: {ex}");
                 }
             }
-
-            //switch (message)
-            //{
-            //    case MessageSuccess messageSuccess:
-            //        _pendingCommands[messageSuccess.Id].SetResult(messageSuccess.Result);
-            //        _pendingCommands.TryRemove(messageSuccess.Id, out _);
-            //        break;
-            //    case MessageEvent messageEvent:
-            //        _pendingEvents.Add(messageEvent);
-            //        break;
-            //    case MessageError mesageError:
-            //        _pendingCommands[mesageError.Id].SetException(new BiDiException($"{mesageError.Error}: {mesageError.Message}"));
-            //        _pendingCommands.TryRemove(mesageError.Id, out _);
-            //        break;
-            //}
         }
     }
 
@@ -227,7 +210,7 @@ public class Broker : IAsyncDisposable
             {
                 if (_logger.IsEnabled(LogEventLevel.Error))
                 {
-                    _logger.Error($"Unhandled error processing BiDi event: {ex}");
+                    _logger.Error($"Unhandled error processing BiDi event handler: {ex}");
                 }
             }
         }
@@ -242,10 +225,6 @@ public class Broker : IAsyncDisposable
     public async Task<TResult> ExecuteCommandAsync<TCommand, TResult>(TCommand command, CommandOptions? options)
         where TCommand : Command
     {
-        //var jsonElement = await ExecuteCommandCoreAsync(command, options).ConfigureAwait(false);
-
-        //return (TResult)jsonElement.Deserialize(typeof(TResult), _jsonSerializerContext)!;
-
         var result = await ExecuteCommandCoreAsync(command, options).ConfigureAwait(false);
 
         return ((MessageSuccess<TResult>)result).Result;
@@ -258,14 +237,7 @@ public class Broker : IAsyncDisposable
 
         var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        //var cancellationToken = new CancellationToken();
-
-        //using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
         var timeout = options?.Timeout ?? TimeSpan.FromSeconds(30);
-
-        //cts.CancelAfter(timeout);
-
 
         using var cts = new CancellationTokenSource(timeout);
 
