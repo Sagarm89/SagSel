@@ -151,14 +151,10 @@ public class Broker : IAsyncDisposable
 
                         utfJsonReader.Read();
 
-                        EventArgs eventArgs = null;
+                        // TODO: Just getting type info, could be better
+                        var type = _eventHandlers[method].First().EventArgsType;
 
-                        switch (method)
-                        {
-                            case "network.beforeRequestSent":
-                                eventArgs = JsonSerializer.Deserialize(ref utfJsonReader, _jsonSerializerContext.BeforeRequestSentEventArgs);
-                                break;
-                        }
+                        var eventArgs = (EventArgs)JsonSerializer.Deserialize(ref utfJsonReader, type, _jsonSerializerContext);
 
                         var messageEvent = new MessageEvent(method, eventArgs);
                         _pendingEvents.Add(messageEvent);
