@@ -98,6 +98,17 @@ def pytest_ignore_collect(path, config):
     return len([d for d in _drivers if d.lower() in parts]) > 0
 
 
+def get_driver_class(driver_option):
+    """Generate the driver class name from the lowercase driver option"""
+    if driver_option == "webkitgtk":
+        driver_class = "WebKitGTK"
+    elif driver_option == "wpewebkit":
+        driver_class = "WPEWebKit"
+    else:
+        driver_class = driver_option.capitalize()
+    return driver_class
+
+
 driver_instance = None
 selenium_driver = None
 

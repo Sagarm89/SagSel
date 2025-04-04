@@ -27,8 +27,8 @@ namespace OpenQA.Selenium.BiDi.Communication.Json;
 [JsonSerializable(typeof(MessageError))]
 [JsonSerializable(typeof(MessageEvent))]
 
-[JsonSerializable(typeof(Modules.Script.EvaluateResult.Success))]
-[JsonSerializable(typeof(Modules.Script.EvaluateResult.Exception))]
+[JsonSerializable(typeof(Modules.Script.EvaluateResultSuccess))]
+[JsonSerializable(typeof(Modules.Script.EvaluateResultException))]
 
 [JsonSerializable(typeof(Modules.Script.NumberRemoteValue))]
 [JsonSerializable(typeof(Modules.Script.BooleanRemoteValue))]
@@ -120,7 +120,6 @@ namespace OpenQA.Selenium.BiDi.Communication.Json;
 [JsonSerializable(typeof(Modules.BrowsingContext.UserPromptOpenedEventArgs))]
 [JsonSerializable(typeof(Modules.BrowsingContext.UserPromptClosedEventArgs))]
 
-[JsonSerializable(typeof(Modules.Network.ContinueWithAuthParameters.Default), TypeInfoPropertyName = "Network_ContinueWithAuthParameters_Default")]
 [JsonSerializable(typeof(Modules.Network.AddInterceptCommand))]
 [JsonSerializable(typeof(Modules.Network.AddInterceptResult))]
 [JsonSerializable(typeof(Modules.Network.ContinueRequestCommand))]
