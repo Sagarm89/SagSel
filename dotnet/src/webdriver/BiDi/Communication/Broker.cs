@@ -39,7 +39,7 @@ public sealed class Broker : IAsyncDisposable
     private readonly BiDi _bidi;
     private readonly ITransport _transport;
 
-    private readonly ConcurrentDictionary<long, (Command, TaskCompletionSource<object>)> _pendingCommands = new();
+    private readonly ConcurrentDictionary<long, (Command, TaskCompletionSource<EmptyResult>)> _pendingCommands = new();
     private readonly BlockingCollection<MessageEvent> _pendingEvents = [];
     private readonly Dictionary<string, Type> _eventTypesMap = [];
 
@@ -186,18 +186,19 @@ public sealed class Broker : IAsyncDisposable
 
     public async Task<TResult> ExecuteCommandAsync<TCommand, TResult>(TCommand command, CommandOptions? options)
         where TCommand : Command
+        where TResult : EmptyResult
     {
         var result = await ExecuteCommandCoreAsync(command, options).ConfigureAwait(false);
 
         return (TResult)result;
     }
 
-    private async Task<object> ExecuteCommandCoreAsync<TCommand>(TCommand command, CommandOptions? options)
+    private async Task<EmptyResult> ExecuteCommandCoreAsync<TCommand>(TCommand command, CommandOptions? options)
         where TCommand : Command
     {
         command.Id = Interlocked.Increment(ref _currentCommandId);
 
-        var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var tcs = new TaskCompletionSource<EmptyResult>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         var timeout = options?.Timeout ?? TimeSpan.FromSeconds(30);
 
@@ -379,7 +380,7 @@ public sealed class Broker : IAsyncDisposable
 
                 var successCommand = _pendingCommands[id.Value];
                 var messageSuccess = JsonSerializer.Deserialize(ref resultReader, successCommand.Item1.ResultType, _jsonSerializerContext)!;
-                successCommand.Item2.SetResult(messageSuccess);
+                successCommand.Item2.SetResult((EmptyResult)messageSuccess);
                 _pendingCommands.TryRemove(id.Value, out _);
                 break;
 
