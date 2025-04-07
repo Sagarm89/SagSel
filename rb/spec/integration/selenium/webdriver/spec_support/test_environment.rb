@@ -120,7 +120,7 @@ module Selenium
         end
 
         def version
-          ENV['WD_BROWSER_VERSION'] |
+          ENV['WD_BROWSER_VERSION'] || :stable
         end
 
         def reset_remote_server
