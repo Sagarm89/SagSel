@@ -26,12 +26,12 @@ def calculate_hash(url):
     return h.hexdigest()
 
 
-def get_chrome_milestone(channel=None):
-    if channel is None:
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--chrome_channel', default='Stable', help='Set the Chrome channel')
-        args = parser.parse_args()
-        channel = args.chrome_channel
+def get_chrome_milestone():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--chrome_channel', default='Stable', help='Set the Chrome channel')
+    args = parser.parse_args()
+    channel = args.chrome_channel
+
     r = http.request(
         "GET", f"https://chromiumdash.appspot.com/fetch_releases?channel={channel}&num=1&platform=Mac,Linux"
     )
@@ -48,15 +48,18 @@ def get_chrome_milestone(channel=None):
     )[-1]
 
 
-def chromedriver(selected_version, workspace_prefix=""):
+def chromedriver(selected_version):
     content = ""
 
     drivers = selected_version["downloads"]["chromedriver"]
 
     linux = [d["url"] for d in drivers if d["platform"] == "linux64"][0]
     sha = calculate_hash(linux)
-    content = content + """    http_archive(
-        name = "linux_%schromedriver",
+
+    content = (
+      content
+      + """    http_archive(
+        name = "linux_chromedriver",
         url = "%s",
         sha256 = "%s",
         strip_prefix = "chromedriver-linux64",
@@ -72,12 +75,17 @@ js_library(
 )
 \"\"\",
     )
-""" % (workspace_prefix, linux, sha)
+"""
+      % (linux, sha)
+    )
+
     mac = [d["url"] for d in drivers if d["platform"] == "mac-x64"][0]
     sha = calculate_hash(mac)
-    content = content + """
+    content = (
+      content
+      + """
     http_archive(
-        name = "mac_%schromedriver",
+        name = "mac_chromedriver",
         url = "%s",
         sha256 = "%s",
         strip_prefix = "chromedriver-mac-x64",
@@ -93,11 +101,14 @@ js_library(
 )
 \"\"\",
     )
-""" % (workspace_prefix, mac, sha)
+"""
+      % (mac, sha)
+    )
+
     return content
 
 
-def chrome(selected_version, workspace_prefix=""):
+def chrome(selected_version):
     chrome_downloads = selected_version["downloads"]["chrome"]
 
     linux = [d["url"] for d in chrome_downloads if d["platform"] == "linux64"][0]
@@ -105,7 +116,7 @@ def chrome(selected_version, workspace_prefix=""):
 
     content = """
     http_archive(
-        name = "linux_%schrome",
+        name = "linux_chrome",
         url = "%s",
         sha256 = "%s",
         build_file_content = \"\"\"
@@ -126,11 +137,16 @@ js_library(
 \"\"\",
     )
 
-""" % (workspace_prefix, linux, sha)
+""" % (
+        linux,
+        sha,
+    )
+
     mac = [d["url"] for d in chrome_downloads if d["platform"] == "mac-x64"][0]
     sha = calculate_hash(mac)
+
     content += """    http_archive(
-        name = "mac_%schrome",
+        name = "mac_chrome",
         url = "%s",
         sha256 = "%s",
         strip_prefix = "chrome-mac-x64",
@@ -151,7 +167,11 @@ js_library(
 \"\"\",
     )
 
-""" % (workspace_prefix, mac, sha)
+""" % (
+        mac,
+        sha,
+    )
+
     return content
 
 
@@ -217,7 +237,12 @@ js_library(
 )
 \"\"\",
     )
-""" % (mac, mac_hash.lower(), mac_version)
+""" % (
+            mac,
+            mac_hash.lower(),
+            mac_version,
+        )
+
     if linux and linux_hash:
         content += """
     deb_archive(
@@ -241,7 +266,11 @@ js_library(
 )
 \"\"\",
     )
-""" % (linux, linux_hash.lower())
+""" % (
+            linux,
+            linux_hash.lower()
+        )
+
     return content
 
 
@@ -256,7 +285,9 @@ def edgedriver():
 
     linux = "https://msedgedriver.azureedge.net/%s/edgedriver_linux64.zip" % linux_version
     sha = calculate_hash(linux)
-    content = content + """
+    content = (
+      content
+      + """
     http_archive(
         name = "linux_edgedriver",
         url = "%s",
@@ -273,12 +304,17 @@ js_library(
 )
 \"\"\",
     )
-""" % (linux, sha)
+"""
+      % (linux, sha)
+    )
+
     r = http.request("GET", f"https://msedgedriver.azureedge.net/LATEST_RELEASE_{major_version}_MACOS")
     macos_version = r.data.decode("utf-16").strip()
     mac = "https://msedgedriver.azureedge.net/%s/edgedriver_mac64.zip" % macos_version
     sha = calculate_hash(mac)
-    content = content + """
+    content = (
+      content
+      + """
     http_archive(
         name = "mac_edgedriver",
         url = "%s",
@@ -295,7 +331,9 @@ js_library(
 )
 \"\"\",
     )
-""" % (mac, sha)
+"""
+      % (mac, sha)
+    )
     return content
 
 
@@ -307,7 +345,9 @@ def geckodriver():
         if a["name"].endswith("-linux64.tar.gz"):
             url = a["browser_download_url"]
             sha = calculate_hash(url)
-            content = content + """    http_archive(
+            content = (
+              content
+              + """    http_archive(
         name = "linux_geckodriver",
         url = "%s",
         sha256 = "%s",
@@ -323,11 +363,16 @@ js_library(
 )
 \"\"\",
     )
-""" % (url, sha)
+"""
+              % (url, sha)
+            )
+
         if a["name"].endswith("-macos.tar.gz"):
             url = a["browser_download_url"]
             sha = calculate_hash(url)
-            content = content + """
+            content = (
+              content
+              + """
     http_archive(
         name = "mac_geckodriver",
         url = "%s",
@@ -344,7 +389,9 @@ js_library(
 )
 \"\"\",
     )
-""" % (url, sha)
+"""
+              % (url, sha)
+            )
     return content
 
 
@@ -370,9 +417,11 @@ def firefox_version_data():
 
 def firefox_linux(version):
     if int(version.split(".")[0]) < 135:
-        return "https://ftp.mozilla.org/pub/firefox/releases/%s/linux-x86_64/en-US/firefox-%s.tar.bz2" % (version, version)
+        return "https://ftp.mozilla.org/pub/firefox/releases/%s/linux-x86_64/en-US/firefox-%s.tar.bz2" % (
+            version, version)
     else:
-        return "https://ftp.mozilla.org/pub/firefox/releases/%s/linux-x86_64/en-US/firefox-%s.tar.xz" % (version, version)
+        return "https://ftp.mozilla.org/pub/firefox/releases/%s/linux-x86_64/en-US/firefox-%s.tar.xz" % (
+            version, version)
 
 
 def firefox_mac(version):
@@ -381,7 +430,10 @@ def firefox_mac(version):
 
 def print_firefox(version, workspace_name, sha_linux, sha_mac):
     content = ""
-    content = content + f"""    http_archive(
+
+    content = (
+      content
+      + f"""    http_archive(
         name = "linux_{workspace_name}firefox",
         url = "{firefox_linux(version)}",
         sha256 = "{sha_linux}",
@@ -404,7 +456,11 @@ js_library(
     )
 
 """
-    content = content + f"""    dmg_archive(
+    )
+
+    content = (
+      content
+      + f"""    dmg_archive(
         name = "mac_{workspace_name}firefox",
         url = "{firefox_mac(version)}",
         sha256 = "{sha_mac}",
@@ -422,6 +478,8 @@ js_library(
     )
 
 """
+    )
+
     return content
 
 
@@ -442,13 +500,9 @@ def pin_browsers():
     content = content + geckodriver()
     content = content + edge()
     content = content + edgedriver()
-    chrome_stable = get_chrome_milestone("Stable")
-    content = content + chrome(chrome_stable, "")
-    content = content + chromedriver(chrome_stable, "")
-    chrome_beta = get_chrome_milestone("Beta")
-    if chrome_beta["version"] != chrome_stable["version"]:
-        content = content + chrome(chrome_beta, "beta_")
-        content = content + chromedriver(chrome_beta, "beta_")
+    chrome_milestone = get_chrome_milestone()
+    content = content + chrome(chrome_milestone)
+    content = content + chromedriver(chrome_milestone)
     content += """
 def _pin_browsers_extension_impl(_ctx):
     pin_browsers()
@@ -457,7 +511,9 @@ pin_browsers_extension = module_extension(
     implementation = _pin_browsers_extension_impl,
 )
 """
+
     current_script_dir = Path(os.path.realpath(__file__)).parent
     target_file_path = current_script_dir.parent / "common/repositories.bzl"
+
     with open(target_file_path, "w") as file:
         file.write(content)

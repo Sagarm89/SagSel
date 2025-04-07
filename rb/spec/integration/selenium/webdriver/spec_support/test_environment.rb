@@ -80,11 +80,11 @@ module Selenium
 
         def app_server
           @app_server ||= begin
-            app_server = RackServer.new(root.join('common/src/web').to_s, random_port)
-            app_server.start
+                            app_server = RackServer.new(root.join('common/src/web').to_s, random_port)
+                            app_server.start
 
-            app_server
-          end
+                            app_server
+                          end
         end
 
         def remote_server
@@ -117,6 +117,10 @@ module Selenium
 
         def rbe?
           Dir.pwd.start_with?('/mnt/engflow')
+        end
+
+        def version
+          ENV['WD_BROWSER_VERSION'] |
         end
 
         def reset_remote_server
@@ -166,12 +170,11 @@ module Selenium
         def create_driver!(listener: nil, **opts, &block)
           check_for_previous_error
 
-          method = select_driver(opts)
-
+          method = :"#{driver}_driver"
           instance = if private_methods.include?(method)
                        send(method, listener: listener, options: build_options(**opts))
                      else
-                       WebDriver::Driver.for(method, listener: listener, options: build_options(**opts))
+                       WebDriver::Driver.for(driver, listener: listener, options: build_options(**opts))
                      end
           @create_driver_error_count -= 1 unless @create_driver_error_count.zero?
           if block
@@ -196,8 +199,7 @@ module Selenium
           if private_methods.include?(options_method)
             send(options_method, **opts)
           else
-            parsed_browser = browser == :chrome_beta ? :chrome : browser
-            WebDriver::Options.send(parsed_browser, **opts)
+            WebDriver::Options.send(browser, **opts)
           end
         end
 
@@ -314,15 +316,6 @@ module Selenium
           sock.local_address.ip_port
         ensure
           sock.close
-        end
-
-        def select_driver(opts)
-          if driver == :chrome_beta
-            opts[:browser_version] = 'beta'
-            :chrome_driver
-          else
-            driver
-          end
         end
       end
     end # SpecSupport
