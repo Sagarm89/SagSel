@@ -22,7 +22,7 @@ const { Browser } = require('selenium-webdriver')
 const { Pages, suite } = require('../../lib/test')
 const until = require('selenium-webdriver/lib/until')
 const { By } = require('selenium-webdriver')
-const { Request, Response } = require('../../http')
+const { Request, Response } = require('selenium-webdriver/http')
 const { Network } = require('../../bidi/network')
 
 suite(
