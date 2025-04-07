@@ -35,7 +35,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::option::Option;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
 
@@ -50,6 +50,8 @@ const CFT_MACOS_APP_NAME: &str =
     "Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing";
 const MIN_CHROME_VERSION_CFT: i32 = 113;
 const MIN_CHROMEDRIVER_VERSION_CFT: i32 = 115;
+const CHROMIUM_SNAP_LINK: &str = "/snap/bin/chromium";
+const CHROMIUM_SNAP_BINARY: &str = "/snap/chromium/current/usr/lib/chromium-browser/chrome";
 
 pub struct ChromeManager {
     pub browser_name: &'static str,
@@ -249,19 +251,19 @@ impl SeleniumManager for ChromeManager {
             ),
             (
                 BrowserPath::new(MACOS, STABLE),
-                r#"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"#,
+                "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
             ),
             (
                 BrowserPath::new(MACOS, BETA),
-                r#"/Applications/Google Chrome Beta.app/Contents/MacOS/Google Chrome Beta"#,
+                "/Applications/Google Chrome Beta.app/Contents/MacOS/Google Chrome Beta",
             ),
             (
                 BrowserPath::new(MACOS, DEV),
-                r#"/Applications/Google Chrome Dev.app/Contents/MacOS/Google Chrome Dev"#,
+                "/Applications/Google Chrome Dev.app/Contents/MacOS/Google Chrome Dev",
             ),
             (
                 BrowserPath::new(MACOS, NIGHTLY),
-                r#"/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"#,
+                "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
             ),
             (BrowserPath::new(LINUX, STABLE), "/usr/bin/google-chrome"),
             (BrowserPath::new(LINUX, BETA), "/usr/bin/google-chrome-beta"),
@@ -521,18 +523,18 @@ impl SeleniumManager for ChromeManager {
             let good_versions_url = self.create_cft_url_for_browsers(GOOD_VERSIONS_ENDPOINT);
             let all_versions =
                 self.request_versions_from_online::<VersionsWithDownloads>(&good_versions_url)?;
-            let filtered_versions: Vec<Version> = all_versions
-                .versions
-                .into_iter()
-                .filter(|r| r.version.starts_with(major_browser_version.as_str()))
-                .collect();
+            let iter_versions = all_versions.versions.into_iter();
+            let filtered_versions: Vec<Version> = if self.is_browser_version_specific() {
+                iter_versions
+                    .filter(|r| r.version.eq(browser_version.as_str()))
+                    .collect()
+            } else {
+                iter_versions
+                    .filter(|r| r.version.starts_with(major_browser_version.as_str()))
+                    .collect()
+            };
             if filtered_versions.is_empty() {
-                return Err(anyhow!(format_three_args(
-                    UNAVAILABLE_DOWNLOAD_WITH_MIN_VERSION_ERR_MSG,
-                    browser_name,
-                    &major_browser_version,
-                    &MIN_CHROME_VERSION_CFT.to_string(),
-                )));
+                return self.unavailable_download();
             }
             let last_browser = filtered_versions.last().unwrap();
             let platform_url: Vec<&PlatformUrl> = last_browser
@@ -586,6 +588,15 @@ impl SeleniumManager for ChromeManager {
 
     fn set_download_browser(&mut self, download_browser: bool) {
         self.download_browser = download_browser;
+    }
+
+    fn is_snap(&self, browser_path: &str) -> bool {
+        LINUX.is(self.get_os())
+            && (browser_path.eq(CHROMIUM_SNAP_LINK) || browser_path.eq(CHROMIUM_SNAP_BINARY))
+    }
+
+    fn get_snap_path(&self) -> Option<PathBuf> {
+        Some(Path::new(CHROMIUM_SNAP_BINARY).to_path_buf())
     }
 }
 

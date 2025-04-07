@@ -22,13 +22,14 @@ require_relative 'spec_helper'
 module Selenium
   module WebDriver
     module Support
-      describe Select do
+      describe Select, exclusive: {bidi: false, reason: 'Not yet implemented with BiDi'} do
         let(:select) { described_class.new(driver.find_element(name: 'selectomatic')) }
         let(:multi_select) { described_class.new(driver.find_element(id: 'multi')) }
         let(:single_disabled) { described_class.new(driver.find_element(name: 'single_disabled')) }
         let(:multi_disabled) { described_class.new(driver.find_element(name: 'multi_disabled')) }
 
         before { driver.navigate.to url_for('formPage.html') }
+        after { reset_driver! if GlobalTestEnv.rbe? && GlobalTestEnv.browser == :chrome }
 
         describe '#initialize' do
           it 'raises exception if not a select element' do

@@ -110,11 +110,15 @@ public class RemoteWebDriver
         TakesScreenshot {
 
   private static final Logger LOG = Logger.getLogger(RemoteWebDriver.class.getName());
+
+  /** Boolean system property that defines whether the tracing is enabled or not. */
+  private static final String WEBDRIVER_REMOTE_ENABLE_TRACING = "webdriver.remote.enableTracing";
+
   private final ElementLocation elementLocation = new ElementLocation();
   private Level level = Level.FINE;
   private ErrorHandler errorHandler = new ErrorHandler();
   private CommandExecutor executor;
-  private Capabilities capabilities;
+  protected Capabilities capabilities;
   private SessionId sessionId;
   private FileDetector fileDetector = new UselessFileDetector();
   private ExecuteMethod executeMethod;
@@ -124,13 +128,20 @@ public class RemoteWebDriver
   private Logs remoteLogs;
   private LocalLogs localLogs;
 
+  private Script remoteScript;
+
+  private Network remoteNetwork;
+
   // For cglib
   protected RemoteWebDriver() {
     this.capabilities = init(new ImmutableCapabilities());
   }
 
   public RemoteWebDriver(Capabilities capabilities) {
-    this(getDefaultServerURL(), Require.nonNull("Capabilities", capabilities), true);
+    this(
+        getDefaultServerURL(),
+        Require.nonNull("Capabilities", capabilities),
+        Boolean.parseBoolean(System.getProperty(WEBDRIVER_REMOTE_ENABLE_TRACING, "true")));
   }
 
   public RemoteWebDriver(Capabilities capabilities, boolean enableTracing) {
@@ -139,7 +150,9 @@ public class RemoteWebDriver
 
   public RemoteWebDriver(URL remoteAddress, Capabilities capabilities) {
     this(
-        createExecutor(Require.nonNull("Server URL", remoteAddress), true),
+        createExecutor(
+            Require.nonNull("Server URL", remoteAddress),
+            Boolean.parseBoolean(System.getProperty(WEBDRIVER_REMOTE_ENABLE_TRACING, "true"))),
         Require.nonNull("Capabilities", capabilities));
   }
 
@@ -486,6 +499,20 @@ public class RemoteWebDriver
     return new RemoteWebDriverOptions();
   }
 
+  public Script script() {
+    if (this.remoteScript == null) {
+      this.remoteScript = new RemoteScript(this);
+    }
+    return this.remoteScript;
+  }
+
+  public Network network() {
+    if (this.remoteNetwork == null) {
+      this.remoteNetwork = new RemoteNetwork(this);
+    }
+    return this.remoteNetwork;
+  }
+
   protected JsonToWebElementConverter getElementConverter() {
     return converter;
   }
@@ -624,9 +651,9 @@ public class RemoteWebDriver
   }
 
   /**
-   * Retrieves the downloadable files as a map of file names and their corresponding URLs.
+   * Retrieves the names of the downloadable files.
    *
-   * @return A map containing file names as keys and URLs as values.
+   * @return A list containing the names of the downloadable files.
    * @throws WebDriverException if capability to enable downloads is not set
    */
   @Override
@@ -842,6 +869,9 @@ public class RemoteWebDriver
 
     @Override
     public void deleteCookieNamed(String name) {
+      if (name == null || name.isBlank()) {
+        throw new IllegalArgumentException("Cookie name cannot be empty");
+      }
       execute(DriverCommand.DELETE_COOKIE(name));
     }
 
@@ -900,6 +930,9 @@ public class RemoteWebDriver
 
     @Override
     public Cookie getCookieNamed(String name) {
+      if (name == null || name.isBlank()) {
+        throw new IllegalArgumentException("Cookie name cannot be empty");
+      }
       Set<Cookie> allCookies = getCookies();
       for (Cookie cookie : allCookies) {
         if (cookie.getName().equals(name)) {
@@ -1121,12 +1154,16 @@ public class RemoteWebDriver
         // simulate search by name
         String original = getWindowHandle();
         for (String handle : getWindowHandles()) {
-          switchTo().window(handle);
-          if (windowHandleOrName.equals(executeScript("return window.name"))) {
-            return RemoteWebDriver.this; // found by name
+          try {
+            execute(DriverCommand.SWITCH_TO_WINDOW(handle));
+            if (windowHandleOrName.equals(executeScript("return window.name"))) {
+              return RemoteWebDriver.this; // found by name
+            }
+          } catch (NoSuchWindowException nswe) {
+            // swallow
           }
         }
-        switchTo().window(original);
+        execute(DriverCommand.SWITCH_TO_WINDOW(original));
         throw nsw;
       }
     }
@@ -1216,7 +1253,7 @@ public class RemoteWebDriver
           Stream.concat(
                   credential.toMap().entrySet().stream(),
                   Stream.of(Map.entry("authenticatorId", id)))
-              .collect(Collectors.toUnmodifiableMap((e) -> e.getKey(), (e) -> e.getValue())));
+              .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @Override

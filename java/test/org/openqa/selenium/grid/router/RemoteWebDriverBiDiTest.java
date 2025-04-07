@@ -21,13 +21,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.openqa.selenium.testing.drivers.Browser.*;
 
 import java.io.StringReader;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -35,13 +36,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WindowType;
 import org.openqa.selenium.bidi.BiDi;
 import org.openqa.selenium.bidi.BiDiSessionStatus;
-import org.openqa.selenium.bidi.Command;
 import org.openqa.selenium.bidi.HasBiDi;
 import org.openqa.selenium.bidi.browsingcontext.BrowsingContext;
 import org.openqa.selenium.bidi.browsingcontext.NavigationResult;
 import org.openqa.selenium.bidi.log.ConsoleLogEntry;
 import org.openqa.selenium.bidi.log.LogLevel;
 import org.openqa.selenium.bidi.module.LogInspector;
+import org.openqa.selenium.bidi.script.Source;
 import org.openqa.selenium.environment.webserver.AppServer;
 import org.openqa.selenium.environment.webserver.NettyAppServer;
 import org.openqa.selenium.grid.config.TomlConfig;
@@ -53,8 +54,14 @@ import org.openqa.selenium.testing.NotYetImplemented;
 import org.openqa.selenium.testing.drivers.Browser;
 
 class RemoteWebDriverBiDiTest {
+  private static AppServer server;
   private WebDriver driver;
-  private AppServer server;
+
+  @BeforeAll
+  static void serverSetup() {
+    server = new NettyAppServer(false);
+    server.start();
+  }
 
   @BeforeEach
   void setup() {
@@ -68,13 +75,10 @@ class RemoteWebDriverBiDiTest {
                     "[node]\n"
                         + "selenium-manager = false\n"
                         + "driver-implementation = "
-                        + browser.displayName())));
+                        + String.format("\"%s\"", browser.displayName()))));
 
     driver = new RemoteWebDriver(deployment.getServer().getUrl(), browser.getCapabilities());
     driver = new Augmenter().augment(driver);
-
-    server = new NettyAppServer();
-    server.start();
   }
 
   @Test
@@ -83,9 +87,7 @@ class RemoteWebDriverBiDiTest {
   @NotYetImplemented(EDGE)
   void ensureBiDiSessionCreation() {
     try (BiDi biDi = ((HasBiDi) driver).getBiDi()) {
-      BiDiSessionStatus status =
-          biDi.send(
-              new Command<>("session.status", Collections.emptyMap(), BiDiSessionStatus.class));
+      BiDiSessionStatus status = biDi.getBidiSessionStatus();
       assertThat(status).isNotNull();
       assertThat(status.getMessage()).isNotEmpty();
     }
@@ -108,8 +110,10 @@ class RemoteWebDriverBiDiTest {
 
       ConsoleLogEntry logEntry = future.get(5, TimeUnit.SECONDS);
 
+      Source source = logEntry.getSource();
+      assertThat(source.getBrowsingContext().isPresent()).isTrue();
+      assertThat(source.getRealm()).isNotNull();
       assertThat(logEntry.getText()).isEqualTo("Hello, world!");
-      assertThat(logEntry.getRealm()).isNull();
       assertThat(logEntry.getArgs().size()).isEqualTo(1);
       assertThat(logEntry.getType()).isEqualTo("console");
       assertThat(logEntry.getLevel()).isEqualTo(LogLevel.INFO);
@@ -135,6 +139,10 @@ class RemoteWebDriverBiDiTest {
   @AfterEach
   void clean() {
     driver.quit();
+  }
+
+  @AfterAll
+  static void stopServer() {
     server.stop();
   }
 }

@@ -154,7 +154,7 @@ impl SeleniumManager for IExplorerManager {
                     .collect();
 
                 if !filtered_releases.is_empty() {
-                    let assets = &filtered_releases.get(0).unwrap().assets;
+                    let assets = &filtered_releases.first().unwrap().assets;
                     let driver_releases: Vec<&Assets> = assets
                         .iter()
                         .filter(|url| url.browser_download_url.contains(IEDRIVER_RELEASE))
@@ -291,5 +291,13 @@ impl SeleniumManager for IExplorerManager {
 
     fn set_download_browser(&mut self, download_browser: bool) {
         self.download_browser = download_browser;
+    }
+
+    fn is_snap(&self, _browser_path: &str) -> bool {
+        false
+    }
+
+    fn get_snap_path(&self) -> Option<PathBuf> {
+        None
     }
 }

@@ -25,7 +25,7 @@ public class Header {
   private final String name;
   private final BytesValue value;
 
-  private Header(String name, BytesValue value) {
+  public Header(String name, BytesValue value) {
     this.name = name;
     this.value = value;
   }
@@ -66,6 +66,6 @@ public class Header {
     map.put("name", this.name);
     map.put("value", this.value.toMap());
 
-    return map;
+    return Map.copyOf(map);
   }
 }

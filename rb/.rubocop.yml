@@ -1,12 +1,21 @@
 require:
-  - rubocop-performance
+  - rubocop-rake
   - rubocop-rspec
 
+plugins:
+  - rubocop-performance
+
 AllCops:
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.1
   NewCops: enable
   Exclude:
     - !ruby/regexp /lib\/selenium\/devtools\/v\d+/
+
+Capybara/RSpec/PredicateMatcher:
+  Enabled: false
+
+FactoryBot/CreateList:
+  Enabled: false
 
 Gemspec/DevelopmentDependencies:
   EnforcedStyle: gemspec
@@ -32,6 +41,7 @@ Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
     - 'selenium-*.gemspec'
+    - '../Rakefile*'
 
 Metrics/ClassLength:
   CountComments: false
@@ -73,9 +83,14 @@ Metrics/PerceivedComplexity:
     - 'lib/selenium/webdriver/common/local_driver.rb'
     - 'lib/selenium/webdriver/common/logger.rb'
 
+Naming/BlockForwarding:
+  EnforcedStyle: explicit
+
 Naming/FileName:
   Exclude:
     - 'lib/selenium-webdriver.rb'
+    - 'Rakefile'
+    - '../Rakefile'
 
 Naming/MethodParameterName:
   AllowedNames:
@@ -144,3 +159,6 @@ Lint/Debugger:
   DebuggerMethods:
     Capybara:
       - save_screenshot: ~
+
+Lint/UselessConstantScoping:
+  Enabled: false

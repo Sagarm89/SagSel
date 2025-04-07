@@ -21,15 +21,28 @@ require_relative '../spec_helper'
 
 module Selenium
   module WebDriver
-    describe Script, only: {browser: %i[chrome edge firefox]} do
-      before { reset_driver!(web_socket_url: true) }
-      after(:all) { quit_driver }
+    describe Script, exclusive: {bidi: true, reason: 'only executed when bidi is enabled'},
+                     only: {browser: %i[chrome edge firefox]} do
+      after { |example| reset_driver!(example: example) }
+
+      # Helper to match the expected pattern of `script.StackFrame` objects.
+      # https://w3c.github.io/webdriver-bidi/#type-script-StackFrame
+      #
+      # Pass in any fields you want to check more specific values for, e.g:
+      #   a_stack_frame('functionName' => 'someFunction')
+      def a_stack_frame(**options)
+        include({
+          'columnNumber' => an_instance_of(Integer),
+          'functionName' => an_instance_of(String),
+          'lineNumber' => an_instance_of(Integer),
+          'url' => an_instance_of(String)
+        }.merge(options))
+      end
 
       it 'errors when bidi not enabled' do
-        reset_driver! do |driver|
-          expect {
-            driver.script
-          }.to raise_error(WebDriver::Error::WebDriverError, /this operation requires enabling BiDi/)
+        reset_driver!(web_socket_url: false) do |driver|
+          msg = /BiDi must be enabled by setting #web_socket_url to true in options class/
+          expect { driver.script }.to raise_error(WebDriver::Error::WebDriverError, msg)
         end
       end
 
@@ -46,10 +59,27 @@ module Selenium
         expect(log_entries.size).to eq(1)
         log_entry = log_entries.first
         expect(log_entry).to be_a BiDi::LogHandler::ConsoleLogEntry
+        expect(log_entry.type).to eq 'console'
         expect(log_entry.level).to eq 'info'
         expect(log_entry.method).to eq 'log'
         expect(log_entry.text).to eq 'Hello, world!'
-        expect(log_entry.type).to eq 'console'
+        expect(log_entry.args).to eq [
+          {'type' => 'string', 'value' => 'Hello, world!'}
+        ]
+        expect(log_entry.timestamp).to be_an_integer
+        expect(log_entry.source).to match(
+          'context' => an_instance_of(String),
+          'realm' => an_instance_of(String)
+        )
+        # Stack traces on console messages are optional.
+        expect(log_entry.stack_trace).to be_nil.or match(
+          # Some browsers include stack traces from parts of the runtime, so we
+          # just check the first frames that come from user code.
+          'callFrames' => start_with(
+            a_stack_frame('functionName' => 'helloWorld'),
+            a_stack_frame('functionName' => 'onclick')
+          )
+        )
       end
 
       it 'logs multiple console messages' do
@@ -66,7 +96,7 @@ module Selenium
         expect(log_entries.size).to eq(2)
       end
 
-      it 'logs removes console message handler' do
+      it 'removes console message handler' do
         driver.navigate.to url_for('bidi/logEntryAdded.html')
 
         log_entries = []
@@ -98,16 +128,28 @@ module Selenium
         expect(log_entries.size).to eq(1)
         log_entry = log_entries.first
         expect(log_entry).to be_a BiDi::LogHandler::JavaScriptLogEntry
-        expect(log_entry.level).to eq 'error'
         expect(log_entry.type).to eq 'javascript'
+        expect(log_entry.level).to eq 'error'
         expect(log_entry.text).to eq 'Error: Not working'
-        expect(log_entry.stack_trace).not_to be_empty
+        expect(log_entry.timestamp).to be_an_integer
+        expect(log_entry.source).to match(
+          'context' => an_instance_of(String),
+          'realm' => an_instance_of(String)
+        )
+        expect(log_entry.stack_trace).to match(
+          # Some browsers include stack traces from parts of the runtime, so we
+          # just check the first frames that come from user code.
+          'callFrames' => start_with(
+            a_stack_frame('functionName' => 'createError'),
+            a_stack_frame('functionName' => 'onclick')
+          )
+        )
       end
 
       it 'errors removing non-existent handler' do
         expect {
-          driver.script.remove_console_message_handler(0)
-        }.to raise_error(Error::WebDriverError, /Callback with ID 0 does not exist/)
+          driver.script.remove_console_message_handler(12345)
+        }.to raise_error(Error::WebDriverError, /Callback with ID 12345 does not exist/)
       end
     end
   end

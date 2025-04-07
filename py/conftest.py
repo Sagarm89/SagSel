@@ -47,37 +47,43 @@ def pytest_addoption(parser):
         choices=drivers,
         dest="drivers",
         metavar="DRIVER",
-        help="driver to run tests against ({})".format(", ".join(drivers)),
+        help="Driver to run tests against ({})".format(", ".join(drivers)),
     )
     parser.addoption(
         "--browser-binary",
         action="store",
         dest="binary",
-        help="location of the browser binary",
+        help="Location of the browser binary",
     )
     parser.addoption(
         "--driver-binary",
         action="store",
         dest="executable",
-        help="location of the service executable binary",
+        help="Location of the service executable binary",
     )
     parser.addoption(
         "--browser-args",
         action="store",
         dest="args",
-        help="arguments to start the browser with",
+        help="Arguments to start the browser with",
     )
     parser.addoption(
         "--headless",
-        action="store",
+        action="store_true",
         dest="headless",
-        help="Allow tests to run in headless",
+        help="Run tests in headless mode",
     )
     parser.addoption(
         "--use-lan-ip",
         action="store_true",
         dest="use_lan_ip",
-        help="Whether to start test server with lan ip instead of localhost",
+        help="Start test server with lan ip instead of localhost",
+    )
+    parser.addoption(
+        "--bidi",
+        action="store_true",
+        dest="bidi",
+        help="Enable BiDi support",
     )
 
 
@@ -90,6 +96,17 @@ def pytest_ignore_collect(path, config):
     return len([d for d in _drivers if d.lower() in parts]) > 0
 
 
+def get_driver_class(driver_option):
+    """Generate the driver class name from the lowercase driver option"""
+    if driver_option == "webkitgtk":
+        driver_class = "WebKitGTK"
+    elif driver_option == "wpewebkit":
+        driver_class = "WPEWebKit"
+    else:
+        driver_class = driver_option.capitalize()
+    return driver_class
+
+
 driver_instance = None
 
 
@@ -98,7 +115,7 @@ def driver(request):
     kwargs = {}
 
     # browser can be changed with `--driver=firefox` as an argument or to addopts in pytest.ini
-    driver_class = getattr(request, "param", "Chrome").capitalize()
+    driver_class = get_driver_class(getattr(request, "param", "Chrome"))
 
     # skip tests if not available on the platform
     _platform = platform.system()
@@ -106,8 +123,8 @@ def driver(request):
         pytest.skip("Safari tests can only run on an Apple OS")
     if (driver_class == "Ie") and _platform != "Windows":
         pytest.skip("IE and EdgeHTML Tests can only run on Windows")
-    if "WebKit" in driver_class and _platform != "Linux":
-        pytest.skip("Webkit tests can only run on Linux")
+    if "WebKit" in driver_class and _platform == "Windows":
+        pytest.skip("WebKit tests cannot be run on Windows")
 
     # conditionally mark tests as expected to fail based on driver
     marker = request.node.get_closest_marker(f"xfail_{driver_class.lower()}")
@@ -139,17 +156,16 @@ def driver(request):
             options = get_options(driver_class, request.config)
         if driver_class == "Chrome":
             options = get_options(driver_class, request.config)
+        if driver_class == "Edge":
+            options = get_options(driver_class, request.config)
+        if driver_class == "WebKitGTK":
+            options = get_options(driver_class, request.config)
+        if driver_class.lower() == "WPEWebKit":
+            options = get_options(driver_class, request.config)
         if driver_class == "Remote":
             options = get_options("Firefox", request.config) or webdriver.FirefoxOptions()
             options.set_capability("moz:firefoxOptions", {})
             options.enable_downloads = True
-        if driver_class == "WebKitGTK":
-            options = get_options(driver_class, request.config)
-        if driver_class == "Edge":
-            options = get_options(driver_class, request.config)
-        if driver_class.lower() == "wpewebkit":
-            driver_class = "WPEWebKit"
-            options = get_options(driver_class, request.config)
         if driver_path is not None:
             kwargs["service"] = get_service(driver_class, driver_path)
         if options is not None:
@@ -158,6 +174,20 @@ def driver(request):
         driver_instance = getattr(webdriver, driver_class)(**kwargs)
     yield driver_instance
 
+    # Close the browser after BiDi tests. Those make event subscriptions
+    # and doesn't seems to be stable enough, causing the flakiness of the
+    # subsequent tests.
+    # Remove this when BiDi implementation and API is stable.
+    if request.config.option.bidi:
+
+        def fin():
+            global driver_instance
+            if driver_instance is not None:
+                driver_instance.quit()
+            driver_instance = None
+
+        request.addfinalizer(fin)
+
     if request.node.get_closest_marker("no_driver_after_test"):
         driver_instance = None
 
@@ -165,7 +195,8 @@ def driver(request):
 def get_options(driver_class, config):
     browser_path = config.option.binary
     browser_args = config.option.args
-    headless = bool(config.option.headless)
+    headless = config.option.headless
+    bidi = config.option.bidi
     options = None
 
     if browser_path or browser_args:
@@ -187,6 +218,14 @@ def get_options(driver_class, config):
             options.add_argument("--headless=new")
         if driver_class == "Firefox":
             options.add_argument("-headless")
+
+    if bidi:
+        if not options:
+            options = getattr(webdriver, f"{driver_class}Options")()
+
+        options.web_socket_url = True
+        options.unhandled_prompt_behavior = "ignore"
+
     return options
 
 
@@ -291,7 +330,7 @@ def server(request):
 
 @pytest.fixture(autouse=True, scope="session")
 def webserver(request):
-    host = get_lan_ip() if request.config.getoption("use_lan_ip") else "0.0.0.0"
+    host = get_lan_ip() if request.config.getoption("use_lan_ip") else None
 
     webserver = SimpleWebServer(host=host)
     webserver.start()
@@ -314,9 +353,9 @@ def driver_executable(request):
 @pytest.fixture(scope="function")
 def clean_service(request):
     try:
-        driver_class = request.config.option.drivers[0].capitalize()
-    except AttributeError:
-        raise Exception("This test requires a --driver to be specified.")
+        driver_class = get_driver_class(request.config.option.drivers[0])
+    except (AttributeError, TypeError):
+        raise Exception("This test requires a --driver to be specified")
 
     yield get_service(driver_class, request.config.option.executable)
 
@@ -324,9 +363,9 @@ def clean_service(request):
 @pytest.fixture(scope="function")
 def clean_driver(request):
     try:
-        driver_class = request.config.option.drivers[0].capitalize()
-    except AttributeError:
-        raise Exception("This test requires a --driver to be specified.")
+        driver_class = get_driver_class(request.config.option.drivers[0])
+    except (AttributeError, TypeError):
+        raise Exception("This test requires a --driver to be specified")
 
     driver_reference = getattr(webdriver, driver_class)
     yield driver_reference

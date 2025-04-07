@@ -24,15 +24,31 @@ use selenium_manager::shell;
 use selenium_manager::shell::run_shell_command_by_os;
 use std::borrow::BorrowMut;
 use std::env::consts::OS;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+#[allow(dead_code)]
+pub fn get_selenium_manager() -> Command {
+    let mut path = PathBuf::from(env!("CARGO_BIN_EXE_selenium-manager"));
+
+    if path.exists() {
+        return Command::new(path);
+    }
+
+    if cfg!(windows) {
+        let exe_path = path.with_extension("exe");
+        if exe_path.exists() {
+            return Command::new(exe_path);
+        }
+    }
+
+    panic!("Binary not found {}", path_to_string(&path));
+}
 
 #[allow(dead_code)]
 pub fn assert_driver(cmd: &mut Command) {
-    let stdout = &cmd.unwrap().stdout;
-    let output = std::str::from_utf8(stdout).unwrap();
-    println!("{}", output);
+    let stdout = get_stdout(cmd);
 
-    let json: JsonOutput = serde_json::from_str(output).unwrap();
+    let json: JsonOutput = serde_json::from_str(&stdout).unwrap();
     let driver_path = Path::new(&json.result.driver_path);
     assert!(driver_path.exists());
     assert!(is_executable(driver_path));
@@ -67,10 +83,19 @@ pub fn exec_driver(cmd: &mut Command) -> String {
 }
 
 #[allow(dead_code)]
-pub fn display_output(cmd: &mut Command) {
+pub fn get_stdout(cmd: &mut Command) -> String {
     let stdout = &cmd.unwrap().stdout;
     let output = std::str::from_utf8(stdout).unwrap();
     println!("{}", output);
+    output.to_string()
+}
+
+#[allow(dead_code)]
+pub fn get_stderr(cmd: &mut Command) -> String {
+    let stderr = &cmd.unwrap().stderr;
+    let err_output = std::str::from_utf8(stderr).unwrap();
+    println!("stderr: {}", err_output);
+    err_output.to_string()
 }
 
 #[allow(dead_code)]

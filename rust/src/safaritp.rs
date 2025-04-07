@@ -35,9 +35,9 @@ pub const SAFARITP_NAMES: &[&str] = &[
     "safaritechnologypreview",
 ];
 pub const SAFARITPDRIVER_NAME: &str = "safaridriver";
-const SAFARITP_PATH: &str = r#"/Applications/Safari Technology Preview.app"#;
+const SAFARITP_PATH: &str = "/Applications/Safari Technology Preview.app";
 const SAFARITP_FULL_PATH: &str =
-    r#"/Applications/Safari Technology Preview.app/Contents/MacOS/Safari Technology Preview"#;
+    "/Applications/Safari Technology Preview.app/Contents/MacOS/Safari Technology Preview";
 
 pub struct SafariTPManager {
     pub browser_name: &'static str,
@@ -192,5 +192,13 @@ impl SeleniumManager for SafariTPManager {
 
     fn set_download_browser(&mut self, download_browser: bool) {
         self.download_browser = download_browser;
+    }
+
+    fn is_snap(&self, _browser_path: &str) -> bool {
+        false
+    }
+
+    fn get_snap_path(&self) -> Option<PathBuf> {
+        None
     }
 }

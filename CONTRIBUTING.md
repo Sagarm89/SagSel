@@ -89,6 +89,40 @@ to check that your approach aligns with the project's
 ideas. Nothing is more frustrating than seeing your hard work go to
 waste because your vision doesn't align with the project's.
 
+#### Dependencies Managed by Bazel
+
+##### Java
+
+Edit `MODULE.bazel`, and either update or add the dependency you want
+using the regular maven coordinates to the `maven.install` with the
+name `maven`. Once done, run `REPIN=1 bazel run @maven//:pin` to
+update the lock file, create a PR and check the change in.
+
+##### JS
+
+We use `pnpm` for JS development in the project, and we also use [pnpm
+workspaces](https://pnpm.io/workspaces). Take a look at the top-level
+`pnpm-workspace.yaml` file to find them all, but the main thing to
+know is that each of the workspaces has its own `package.json`. You
+can add dependencies to specific workspaces either by using `pnpm`
+installed on your local machine, or by executing:
+
+```shell
+# Example of adding a dep to the JS webdriver bindings 
+cd javascript/selenium-webdriver
+bazel run javascript:pnpm -- install my-amazing-dep --dir $PWD
+```
+
+This will install the dependency using the same version of `pnpm` we
+build the project with for a single JS project.
+
+To update all dependencies in the tree to the latest version:
+
+`bazel run javascript:pnpm -- -r up --dir $PWD`
+
+This will also update the lock file, so once a change is made, create
+a PR and commit all the changed files.
+
 #### License Headers
 
 Every file in the Selenium project must carry the following license
@@ -221,12 +255,12 @@ Build your code for the latest changes and run tests locally.
 
   Node Tests
   ```shell
-  % bazel test //javascript/node/selenium-webdriver:tests
+  % bazel test //javascript/selenium-webdriver:all
   ```
 
   Firefox Atom Tests
   ```shell
-  % bazel test --test_tag_filters=firefox //javascript/atoms/... //javascript/selenium-atoms/... //javascript/webdriver/...
+  % bazel test --test_tag_filters=firefox //javascript/atoms/... //javascript/webdriver/...
   ```
 
   Grid UI Unit Tests
@@ -324,8 +358,8 @@ Check https://selenium.dev/support/ for a complete list of options to communicat
 
 To access the EngFlow RBE, a developer needs to be granted access to our project
 container repository. Once that has been done, then any bazel command can be run
-remotely by using `--config=remote`. For example: `bazel build --config=remote
-grid` or `bazel test --config=remote java/test/...`
+remotely by using `--config=rbe`. For example: `bazel build --config=rbe
+grid` or `bazel test --config=rbe java/test/...`
 
 When you run a remote build, one of the first lines of output from Bazel will 
 include a link to the EngFlow UI so you can track the progress of the build and

@@ -623,7 +623,7 @@ class RemoteWebDriverUnitTest {
   void canHandleSetScriptTimeoutCommand() {
     WebDriverFixture fixture = new WebDriverFixture(echoCapabilities, nullValueResponder);
 
-    fixture.driver.manage().timeouts().setScriptTimeout(Duration.ofSeconds(10));
+    fixture.driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10));
 
     fixture.verifyCommands(
         new CommandPayload(DriverCommand.SET_TIMEOUT, ImmutableMap.of("script", 10000L)));
@@ -806,5 +806,22 @@ class RemoteWebDriverUnitTest {
   void noArgConstructorEmptyCapabilitiesTest() {
     RemoteWebDriver driver = new RemoteWebDriver() {}; // anonymous subclass
     assertThat(driver.getCapabilities()).isEqualTo(new ImmutableCapabilities());
+  }
+
+  @Test
+  void getDownloadableFilesReturnsType() {
+    List<String> expectedFiles = Arrays.asList("file1.txt", "file2.pdf");
+
+    WebDriverFixture fixture =
+        new WebDriverFixture(
+            new ImmutableCapabilities("se:downloadsEnabled", true),
+            echoCapabilities,
+            valueResponder(ImmutableMap.of("names", expectedFiles)));
+
+    List<String> result = fixture.driver.getDownloadableFiles();
+
+    assertThat(result).isInstanceOf(List.class).isEqualTo(expectedFiles);
+
+    fixture.verifyCommands(new CommandPayload(DriverCommand.GET_DOWNLOADABLE_FILES, emptyMap()));
   }
 }

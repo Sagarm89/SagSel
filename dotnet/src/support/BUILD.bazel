@@ -1,7 +1,6 @@
 load(
     "//dotnet:defs.bzl",
     "csharp_library",
-    "framework",
     "generated_assembly_info",
     "nuget_pack",
 )
@@ -32,22 +31,19 @@ csharp_library(
         "*.cs",
         "Events/*.cs",
         "Extensions/*.cs",
-        "PageObjects/**/*.cs",
         "UI/*.cs",
     ]) + [":assembly-info"],
     out = "WebDriver.Support",
+    langversion = "12.0",
+    nullable = "enable",
     target_frameworks = [
         "netstandard2.0",
-    ],
-    targeting_packs = [
-        framework("nuget", "NETStandard.Library"),
     ],
     visibility = [
         "//dotnet:__subpackages__",
     ],
     deps = [
-        "//dotnet/src/webdriver",
-        framework("nuget", "NETStandard.Library"),
+        "//dotnet/src/webdriver:webdriver-netstandard2.0",
     ],
 )
 
@@ -74,23 +70,20 @@ csharp_library(
         "*.cs",
         "Events/*.cs",
         "Extensions/*.cs",
-        "PageObjects/**/*.cs",
         "UI/*.cs",
     ]) + [":assembly-info"],
     out = "WebDriver.Support.StrongNamed",
     keyfile = "//dotnet:WebDriver.snk",
+    langversion = "12.0",
+    nullable = "enable",
     target_frameworks = [
         "netstandard2.0",
-    ],
-    targeting_packs = [
-        framework("nuget", "NETStandard.Library"),
     ],
     visibility = [
         "//dotnet:__subpackages__",
     ],
     deps = [
-        "//dotnet/src/webdriver:webdriver-strongnamed",
-        framework("nuget", "NETStandard.Library"),
+        "//dotnet/src/webdriver:webdriver-netstandard2.0-strongnamed",
     ],
 )
 

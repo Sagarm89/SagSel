@@ -32,7 +32,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -101,6 +101,18 @@ import org.openqa.selenium.status.HasReadyState;
  * by {@code sessionId}. This returns a boolean.</td>
  * </tr>
  * <tr>
+ * <td>DELETE</td>
+ * <td>/se/grid/node/connection/{sessionId}</td>
+ * <td>Notifies the node about closure of a websocket connection for the {@link Session}
+ * identified by {@code sessionId}.</td>
+ * </tr>
+ * <tr>
+ * <td>POST</td>
+ * <td>/se/grid/node/connection/{sessionId}</td>
+ * <td>Allows the node to be ask about whether or not new websocket connections are allowed for the {@link Session}
+ * identified by {@code sessionId}. This returns a boolean.</td>
+ * </tr>
+ * <tr>
  * <td>*</td>
  * <td>/session/{sessionId}/*</td>
  * <td>The request is forwarded to the {@link Session} identified by {@code sessionId}. When the
@@ -119,7 +131,8 @@ public abstract class Node implements HasReadyState, Routable {
   private final URI uri;
   private final Duration sessionTimeout;
   private final Route routes;
-  protected boolean draining;
+  protected final AtomicBoolean draining = new AtomicBoolean(false);
+  protected final AtomicBoolean registered = new AtomicBoolean(false);
 
   protected Node(
       Tracer tracer, NodeId id, URI uri, Secret registrationSecret, Duration sessionTimeout) {
@@ -148,12 +161,7 @@ public abstract class Node implements HasReadyState, Routable {
         combine(
             // "getSessionId" is aggressive about finding session ids, so this needs to be the last
             // route that is checked.
-            matching(
-                    req ->
-                        getSessionId(req.getUri())
-                            .map(SessionId::new)
-                            .map(this::isSessionOwner)
-                            .orElse(false))
+            matching(req -> getSessionId(req.getUri()).map(SessionId::new).isPresent())
                 .to(() -> new ForwardWebDriverCommand(this))
                 .with(spanDecorator("node.forward_command")),
             new CustomLocatorHandler(this, registrationSecret, customLocators),
@@ -171,6 +179,12 @@ public abstract class Node implements HasReadyState, Routable {
                 .with(spanDecorator("node.download_file")),
             get("/se/grid/node/owner/{sessionId}")
                 .to(params -> new IsSessionOwner(this, sessionIdFrom(params)))
+                .with(spanDecorator("node.is_session_owner").andThen(requiresSecret)),
+            delete("/se/grid/node/connection/{sessionId}")
+                .to(params -> new ReleaseConnection(this, sessionIdFrom(params)))
+                .with(spanDecorator("node.is_session_owner").andThen(requiresSecret)),
+            post("/se/grid/node/connection/{sessionId}")
+                .to(params -> new TryAcquireConnection(this, sessionIdFrom(params)))
                 .with(spanDecorator("node.is_session_owner").andThen(requiresSecret)),
             delete("/se/grid/node/session/{sessionId}")
                 .to(params -> new StopNodeSession(this, sessionIdFrom(params)))
@@ -232,7 +246,7 @@ public abstract class Node implements HasReadyState, Routable {
     throw new UnsupportedOperationException();
   }
 
-  public TemporaryFilesystem getDownloadsFilesystem(UUID uuid) throws IOException {
+  public TemporaryFilesystem getDownloadsFilesystem(SessionId id) throws IOException {
     throw new UnsupportedOperationException();
   }
 
@@ -243,6 +257,10 @@ public abstract class Node implements HasReadyState, Routable {
   public abstract void stop(SessionId id) throws NoSuchSessionException;
 
   public abstract boolean isSessionOwner(SessionId id);
+
+  public abstract boolean tryAcquireConnection(SessionId id);
+
+  public abstract void releaseConnection(SessionId id);
 
   public abstract boolean isSupporting(Capabilities capabilities);
 
@@ -255,7 +273,15 @@ public abstract class Node implements HasReadyState, Routable {
   }
 
   public boolean isDraining() {
-    return draining;
+    return draining.get();
+  }
+
+  public boolean isRegistered() {
+    return registered.get();
+  }
+
+  public void register() {
+    registered.set(true);
   }
 
   public abstract void drain();

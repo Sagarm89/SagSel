@@ -213,12 +213,10 @@ module Selenium
           http.close
         rescue *QUIT_ERRORS
           nil
-        ensure
-          @bidi&.close
         end
 
         def close
-          execute(:close_window).tap { |handles| @bidi&.close if handles.empty? }
+          execute :close_window
         end
 
         def refresh
@@ -299,58 +297,6 @@ module Selenium
         end
 
         #
-        # HTML 5
-        #
-
-        def local_storage_item(key, value = nil)
-          if value
-            execute_script("localStorage.setItem('#{key}', '#{value}')")
-          else
-            execute_script("return localStorage.getItem('#{key}')")
-          end
-        end
-
-        def remove_local_storage_item(key)
-          execute_script("localStorage.removeItem('#{key}')")
-        end
-
-        def local_storage_keys
-          execute_script('return Object.keys(localStorage)')
-        end
-
-        def clear_local_storage
-          execute_script('localStorage.clear()')
-        end
-
-        def local_storage_size
-          execute_script('return localStorage.length')
-        end
-
-        def session_storage_item(key, value = nil)
-          if value
-            execute_script("sessionStorage.setItem('#{key}', '#{value}')")
-          else
-            execute_script("return sessionStorage.getItem('#{key}')")
-          end
-        end
-
-        def remove_session_storage_item(key)
-          execute_script("sessionStorage.removeItem('#{key}')")
-        end
-
-        def session_storage_keys
-          execute_script('return Object.keys(sessionStorage)')
-        end
-
-        def clear_session_storage
-          execute_script('sessionStorage.clear()')
-        end
-
-        def session_storage_size
-          execute_script('return sessionStorage.length')
-        end
-
-        #
         # javascript execution
         #
 
@@ -377,6 +323,8 @@ module Selenium
         end
 
         def delete_cookie(name)
+          raise ArgumentError, 'Cookie name cannot be null or empty' if name.nil? || name.to_s.strip.empty?
+
           execute :delete_cookie, name: name
         end
 
@@ -604,11 +552,49 @@ module Selenium
           execute :set_user_verified, {authenticatorId: authenticator_id}, {isUserVerified: verified}
         end
 
-        def bidi
-          msg = 'this operation requires enabling BiDi by setting #web_socket_url to true in options class'
-          raise(WebDriver::Error::WebDriverError, msg) unless capabilities.web_socket_url
+        #
+        # federated-credential management
+        #
 
-          @bidi ||= Selenium::WebDriver::BiDi.new(url: capabilities[:web_socket_url])
+        def cancel_fedcm_dialog
+          execute :cancel_fedcm_dialog
+        end
+
+        def select_fedcm_account(index)
+          execute :select_fedcm_account, {}, {accountIndex: index}
+        end
+
+        def fedcm_dialog_type
+          execute :get_fedcm_dialog_type
+        end
+
+        def fedcm_title
+          execute(:get_fedcm_title).fetch('title')
+        end
+
+        def fedcm_subtitle
+          execute(:get_fedcm_title).fetch('subtitle', nil)
+        end
+
+        def fedcm_account_list
+          execute :get_fedcm_account_list
+        end
+
+        def fedcm_delay(enabled)
+          execute :set_fedcm_delay, {}, {enabled: enabled}
+        end
+
+        def reset_fedcm_cooldown
+          execute :reset_fedcm_cooldown
+        end
+
+        def click_fedcm_dialog_button
+          execute :click_fedcm_dialog_button, {}, {dialogButton: 'ConfirmIdpLoginContinue'}
+        end
+
+        def bidi
+          msg = 'BiDi must be enabled by setting #web_socket_url to true in options class'
+          raise(WebDriver::Error::WebDriverError, msg)
         end
 
         def command_list
@@ -640,7 +626,7 @@ module Selenium
         end
 
         def escaper
-          @escaper ||= defined?(URI::Parser) ? URI::DEFAULT_PARSER : URI
+          @escaper ||= defined?(URI::RFC2396_PARSER) ? URI::RFC2396_PARSER : URI::DEFAULT_PARSER
         end
 
         def commands(command)

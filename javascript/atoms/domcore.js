@@ -18,8 +18,7 @@
 /**
  * @fileoverview Defines the core DOM querying library for the atoms, with a
  * minimal set of dependencies. Notably, this file should never have a
- * dependency on CSS or XPath polyfill libraries (sizzle and wgxpath,
- * respectively).
+ * dependency on CSS libraries such as sizzle.
  */
 
 goog.provide('bot.dom.core');
@@ -168,6 +167,11 @@ bot.dom.core.isElement = function (node, opt_tagName) {
   // because we call this with deprecated tags such as SHADOW
   if (opt_tagName && (typeof opt_tagName !== 'string')) {
     opt_tagName = opt_tagName.toString();
+  }
+  // because node.tagName.toUpperCase() fails when tagName is "tagName"
+  if (node instanceof HTMLFormElement) {
+    return !!node && node.nodeType == goog.dom.NodeType.ELEMENT &&
+    (!opt_tagName || "FORM" == opt_tagName);
   }
   return !!node && node.nodeType == goog.dom.NodeType.ELEMENT &&
     (!opt_tagName || node.tagName.toUpperCase() == opt_tagName);

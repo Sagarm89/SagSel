@@ -18,6 +18,7 @@
 package org.openqa.selenium;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.openqa.selenium.testing.drivers.Browser.ALL;
 import static org.openqa.selenium.testing.drivers.Browser.CHROME;
@@ -35,10 +36,11 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.environment.DomainHelper;
 import org.openqa.selenium.testing.Ignore;
 import org.openqa.selenium.testing.JupiterTestBase;
+import org.openqa.selenium.testing.NeedsSecureServer;
 import org.openqa.selenium.testing.NotWorkingInRemoteBazelBuilds;
-import org.openqa.selenium.testing.NotYetImplemented;
 import org.openqa.selenium.testing.SwitchToTopAfterTest;
 
+@NeedsSecureServer
 class CookieImplementationTest extends JupiterTestBase {
 
   private DomainHelper domainHelper;
@@ -71,7 +73,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testShouldGetCookieByName() {
     String key = generateUniqueKey();
     String value = "set";
@@ -84,7 +85,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   @NotWorkingInRemoteBazelBuilds(FIREFOX)
   public void testShouldBeAbleToAddCookie() {
     String key = generateUniqueKey();
@@ -101,7 +101,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testGetAllCookies() {
     String key1 = generateUniqueKey();
     String key2 = generateUniqueKey();
@@ -127,7 +126,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testDeleteAllCookies() {
     addCookieOnServerSide(new Cookie("foo", "set"));
     assertSomeCookiesArePresent();
@@ -141,7 +139,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testDeleteCookieWithName() {
     String key1 = generateUniqueKey();
     String key2 = generateUniqueKey();
@@ -163,7 +160,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testShouldNotDeleteCookiesWithASimilarName() {
     String cookieOneName = "fish";
     Cookie cookie1 = new Cookie.Builder(cookieOneName, "cod").build();
@@ -184,7 +180,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testAddCookiesWithDifferentPathsThatAreRelatedToOurs() {
     driver.get(domainHelper.getUrlForFirstValidHostname("/common/animals"));
     Cookie cookie1 = new Cookie.Builder("fish", "cod").path("/common/animals").build();
@@ -221,7 +216,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testCannotGetCookiesWithPathDifferingOnlyInCase() {
     String cookieName = "fish";
     Cookie cookie = new Cookie.Builder(cookieName, "cod").path("/Common/animals").build();
@@ -232,7 +226,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testShouldNotGetCookieOnDifferentDomain() {
     assumeTrue(domainHelper.checkHasValidAlternateHostname());
 
@@ -246,7 +239,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   @NotWorkingInRemoteBazelBuilds(FIREFOX)
   public void testShouldBeAbleToAddToADomainWhichIsRelatedToTheCurrentDomain() {
     String cookieName = "name";
@@ -286,7 +278,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   @NotWorkingInRemoteBazelBuilds(FIREFOX)
   public void testShouldBeAbleToSetDomainToTheCurrentDomain() throws Exception {
     URI url = new URI(driver.getCurrentUrl());
@@ -301,7 +292,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   @NotWorkingInRemoteBazelBuilds(CHROME)
   @NotWorkingInRemoteBazelBuilds(EDGE)
   @NotWorkingInRemoteBazelBuilds(FIREFOX)
@@ -333,7 +323,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   @NotWorkingInRemoteBazelBuilds(FIREFOX)
   public void testShouldIgnoreThePortNumberOfTheHostWhenSettingTheCookie() throws Exception {
     URI uri = new URI(driver.getCurrentUrl());
@@ -349,7 +338,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   @NotWorkingInRemoteBazelBuilds(CHROME)
   @NotWorkingInRemoteBazelBuilds(EDGE)
   @NotWorkingInRemoteBazelBuilds(FIREFOX)
@@ -380,7 +368,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testRetainsCookieExpiry() {
     Cookie addedCookie =
         new Cookie.Builder("fish", "cod")
@@ -467,7 +454,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testSettingACookieThatExpiredInThePast() {
     long expires = System.currentTimeMillis() - 1000;
     Cookie cookie = new Cookie.Builder("expired", "yes").expiresOn(new Date(expires)).build();
@@ -480,7 +466,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testCanSetCookieWithoutOptionalFieldsSet() {
     String key = generateUniqueKey();
     String value = "foo";
@@ -493,12 +478,23 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void testDeleteNotExistedCookie() {
     String key = generateUniqueKey();
     assertCookieIsNotPresentWithName(key);
 
     driver.manage().deleteCookieNamed(key);
+  }
+
+  @Test
+  public void testDeleteEmptyNamedCookie() {
+    assertThrows(IllegalArgumentException.class, () -> driver.manage().deleteCookieNamed(""));
+    assertThrows(IllegalArgumentException.class, () -> driver.manage().deleteCookieNamed(" "));
+  }
+
+  @Test
+  public void testGetEmptyNamedCookie() {
+    assertThrows(IllegalArgumentException.class, () -> driver.manage().getCookieNamed(""));
+    assertThrows(IllegalArgumentException.class, () -> driver.manage().getCookieNamed(" "));
   }
 
   @Test
@@ -622,7 +618,6 @@ class CookieImplementationTest extends JupiterTestBase {
   }
 
   @Test
-  @NotYetImplemented(SAFARI)
   public void deleteAllCookies() {
     assumeTrue(domainHelper.checkHasValidAlternateHostname());
 

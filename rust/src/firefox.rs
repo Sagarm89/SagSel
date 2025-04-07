@@ -34,7 +34,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
 
@@ -55,6 +55,7 @@ const FIREFOX_CANARY_LABEL: &str = "FIREFOX_NIGHTLY";
 const FIREFOX_ESR_LABEL: &str = "FIREFOX_ESR";
 const FIREFOX_VERSIONS_ENDPOINT: &str = "firefox_versions.json";
 const FIREFOX_HISTORY_ENDPOINT: &str = "firefox_history_stability_releases.json";
+const FIREFOX_HISTORY_MAJOR_ENDPOINT: &str = "firefox_history_major_releases.json";
 const FIREFOX_HISTORY_DEV_ENDPOINT: &str = "firefox_history_development_releases.json";
 const FIREFOX_NIGHTLY_URL: &str =
     "https://download.mozilla.org/?product=firefox-nightly-latest-ssl&os={}&lang={}";
@@ -65,6 +66,8 @@ const MIN_DOWNLOADABLE_FIREFOX_VERSION_MAC: i32 = 4;
 const MIN_DOWNLOADABLE_FIREFOX_VERSION_LINUX: i32 = 4;
 const UNAVAILABLE_DOWNLOAD_ERROR_MESSAGE: &str =
     "{} {} not available for downloading (minimum version: {})";
+const FIREFOX_SNAP_LINK: &str = "/snap/bin/firefox";
+const FIREFOX_SNAP_BINARY: &str = "/snap/firefox/current/usr/lib/firefox/firefox";
 
 pub struct FirefoxManager {
     pub browser_name: &'static str,
@@ -163,23 +166,23 @@ impl SeleniumManager for FirefoxManager {
             ),
             (
                 BrowserPath::new(MACOS, STABLE),
-                r#"/Applications/Firefox.app/Contents/MacOS/firefox"#,
+                "/Applications/Firefox.app/Contents/MacOS/firefox",
             ),
             (
                 BrowserPath::new(MACOS, BETA),
-                r#"/Applications/Firefox.app/Contents/MacOS/firefox"#,
+                "/Applications/Firefox.app/Contents/MacOS/firefox",
             ),
             (
                 BrowserPath::new(MACOS, DEV),
-                r#"/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox"#,
+                "/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox",
             ),
             (
                 BrowserPath::new(MACOS, NIGHTLY),
-                r#"/Applications/Firefox Nightly.app/Contents/MacOS/firefox"#,
+                "/Applications/Firefox Nightly.app/Contents/MacOS/firefox",
             ),
             (
                 BrowserPath::new(MACOS, ESR),
-                r#"/Applications/Firefox.app/Contents/MacOS/firefox"#,
+                "/Applications/Firefox.app/Contents/MacOS/firefox",
             ),
             (BrowserPath::new(LINUX, STABLE), "/usr/bin/firefox"),
             (BrowserPath::new(LINUX, BETA), "/usr/bin/firefox"),
@@ -222,9 +225,11 @@ impl SeleniumManager for FirefoxManager {
             _ => {
                 self.assert_online_or_err(OFFLINE_REQUEST_ERR_MSG)?;
 
+                let driver_version_url =
+                    self.get_driver_mirror_versions_url_or_default(DRIVER_VERSIONS_URL);
                 let driver_version = match parse_json_from_url::<GeckodriverReleases>(
                     self.get_http_client(),
-                    DRIVER_VERSIONS_URL,
+                    &driver_version_url,
                 ) {
                     Ok(driver_releases) => {
                         let major_browser_version_int =
@@ -478,9 +483,13 @@ impl SeleniumManager for FirefoxManager {
                 self.request_versions_from_online(FIREFOX_HISTORY_ENDPOINT)?;
             if firefox_versions.is_empty() {
                 firefox_versions =
-                    self.request_versions_from_online(FIREFOX_HISTORY_DEV_ENDPOINT)?;
+                    self.request_versions_from_online(FIREFOX_HISTORY_MAJOR_ENDPOINT)?;
                 if firefox_versions.is_empty() {
-                    return self.unavailable_discovery();
+                    firefox_versions =
+                        self.request_versions_from_online(FIREFOX_HISTORY_DEV_ENDPOINT)?;
+                    if firefox_versions.is_empty() {
+                        return self.unavailable_discovery();
+                    }
                 }
             }
 
@@ -565,11 +574,19 @@ impl SeleniumManager for FirefoxManager {
         } else {
             // Linux
             artifact_name = "firefox-";
-            artifact_extension = "tar.bz2";
+            if major_browser_version < 135 {
+                artifact_extension = "tar.bz2";
+            } else {
+                artifact_extension = "tar.xz";
+            }
             if X32.is(arch) {
                 platform_label = "linux-i686";
             } else if self.is_nightly(browser_version) {
-                platform_label = "linux64";
+                if ARM64.is(arch) {
+                    platform_label = "linux64-aarch64";
+                } else {
+                    platform_label = "linux64";
+                }
             } else {
                 platform_label = "linux-x86_64";
             }
@@ -613,6 +630,15 @@ impl SeleniumManager for FirefoxManager {
 
     fn set_download_browser(&mut self, download_browser: bool) {
         self.download_browser = download_browser;
+    }
+
+    fn is_snap(&self, browser_path: &str) -> bool {
+        LINUX.is(self.get_os())
+            && (browser_path.eq(FIREFOX_SNAP_LINK) || browser_path.eq(FIREFOX_SNAP_BINARY))
+    }
+
+    fn get_snap_path(&self) -> Option<PathBuf> {
+        Some(Path::new(FIREFOX_SNAP_BINARY).to_path_buf())
     }
 }
 
