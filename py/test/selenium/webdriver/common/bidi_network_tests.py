@@ -19,7 +19,6 @@ import pytest
 from selenium.webdriver.common.bidi.network import UrlPatternString
 
 
-@pytest.mark.xfail_firefox
 @pytest.mark.xfail_safari
 def test_request_handler(driver, pages):
 
