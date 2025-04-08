@@ -26,8 +26,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 
-#nullable enable
-
 namespace OpenQA.Selenium.Chromium
 {
     /// <summary>
@@ -363,6 +361,8 @@ namespace OpenQA.Selenium.Chromium
         /// <summary>
         /// Closes a DevTools session.
         /// </summary>
+        [RequiresUnreferencedCode(DevToolsSession.CDP_AOTIncompatibilityMessage)]
+        [RequiresDynamicCode(DevToolsSession.CDP_AOTIncompatibilityMessage)]
         public void CloseDevToolsSession()
         {
             if (this.devToolsSession != null)

@@ -28,8 +28,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
-#nullable enable
-
 namespace OpenQA.Selenium
 {
     /// <summary>
@@ -705,7 +703,7 @@ namespace OpenQA.Selenium
 #nullable enable
                 >? parameters)
         {
-            return this.driver.InternalExecute(commandToExecute, parameters);
+            return this.driver.Execute(commandToExecute, parameters);
         }
 
         private static string GetAtom(string atomResourceName)
