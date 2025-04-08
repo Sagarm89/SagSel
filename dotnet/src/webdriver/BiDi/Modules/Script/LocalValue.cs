@@ -162,7 +162,6 @@ public record ChannelLocalValue(ChannelProperties Value) : LocalValue
 {
     // AddPreloadScript takes arguments typed as ChannelLocalValue but still requires "type":"channel"
     [JsonInclude]
-    [JsonPropertyName("type")]
     internal string Type => "channel";
 }
 
