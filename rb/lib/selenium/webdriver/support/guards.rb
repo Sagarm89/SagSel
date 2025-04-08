@@ -39,6 +39,7 @@ module Selenium
 
         def add_condition(name, condition = nil, &block)
           @guard_conditions << GuardCondition.new(name, condition, &block)
+          WebDriver.logger.info "Running with Guard '#{name}' set to: #{!!condition}"
         end
 
         def add_message(name, message)
