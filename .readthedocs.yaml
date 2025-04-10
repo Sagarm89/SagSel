@@ -8,12 +8,12 @@ build:
   os: ubuntu-22.04
   tools:
     python: "latest"
+    commands:
+    - PYTHONPATH=py sphinx-autogen py/docs/source/api.rst
+    - sphinx-build -b html -d build/docs/doctrees py/docs/source $READTHEDOCS_OUTPUT/html
 
 sphinx:
   configuration: py/docs/source/conf.py
-  commands:
-    - PYTHONPATH=py sphinx-autogen py/docs/source/api.rst
-    - sphinx-build -b html -d build/docs/doctrees py/docs/source $READTHEDOCS_OUTPUT/html
 
 python:
   install:
