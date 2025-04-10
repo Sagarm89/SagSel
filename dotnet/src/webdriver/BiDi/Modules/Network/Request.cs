@@ -17,17 +17,12 @@
 // under the License.
 // </copyright>
 
-using System.Threading.Tasks;
-
 namespace OpenQA.Selenium.BiDi.Modules.Network;
 
 public class Request
 {
-    private readonly BiDi _bidi;
-
-    internal Request(BiDi bidi, string id)
+    internal Request(string id)
     {
-        _bidi = bidi;
         Id = id;
     }
 
