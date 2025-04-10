@@ -301,7 +301,7 @@ def driver(request):
 
     if driver_instance is None:
         driver_instance = selenium_driver.driver
-
+  
     yield driver_instance
 
 
