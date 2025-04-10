@@ -17,6 +17,8 @@
 import os
 import subprocess
 
+from unittest.mock import patch
+
 import pytest
 
 from selenium.webdriver import Firefox
@@ -79,8 +81,6 @@ class TestGeckoDriverService:
         assert "geckodriver" in service.path
 
     def test_updates_path_after_setting_env_variable(self, service):
-        new_path = "/foo/bar"
-        os.environ["SE_GECKODRIVER"] = new_path
         service.executable_path = self.service_path  # Simulating the update
-
-        assert "geckodriver" in service.executable_path
+        with patch.dict("os.environ", {"SE_GECKODRIVER": "/foo/bar"}):
+            assert "geckodriver" in service.executable_path

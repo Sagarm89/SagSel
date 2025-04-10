@@ -119,5 +119,5 @@ class TestEdgeDriverService:
 
     def test_updates_path_after_setting_env_variable(self, service):
         service.executable_path = self.service_path  # Simulating the update
-        with patch.dict("os.environ", {"SE_CHROMEDRIVER": "/foo/bar"}):
+        with patch.dict("os.environ", {"SE_EDGEDRIVER": "/foo/bar"}):
             assert "msedgedriver" in service.executable_path
