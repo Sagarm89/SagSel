@@ -9,6 +9,7 @@ build:
   tools:
     python: "latest"
   commands:
+    - pip install sphinx
     - export PYTHONPATH=py
     - sphinx-autogen py/docs/source/api.rst
     - sphinx-build -b html -d build/docs/doctrees py/docs/source $READTHEDOCS_OUTPUT/html
