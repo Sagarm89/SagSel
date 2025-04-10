@@ -24,29 +24,29 @@ namespace OpenQA.Selenium.BiDi.Modules.Network;
 
 public partial class NetworkModule
 {
-    public async Task<Intercept> InterceptRequestAsync(Func<BeforeRequestSentEventArgs, Task> handler, InterceptRequestOptions? options = null)
+    public async Task<Intercept> InterceptRequestAsync(Func<InterceptedRequest, Task> handler, InterceptRequestOptions? options = null)
     {
         var intercept = await AddInterceptAsync([InterceptPhase.BeforeRequestSent], options).ConfigureAwait(false);
 
-        await intercept.OnBeforeRequestSentAsync(handler).ConfigureAwait(false);
+        await intercept.OnBeforeRequestSentAsync(async req => await handler(new(req.BiDi, req.Context, req.IsBlocked, req.Navigation, req.RedirectCount, req.Request, req.Timestamp, req.Initiator))).ConfigureAwait(false);
 
         return intercept;
     }
 
-    public async Task<Intercept> InterceptResponseAsync(Func<ResponseStartedEventArgs, Task> handler, InterceptResponseOptions? options = null)
+    public async Task<Intercept> InterceptResponseAsync(Func<InterceptedResponse, Task> handler, InterceptResponseOptions? options = null)
     {
         var intercept = await AddInterceptAsync([InterceptPhase.ResponseStarted], options).ConfigureAwait(false);
 
-        await intercept.OnResponseStartedAsync(handler).ConfigureAwait(false);
+        await intercept.OnResponseStartedAsync(async res => await handler(new(res.BiDi, res.Context, res.IsBlocked, res.Navigation, res.RedirectCount, res.Request, res.Timestamp, res.Response))).ConfigureAwait(false);
 
         return intercept;
     }
 
-    public async Task<Intercept> InterceptAuthAsync(Func<AuthRequiredEventArgs, Task> handler, InterceptAuthOptions? options = null)
+    public async Task<Intercept> InterceptAuthAsync(Func<InterceptedAuth, Task> handler, InterceptAuthOptions? options = null)
     {
         var intercept = await AddInterceptAsync([InterceptPhase.AuthRequired], options).ConfigureAwait(false);
 
-        await intercept.OnAuthRequiredAsync(handler).ConfigureAwait(false);
+        await intercept.OnAuthRequiredAsync(async auth => await handler(new(auth.BiDi, auth.Context, auth.IsBlocked, auth.Navigation, auth.RedirectCount, auth.Request, auth.Timestamp, auth.Response))).ConfigureAwait(false);
 
         return intercept;
     }
@@ -57,3 +57,50 @@ public record InterceptRequestOptions : AddInterceptOptions;
 public record InterceptResponseOptions : AddInterceptOptions;
 
 public record InterceptAuthOptions : AddInterceptOptions;
+
+public record InterceptedRequest(BiDi BiDi, BrowsingContext.BrowsingContext Context, bool IsBlocked, BrowsingContext.Navigation Navigation, long RedirectCount, RequestData Request, DateTimeOffset Timestamp, Initiator Initiator)
+    : BeforeRequestSentEventArgs(BiDi, Context, IsBlocked, Navigation, RedirectCount, Request, Timestamp, Initiator)
+{
+    public Task ContinueAsync(ContinueRequestOptions? options = null)
+    {
+        return BiDi.Network.ContinueRequestAsync(Request.Request, options);
+    }
+
+    public Task FailAsync()
+    {
+        return BiDi.Network.FailRequestAsync(Request.Request);
+    }
+
+    public Task ProvideResponseAsync(ProvideResponseOptions? options = null)
+    {
+        return BiDi.Network.ProvideResponseAsync(Request.Request, options);
+    }
+}
+
+public record InterceptedResponse(BiDi BiDi, BrowsingContext.BrowsingContext Context, bool IsBlocked, BrowsingContext.Navigation Navigation, long RedirectCount, RequestData Request, DateTimeOffset Timestamp, ResponseData Response)
+    : ResponseStartedEventArgs(BiDi, Context, IsBlocked, Navigation, RedirectCount, Request, Timestamp, Response)
+{
+    public Task ContinueResponseAsync(ContinueResponseOptions? options = null)
+    {
+        return BiDi.Network.ContinueResponseAsync(Request.Request, options);
+    }
+}
+
+public record InterceptedAuth(BiDi BiDi, BrowsingContext.BrowsingContext Context, bool IsBlocked, BrowsingContext.Navigation Navigation, long RedirectCount, RequestData Request, DateTimeOffset Timestamp, ResponseData Response)
+    : AuthRequiredEventArgs(BiDi, Context, IsBlocked, Navigation, RedirectCount, Request, Timestamp, Response)
+{
+    public Task ContinueWithAuthAsync(AuthCredentials credentials, ContinueWithAuthCredentialsOptions? options = null)
+    {
+        return BiDi.Network.ContinueWithAuthAsync(Request.Request, credentials, options);
+    }
+
+    public Task ContinueWithAuthAsync(ContinueWithAuthDefaultCredentialsOptions? options = null)
+    {
+        return BiDi.Network.ContinueWithAuthAsync(Request.Request, options);
+    }
+
+    public Task ContinueWithAuthAsync(ContinueWithAuthCancelCredentialsOptions? options = null)
+    {
+        return BiDi.Network.ContinueWithAuthAsync(Request.Request, options);
+    }
+}
