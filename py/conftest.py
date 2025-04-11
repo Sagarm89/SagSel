@@ -229,9 +229,16 @@ class Driver:
         if cls_name.lower() not in self._supported_options:
             raise AttributeError(f"Invalid Options class {cls_name.lower()}")
         self._options = getattr(webdriver, getattr(self._supported_options, cls_name.lower()))()
+        if self.driver_class == self._supported_drivers.firefox:
+            # There are issues with window size/position when running Firefox
+            # under Wayland, so we use XWayland instead.
+            os.environ["MOZ_ENABLE_WAYLAND"] = "0"
         if self.driver_class == self._supported_drivers.remote:
             self._options.set_capability("moz:firefoxOptions", {})
             self._options.enable_downloads = True
+            # There are issues with window size/position when running Firefox
+            # under Wayland, so we use XWayland instead.
+            os.environ["MOZ_ENABLE_WAYLAND"] = "0"
         if self.driver_class == self._supported_drivers.webkitgtk:
             self._options.overlay_scrollbars_enabled = False
 
@@ -301,7 +308,7 @@ def driver(request):
 
     if driver_instance is None:
         driver_instance = selenium_driver.driver
-  
+
     yield driver_instance
 
 
