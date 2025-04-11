@@ -221,7 +221,11 @@ class WebDriver(BaseWebDriver):
             - Custom client configuration to use. Defaults to None.
         """
 
-        if isinstance(options, list):
+        if options is None:
+            raise TypeError(
+                "missing 1 required keyword-only argument: 'options' (instance of driver `options.Options` class)"
+            )
+        elif isinstance(options, list):
             capabilities = create_matches(options)
             _ignore_local_proxy = False
         else:
