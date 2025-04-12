@@ -201,7 +201,7 @@ for Maven to use locally by deploying to your local maven repository (`~/.m2/rep
 
 #### Updating Dependencies
 
-Dependencies are defined in the file [maven_deps.bzl](https://github.com/SeleniumHQ/selenium/blob/trunk/java/maven_deps.bzl).
+Dependencies are defined in the file [MODULE.bazel](https://github.com/SeleniumHQ/selenium/blob/trunk/MODULE.bazel).
 To automatically update and pin new dependencies, run:
 
 ```shell
@@ -314,6 +314,9 @@ Tests can also be filtered by tag like:
 bazel test //<language>/... --test_tag_filters=this,-not-this
 ```
 
+If there are multiple `--test_tag_filters`, only the last one is considered,
+so be careful if also using an inherited config
+
 ### Java
 
 <details>
@@ -346,13 +349,13 @@ bazel test //java/test/org/openqa/selenium/chrome:ChromeDriverFunctionalTest
 To run the tests run:
 
 ```sh
-bazel test //javascript/node/selenium-webdriver:tests
+bazel test //javascript/selenium-webdriver:all
 ```
 
 You can use `--test_env` to pass in the browser name as `SELENIUM_BROWSER`.
 
 ```sh
-bazel test //javascript/node/selenium-webdriver:tests --test_env=SELENIUM_BROWSER=firefox
+bazel test //javascript/selenium-webdriver:all --test_env=SELENIUM_BROWSER=firefox
 ```
 
 </details>
