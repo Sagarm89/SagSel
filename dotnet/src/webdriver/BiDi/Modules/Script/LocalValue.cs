@@ -190,8 +190,6 @@ public abstract record LocalValue
             return new NullLocalValue();
         }
 
-        var type = value.GetType();
-
         List<LocalValue> list = [];
 
         foreach (var element in value)
