@@ -24,23 +24,18 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 
-#nullable enable
-
 namespace OpenQA.Selenium
 {
     /// <summary>
     /// Provides a mechanism for finding elements spatially relative to other elements.
     /// </summary>
-    public class RelativeBy : By
+    public sealed class RelativeBy : By
     {
         private readonly string wrappedAtom;
         private readonly object root;
         private readonly List<object> filters = new List<object>();
 
-        /// <summary>
-        /// Prevents a default instance of the <see cref="RelativeBy"/> class.
-        /// </summary>
-        protected RelativeBy() : base()
+        private static string GetWrappedAtom()
         {
             string atom;
             using (Stream atomStream = ResourceUtilities.GetResourceStream("find-elements.js", "find-elements.js"))
@@ -51,13 +46,13 @@ namespace OpenQA.Selenium
                 }
             }
 
-            wrappedAtom = string.Format(CultureInfo.InvariantCulture, "/* findElements */return ({0}).apply(null, arguments);", atom);
+            return string.Format(CultureInfo.InvariantCulture, "/* findElements */return ({0}).apply(null, arguments);", atom);
         }
 
-        private RelativeBy(object root, List<object>? filters = null) : this()
+        private RelativeBy(object root, List<object>? filters = null)
         {
+            this.wrappedAtom = GetWrappedAtom();
             this.root = GetSerializableRoot(root);
-
             if (filters != null)
             {
                 this.filters.AddRange(filters);
@@ -74,7 +69,6 @@ namespace OpenQA.Selenium
         {
             return new RelativeBy(by);
         }
-
 
         /// <summary>
         /// Finds the first element matching the criteria.
@@ -108,7 +102,7 @@ namespace OpenQA.Selenium
             filterParameters["root"] = GetSerializableObject(this.root);
             filterParameters["filters"] = this.filters;
             parameters["relative"] = filterParameters;
-            object rawElements = js.ExecuteScript(wrappedAtom, parameters);
+            object? rawElements = js.ExecuteScript(wrappedAtom, parameters);
 
             if (rawElements is ReadOnlyCollection<IWebElement> elements)
             {

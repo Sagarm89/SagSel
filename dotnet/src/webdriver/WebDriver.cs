@@ -43,7 +43,7 @@ namespace OpenQA.Selenium
         private NetworkManager network;
         private WebElementFactory elementFactory;
 
-        private List<string> registeredCommands = new List<string>();
+        private readonly List<string> registeredCommands = new List<string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebDriver"/> class.
@@ -73,7 +73,6 @@ namespace OpenQA.Selenium
             }
 
             this.elementFactory = new WebElementFactory(this);
-            this.network = new NetworkManager(this);
             this.registeredCommands.AddRange(DriverCommand.KnownCommands);
 
             if (this is ISupportsLogs)
@@ -108,7 +107,7 @@ namespace OpenQA.Selenium
                 Response commandResponse = this.Execute(DriverCommand.GetCurrentUrl, null);
 
                 commandResponse.EnsureValueIsNotNull();
-                return commandResponse.Value.ToString();
+                return commandResponse.Value.ToString()!;
             }
 
             set => new Navigator(this).GoToUrl(value);
@@ -122,12 +121,10 @@ namespace OpenQA.Selenium
             get
             {
                 Response commandResponse = this.Execute(DriverCommand.GetTitle, null);
-                object returnedTitle = commandResponse.Value ?? string.Empty;
 
-                return returnedTitle.ToString();
+                return commandResponse.Value?.ToString() ?? string.Empty;
             }
         }
-
 
         /// <summary>
         /// Gets the source of the page last loaded by the browser.
@@ -139,7 +136,7 @@ namespace OpenQA.Selenium
                 Response commandResponse = this.Execute(DriverCommand.GetPageSource, null);
 
                 commandResponse.EnsureValueIsNotNull();
-                return commandResponse.Value.ToString();
+                return commandResponse.Value.ToString()!;
             }
         }
 
@@ -154,7 +151,7 @@ namespace OpenQA.Selenium
                 Response commandResponse = this.Execute(DriverCommand.GetCurrentWindowHandle, null);
 
                 commandResponse.EnsureValueIsNotNull();
-                return commandResponse.Value.ToString();
+                return commandResponse.Value.ToString()!;
             }
         }
 
@@ -168,11 +165,11 @@ namespace OpenQA.Selenium
                 Response commandResponse = this.Execute(DriverCommand.GetWindowHandles, null);
 
                 commandResponse.EnsureValueIsNotNull();
-                object[] handles = (object[])commandResponse.Value;
+                object?[] handles = (object?[])commandResponse.Value;
                 List<string> handleList = new List<string>(handles.Length);
-                foreach (object handle in handles)
+                foreach (object? handle in handles)
                 {
-                    handleList.Add(handle.ToString());
+                    handleList.Add(handle!.ToString()!);
                 }
 
                 return handleList.AsReadOnly();
@@ -183,8 +180,6 @@ namespace OpenQA.Selenium
         /// Gets a value indicating whether this object is a valid action executor.
         /// </summary>
         public bool IsActionExecutor => true;
-
-#nullable enable
 
         /// <summary>
         /// Gets the <see cref="Selenium.SessionId"/> for the current session of this driver.
@@ -202,7 +197,7 @@ namespace OpenQA.Selenium
             set => this.fileDetector = value ?? throw new ArgumentNullException(nameof(value), "FileDetector cannot be null");
         }
 
-        internal INetwork Network => this.network;
+        internal INetwork Network => this.network ??= new NetworkManager(this);
 
         /// <summary>
         /// Gets or sets the factory object used to create instances of <see cref="WebElement"/>
@@ -272,8 +267,6 @@ namespace OpenQA.Selenium
             return this.ExecuteScript(script.MakeExecutionScript(), args);
         }
 
-#nullable restore
-
         /// <summary>
         /// Finds the first element in the page that matches the <see cref="By"/> object
         /// </summary>
@@ -310,7 +303,7 @@ namespace OpenQA.Selenium
 
             Response commandResponse = this.Execute(DriverCommand.FindElement, parameters);
 
-            return this.GetElementFromResponse(commandResponse);
+            return this.GetElementFromResponse(commandResponse)!;
         }
 
         /// <summary>
@@ -350,8 +343,6 @@ namespace OpenQA.Selenium
 
             return this.GetElementsFromResponse(commandResponse);
         }
-
-#nullable enable
 
         /// <summary>
         /// Gets a <see cref="Screenshot"/> object representing the image of the page on the screen.
@@ -527,14 +518,8 @@ namespace OpenQA.Selenium
         /// </summary>
         /// <param name="response">Response from the browser</param>
         /// <returns>Element from the page, or <see langword="null"/> if the response does not contain a dictionary.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
         internal IWebElement? GetElementFromResponse(Response response)
         {
-            if (response == null)
-            {
-                throw new NoSuchElementException();
-            }
-
             if (response.Value is Dictionary<string, object?> elementDictionary)
             {
                 return this.elementFactory.CreateElement(elementDictionary);
@@ -566,33 +551,6 @@ namespace OpenQA.Selenium
             return toReturn.AsReadOnly();
         }
 
-#nullable restore
-
-        /// <summary>
-        /// Executes commands with the driver
-        /// </summary>
-        /// <param name="driverCommandToExecute">Command that needs executing</param>
-        /// <param name="parameters">Parameters needed for the command</param>
-        /// <returns>WebDriver Response</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="driverCommandToExecute"/> is <see langword="null"/>.</exception>
-        internal Response InternalExecute(string driverCommandToExecute, Dictionary<string, object> parameters)
-        {
-            return Task.Run(() => this.InternalExecuteAsync(driverCommandToExecute, parameters)).GetAwaiter().GetResult();
-        }
-
-        /// <summary>
-        /// Executes commands with the driver asynchronously
-        /// </summary>
-        /// <param name="driverCommandToExecute">Command that needs executing</param>
-        /// <param name="parameters">Parameters needed for the command</param>
-        /// <returns>A task object representing the asynchronous operation</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="driverCommandToExecute"/> is <see langword="null"/>.</exception>
-        internal Task<Response> InternalExecuteAsync(string driverCommandToExecute,
-            Dictionary<string, object> parameters)
-        {
-            return this.ExecuteAsync(driverCommandToExecute, parameters);
-        }
-
         /// <summary>
         /// Executes a command with this driver.
         /// </summary>
@@ -600,8 +558,11 @@ namespace OpenQA.Selenium
         /// <param name="parameters">A <see cref="Dictionary{K, V}"/> containing the names and values of the parameters of the command.</param>
         /// <returns>A <see cref="Response"/> containing information about the success or failure of the command and any data returned by the command.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="driverCommandToExecute"/> is <see langword="null"/>.</exception>
-        protected virtual Response Execute(string driverCommandToExecute,
-            Dictionary<string, object> parameters)
+        protected internal virtual Response Execute(string driverCommandToExecute, Dictionary<string,
+#nullable disable
+            object
+#nullable enable
+            >? parameters)
         {
             return Task.Run(() => this.ExecuteAsync(driverCommandToExecute, parameters)).GetAwaiter().GetResult();
         }
@@ -613,7 +574,11 @@ namespace OpenQA.Selenium
         /// <param name="parameters">A <see cref="Dictionary{K, V}"/> containing the names and values of the parameters of the command.</param>
         /// <returns>A <see cref="Response"/> containing information about the success or failure of the command and any data returned by the command.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="driverCommandToExecute"/> is <see langword="null"/>.</exception>
-        protected virtual async Task<Response> ExecuteAsync(string driverCommandToExecute, Dictionary<string, object> parameters)
+        protected internal virtual async Task<Response> ExecuteAsync(string driverCommandToExecute, Dictionary<string,
+#nullable disable
+            object
+#nullable enable
+            >? parameters)
         {
             Command commandToExecute = new Command(SessionId, driverCommandToExecute, parameters);
 
@@ -701,8 +666,6 @@ namespace OpenQA.Selenium
 
             return capabilitiesDictionary;
         }
-
-#nullable enable
 
         /// <summary>
         /// Registers a command to be executed with this driver instance as an internally known driver command.

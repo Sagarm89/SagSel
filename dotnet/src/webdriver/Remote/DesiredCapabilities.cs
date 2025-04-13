@@ -23,8 +23,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 
-#nullable enable
-
 namespace OpenQA.Selenium.Remote
 {
     /// <summary>
@@ -63,7 +61,7 @@ namespace OpenQA.Selenium.Remote
         /// DesiredCapabilities capabilities = new DesiredCapabilities(new Dictionary<![CDATA[<string,object>]]>(){["browserName","firefox"],["version",string.Empty],["javaScript",true]});
         /// </code>
         /// </example>
-        public DesiredCapabilities(Dictionary<string, object> rawMap)
+        public DesiredCapabilities(Dictionary<string, object>? rawMap)
         {
             if (rawMap != null)
             {

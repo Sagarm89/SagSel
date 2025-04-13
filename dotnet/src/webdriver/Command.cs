@@ -24,8 +24,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-#nullable enable
-
 namespace OpenQA.Selenium
 {
     /// <summary>
@@ -35,7 +33,11 @@ namespace OpenQA.Selenium
     {
         private readonly static JsonSerializerOptions s_jsonSerializerOptions = new()
         {
-            TypeInfoResolver = JsonTypeInfoResolver.Combine(CommandJsonSerializerContext.Default, new DefaultJsonTypeInfoResolver()),
+            TypeInfoResolverChain =
+            {
+                CommandJsonSerializerContext.Default,
+                new DefaultJsonTypeInfoResolver()
+            },
             Converters = { new ResponseValueJsonConverter() }
         };
 
@@ -56,10 +58,10 @@ namespace OpenQA.Selenium
         /// <param name="name">Name of the command</param>
         /// <param name="parameters">Parameters for that command</param>
         /// <exception cref="ArgumentNullException">If <paramref name="name"/> is <see langword="null"/>.</exception>
-        public Command(SessionId? sessionId, string name, Dictionary<string, object>? parameters)
+        public Command(SessionId? sessionId, string name, Dictionary<string, object?>? parameters)
         {
             this.SessionId = sessionId;
-            this.Parameters = parameters ?? new Dictionary<string, object>();
+            this.Parameters = parameters ?? new Dictionary<string, object?>();
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
@@ -79,7 +81,7 @@ namespace OpenQA.Selenium
         /// Gets the parameters of the command
         /// </summary>
         [JsonPropertyName("parameters")]
-        public Dictionary<string, object> Parameters { get; }
+        public Dictionary<string, object?> Parameters { get; }
 
         /// <summary>
         /// Gets the parameters of the command as a JSON-encoded string.
@@ -88,17 +90,14 @@ namespace OpenQA.Selenium
         {
             get
             {
-                string parametersString;
                 if (this.Parameters != null && this.Parameters.Count > 0)
                 {
-                    parametersString = JsonSerializer.Serialize(this.Parameters, s_jsonSerializerOptions);
+                    return JsonSerializer.Serialize(this.Parameters, s_jsonSerializerOptions);
                 }
                 else
                 {
-                    parametersString = "{}";
+                    return "{}";
                 }
-
-                return parametersString;
             }
         }
 
@@ -118,9 +117,9 @@ namespace OpenQA.Selenium
         /// <returns>A <see cref="Dictionary{K, V}"/> with a string keys, and an object value. </returns>
         /// <exception cref="JsonException">If <paramref name="value"/> is not a JSON object.</exception>
         /// <exception cref="ArgumentNullException">If <paramref name="value"/> is <see langword="null"/>.</exception>
-        private static Dictionary<string, object>? ConvertParametersFromJson(string value)
+        private static Dictionary<string, object?>? ConvertParametersFromJson(string value)
         {
-            Dictionary<string, object>? parameters = JsonSerializer.Deserialize<Dictionary<string, object>>(value, s_jsonSerializerOptions);
+            Dictionary<string, object?>? parameters = JsonSerializer.Deserialize<Dictionary<string, object?>>(value, CommandJsonSerializerContext.Default.DictionaryStringObject!);
             return parameters;
         }
     }
@@ -169,5 +168,6 @@ namespace OpenQA.Selenium
     [JsonSerializable(typeof(Dictionary<string, short>))]
     [JsonSerializable(typeof(Dictionary<string, ushort>))]
     [JsonSerializable(typeof(Dictionary<string, string>))]
+    [JsonSourceGenerationOptions(Converters = [typeof(ResponseValueJsonConverter)])]
     internal partial class CommandJsonSerializerContext : JsonSerializerContext;
 }

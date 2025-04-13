@@ -40,8 +40,6 @@ namespace OpenQA.Selenium
         /// </summary>
         public const string ElementReferencePropertyName = "element-6066-11e4-a52e-4f735466cecf";
 
-#nullable enable
-
         private readonly WebDriver driver;
 
         /// <summary>
@@ -327,8 +325,6 @@ namespace OpenQA.Selenium
             this.Execute(DriverCommand.ClickElement, parameters);
         }
 
-#nullable restore
-
         /// <summary>
         /// Finds the first <see cref="IWebElement"/> using the given method.
         /// </summary>
@@ -346,8 +342,6 @@ namespace OpenQA.Selenium
             return by.FindElement(this);
         }
 
-#nullable enable
-
         /// <summary>
         /// Finds a child element matching the given mechanism and value.
         /// </summary>
@@ -363,10 +357,8 @@ namespace OpenQA.Selenium
 
             Response commandResponse = this.Execute(DriverCommand.FindChildElement, parameters);
 
-            return this.driver.GetElementFromResponse(commandResponse);
+            return this.driver.GetElementFromResponse(commandResponse)!;
         }
-
-#nullable restore
 
         /// <summary>
         /// Finds all <see cref="IWebElement">IWebElements</see> within the current context
@@ -384,8 +376,6 @@ namespace OpenQA.Selenium
 
             return by.FindElements(this);
         }
-
-#nullable enable
 
         /// <summary>
         /// Finds all child elements matching the given mechanism and value.
@@ -701,24 +691,24 @@ namespace OpenQA.Selenium
             return elementDictionary;
         }
 
-#nullable restore
-
         /// <summary>
         /// Executes a command on this element using the specified parameters.
         /// </summary>
         /// <param name="commandToExecute">The <see cref="DriverCommand"/> to execute against this element.</param>
         /// <param name="parameters">A <see cref="Dictionary{K, V}"/> containing names and values of the parameters for the command.</param>
         /// <returns>The <see cref="Response"/> object containing the result of the command execution.</returns>
-        protected virtual Response Execute(string commandToExecute, Dictionary<string, object> parameters)
-        {
-            return this.driver.InternalExecute(commandToExecute, parameters);
-        }
-
+        protected virtual Response Execute(string commandToExecute, Dictionary<string,
+#nullable disable
+            object
 #nullable enable
+                >? parameters)
+        {
+            return this.driver.Execute(commandToExecute, parameters);
+        }
 
         private static string GetAtom(string atomResourceName)
         {
-            string atom = string.Empty;
+            string atom;
             using (Stream atomStream = ResourceUtilities.GetResourceStream(atomResourceName, atomResourceName))
             {
                 using (StreamReader atomReader = new StreamReader(atomStream))
