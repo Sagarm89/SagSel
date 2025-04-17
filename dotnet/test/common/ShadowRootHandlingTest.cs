@@ -18,6 +18,7 @@
 // </copyright>
 
 using NUnit.Framework;
+using System.Collections.ObjectModel;
 
 namespace OpenQA.Selenium
 {
@@ -42,8 +43,23 @@ namespace OpenQA.Selenium
             driver.Url = shadowRootPage;
             IWebElement element = driver.FindElement(By.CssSelector("custom-checkbox-element"));
             ISearchContext shadowRoot = element.GetShadowRoot();
+
             IWebElement elementInShadow = shadowRoot.FindElement(By.CssSelector("input"));
             Assert.That(elementInShadow.GetAttribute("type"), Is.EqualTo("checkbox"), "Did not find element in shadow root");
+
+            ReadOnlyCollection<IWebElement> elementsInShadow = shadowRoot.FindElements(By.CssSelector("input"));
+            Assert.That(elementsInShadow, Has.One.Items, "Did not find element in shadow root");
+            Assert.That(elementsInShadow[0].GetAttribute("type"), Is.EqualTo("checkbox"), "Did not find element in shadow root");
+        }
+
+        [Test]
+        [IgnoreBrowser(Browser.Firefox, "Firefox does not support finding Shadow DOM elements")]
+        public void ShouldUseByMethodsToFindElementsUnderShadowRoot()
+        {
+            driver.Url = shadowRootPage;
+            IWebElement element = driver.FindElement(By.CssSelector("custom-checkbox-element"));
+            ISearchContext shadowRoot = element.GetShadowRoot();
+            Assert.That(shadowRoot.FindElements(By.Id("")), Is.Empty, "Searching for elements by empty ID should return empty");
         }
 
         [Test]

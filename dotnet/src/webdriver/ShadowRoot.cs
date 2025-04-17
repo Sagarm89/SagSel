@@ -28,7 +28,7 @@ namespace OpenQA.Selenium
     /// <summary>
     /// Provides a representation of an element's shadow root.
     /// </summary>
-    public class ShadowRoot : ISearchContext, IWrapsDriver, IWebDriverObjectReference
+    public class ShadowRoot : ISearchContext, IWrapsDriver, IWebDriverObjectReference, IFindsElement
     {
         /// <summary>
         /// The property name that represents an element shadow root in the wire protocol.
@@ -91,10 +91,21 @@ namespace OpenQA.Selenium
                 throw new ArgumentNullException(nameof(by), "by cannot be null");
             }
 
+            return by.FindElement(this);
+        }
+
+        /// <summary>
+        /// Finds a child element matching the given mechanism and value.
+        /// </summary>
+        /// <param name="mechanism">The mechanism by which to find the element.</param>
+        /// <param name="value">The value to use to search for the element.</param>
+        /// <returns>The first <see cref="IWebElement"/> matching the given criteria.</returns>
+        public virtual IWebElement FindElement(string mechanism, string value)
+        {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", this.shadowRootId);
-            parameters.Add("using", by.Mechanism);
-            parameters.Add("value", by.Criteria);
+            parameters.Add("using", mechanism);
+            parameters.Add("value", value);
 
             Response commandResponse = this.driver.Execute(DriverCommand.FindShadowChildElement, parameters);
             return this.driver.GetElementFromResponse(commandResponse)!;
@@ -115,10 +126,21 @@ namespace OpenQA.Selenium
                 throw new ArgumentNullException(nameof(by), "by cannot be null");
             }
 
+            return by.FindElements(this);
+        }
+
+        /// <summary>
+        /// Finds all child elements matching the given mechanism and value.
+        /// </summary>
+        /// <param name="mechanism">The mechanism by which to find the elements.</param>
+        /// <param name="value">The value to use to search for the elements.</param>
+        /// <returns>A collection of all of the <see cref="IWebElement">IWebElements</see> matching the given criteria.</returns>
+        public virtual ReadOnlyCollection<IWebElement> FindElements(string mechanism, string value)
+        {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", this.shadowRootId);
-            parameters.Add("using", by.Mechanism);
-            parameters.Add("value", by.Criteria);
+            parameters.Add("using", mechanism);
+            parameters.Add("value", value);
 
             Response commandResponse = this.driver.Execute(DriverCommand.FindShadowChildElements, parameters);
             return this.driver.GetElementsFromResponse(commandResponse);
