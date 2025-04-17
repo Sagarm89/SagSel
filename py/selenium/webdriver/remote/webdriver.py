@@ -40,6 +40,7 @@ from selenium.common.exceptions import InvalidArgumentException
 from selenium.common.exceptions import JavascriptException
 from selenium.common.exceptions import NoSuchCookieException
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.bidi.browser import Browser
 from selenium.webdriver.common.bidi.network import Network
@@ -343,9 +344,13 @@ class WebDriver(BaseWebDriver):
         """
 
         caps = _create_caps(capabilities)
-        response = self.execute(Command.NEW_SESSION, caps)["value"]
-        self.session_id = response.get("sessionId")
-        self.caps = response.get("capabilities")
+        try:
+            response = self.execute(Command.NEW_SESSION, caps)["value"]
+            self.session_id = response.get("sessionId")
+            self.caps = response.get("capabilities")
+        except SessionNotCreatedException:
+            self.service.stop()
+            raise
 
     def _wrap_value(self, value):
         if isinstance(value, dict):
