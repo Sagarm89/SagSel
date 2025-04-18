@@ -69,7 +69,7 @@ def test_driver_is_stopped_if_browser_cant_start(clean_driver) -> None:
     options.add_argument("-profile=/no/such/location")
     service = Service()
     with pytest.raises(SessionNotCreatedException):
-        driver = clean_driver(options=options, service=service)
+        clean_driver(options=options, service=service)
     assert not service.is_connectable()
     assert service.process.poll() is not None
 
