@@ -37,6 +37,7 @@ namespace OpenQA.Selenium.Edge
             : base(service, options)
         {
         }
+
         public static EdgeOptions DefaultOptions
         {
             get { return new EdgeOptions(); }

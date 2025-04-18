@@ -123,9 +123,13 @@ namespace OpenQA.Selenium.Environment
                         output = webserverProcess.StandardOutput.ReadToEnd();
                     }
 
-                    string errorMessage = string.Format("Could not start the test web server in {0} seconds.\nWorking directory: {1}\nProcess Args: {2}\nstdout: {3}\nstderr: {4}", timeout.TotalSeconds, projectRootPath, processArguments, output, error);
-
-                    throw new TimeoutException(errorMessage);
+                    throw new TimeoutException($"""
+                    Could not start the test web server in {timeout.TotalSeconds} seconds.
+                    Working directory: {projectRootPath}
+                    Process Args: {processArguments}
+                    stdout: {output}
+                    stderr: {error}
+                    """);
                 }
             }
         }
