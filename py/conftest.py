@@ -268,6 +268,16 @@ class Driver:
         self._driver = self._initialize_driver()
         return self._driver
 
+    @property
+    def is_valid_platform(self):
+        if self.driver_class.lower() == "safari" and self.exe_platform != "Darwin":
+            return False
+        if self.driver_class.lower() == "ie" and self.exe_platform != "Windows":
+            return False
+        if "webkit" in self.driver_class.lower() and self.exe_platform != "Linux":
+            return False
+        return True
+
     def _initialize_driver(self):
         if self.options is not None:
             self.kwargs["options"] = self.options
@@ -297,12 +307,8 @@ def driver(request):
         selenium_driver = Driver(driver_class, request)
 
     # skip tests if not available on the platform
-    if driver_class.lower() == "safari" and selenium_driver.exe_platform != "Darwin":
-        pytest.skip("Safari tests can only run on an Apple OS")
-    if driver_class.lower() == "ie" and selenium_driver.exe_platform != "Windows":
-        pytest.skip("IE and EdgeHTML Tests can only run on Windows")
-    if "webkit" in driver_class.lower() and selenium_driver.exe_platform != "Linux":
-        pytest.skip("Webkit tests can only run on Linux")
+    if not selenium_driver.is_valid_platform:
+        pytest.skip(f"{driver_class} tests can only run on {selenium_driver.exe_platform}") 
 
     # skip tests for drivers that don't support BiDi when --bidi is enabled
     if selenium_driver.bidi:
