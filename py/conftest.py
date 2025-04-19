@@ -269,7 +269,7 @@ class Driver:
         return self._driver
 
     @property
-    def is_valid_platform(self):
+    def is_platform_valid(self):
         if self.driver_class.lower() == "safari" and self.exe_platform != "Darwin":
             return False
         if self.driver_class.lower() == "ie" and self.exe_platform != "Windows":
@@ -307,7 +307,7 @@ def driver(request):
         selenium_driver = Driver(driver_class, request)
 
     # skip tests if not available on the platform
-    if not selenium_driver.is_valid_platform:
+    if not selenium_driver.is_platform_valid:
         pytest.skip(f"{driver_class} tests can only run on {selenium_driver.exe_platform}") 
 
     # skip tests for drivers that don't support BiDi when --bidi is enabled
