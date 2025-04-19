@@ -112,8 +112,15 @@ driver_instance = None
 selenium_driver = None
 
 
+class ContainerProtocol:
+    def __contains__(self, name):
+        if name.lower() in self.__dict__:
+            return True
+        return False
+
+
 @dataclass
-class SupportedDrivers:
+class SupportedDrivers(ContainerProtocol):
     chrome: str = "Chrome"
     firefox: str = "Firefox"
     safari: str = "Safari"
@@ -123,14 +130,9 @@ class SupportedDrivers:
     wpewebkit: str = "WPEWebKit"
     remote: str = "Remote"
 
-    def __contains__(self, name):
-        if name in self.__dict__:
-            return True
-        return False
-
 
 @dataclass
-class SupportedOptions:
+class SupportedOptions(ContainerProtocol):
     chrome: str = "ChromeOptions"
     firefox: str = "FirefoxOptions"
     edge: str = "EdgeOptions"
@@ -140,16 +142,16 @@ class SupportedOptions:
     webkitgtk: str = "WebKitGTKOptions"
     wpewebkit: str = "WPEWebKitOptions"
 
-    def __contains__(self, name):
-        if name in self.__dict__:
-            return True
-        return False
+
+@dataclass
+class SupportedBidiDrivers(ContainerProtocol):
+    chrome: str = "Chrome"
+    firefox: str = "Firefox"
+    edge: str = "Edge"
+    remote: str = "Remote"
 
 
 class Driver:
-    _supported_drivers = SupportedDrivers()
-    _supported_options = SupportedOptions()
-
     def __init__(self, driver_class, request):
         self.driver_class = driver_class
         self._request = request
@@ -159,7 +161,19 @@ class Driver:
         self.kwargs = {}
         self.options = driver_class
         self.headless = driver_class
-        self.bidi = bool(self._request.config.option.bidi)
+        self.bidi = bool(request.config.option.bidi)
+
+    @property
+    def supported_drivers(self):
+        return SupportedDrivers()
+
+    @property
+    def supported_options(self):
+        return SupportedOptions()
+
+    @property
+    def supported_bidi_drivers(self):
+        return SupportedBidiDrivers()
 
     @property
     def driver_class(self):
@@ -167,9 +181,9 @@ class Driver:
 
     @driver_class.setter
     def driver_class(self, cls_name):
-        if cls_name.lower() not in self._supported_drivers:
+        if cls_name.lower() not in self.supported_drivers:
             raise AttributeError(f"Invalid driver class {cls_name.lower()}")
-        self._driver_class = getattr(self._supported_drivers, cls_name.lower())
+        self._driver_class = getattr(self.supported_drivers, cls_name.lower())
 
     @property
     def exe_platform(self):
@@ -226,20 +240,18 @@ class Driver:
 
     @options.setter
     def options(self, cls_name):
-        if cls_name.lower() not in self._supported_options:
+        if cls_name.lower() not in self.supported_options:
             raise AttributeError(f"Invalid Options class {cls_name.lower()}")
-        self._options = getattr(webdriver, getattr(self._supported_options, cls_name.lower()))()
-        if self.driver_class == self._supported_drivers.firefox:
+        self._options = getattr(webdriver, getattr(self.supported_options, cls_name.lower()))()
+        if self.driver_class == self.supported_drivers.firefox:
             # There are issues with window size/position when running Firefox
             # under Wayland, so we use XWayland instead.
             os.environ["MOZ_ENABLE_WAYLAND"] = "0"
-        if self.driver_class == self._supported_drivers.remote:
+        if self.driver_class == self.supported_drivers.remote:
             self._options.set_capability("moz:firefoxOptions", {})
             self._options.enable_downloads = True
-            # There are issues with window size/position when running Firefox
-            # under Wayland, so we use XWayland instead.
             os.environ["MOZ_ENABLE_WAYLAND"] = "0"
-        if self.driver_class == self._supported_drivers.webkitgtk:
+        if self.driver_class == self.supported_drivers.webkitgtk:
             self._options.overlay_scrollbars_enabled = False
 
     @property
@@ -292,6 +304,11 @@ def driver(request):
     if "webkit" in driver_class.lower() and selenium_driver.exe_platform != "Linux":
         pytest.skip("Webkit tests can only run on Linux")
 
+    # skip tests for drivers that don't support BiDi when --bidi is enabled
+    if selenium_driver.bidi:
+        if driver_class.lower() not in selenium_driver.supported_bidi_drivers:
+            pytest.skip(f"{driver_class} does not support BiDi")
+
     # conditionally mark tests as expected to fail based on driver
     marker = request.node.get_closest_marker(f"xfail_{driver_class.lower()}")
     if marker is not None:
@@ -304,12 +321,22 @@ def driver(request):
             marker.kwargs.pop("raises")
         pytest.xfail(**marker.kwargs)
 
-        selenium_driver.addfinalizer(selenium_driver.stop_driver)
+        request.addfinalizer(selenium_driver.stop_driver)
 
     if driver_instance is None:
         driver_instance = selenium_driver.driver
 
     yield driver_instance
+
+    # Close the browser after BiDi tests. Those make event subscriptions
+    # and doesn't seems to be stable enough, causing the flakiness of the
+    # subsequent tests.
+    # Remove this when BiDi implementation and API is stable.
+    if selenium_driver.bidi:
+        request.addfinalizer(selenium_driver.stop_driver)
+
+    if request.node.get_closest_marker("no_driver_after_test"):
+        driver_instance = None
 
 
 @pytest.fixture(scope="session", autouse=True)
