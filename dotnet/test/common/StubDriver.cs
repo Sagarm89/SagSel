@@ -28,34 +28,19 @@ namespace OpenQA.Selenium
 
         public string Url
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get => throw new NotImplementedException();
             set
             {
             }
         }
 
-        public string Title
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public string Title => throw new NotImplementedException();
 
-        public string PageSource
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public string PageSource => throw new NotImplementedException();
 
-        public string CurrentWindowHandle
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public string CurrentWindowHandle => throw new NotImplementedException();
 
-        public ReadOnlyCollection<string> WindowHandles
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public ReadOnlyCollection<string> WindowHandles => throw new NotImplementedException();
 
         public void Close()
         {
@@ -82,7 +67,7 @@ namespace OpenQA.Selenium
             throw new NotImplementedException();
         }
 
-        public System.Collections.ObjectModel.ReadOnlyCollection<string> GetWindowHandles()
+        public ReadOnlyCollection<string> GetWindowHandles()
         {
             throw new NotImplementedException();
         }
@@ -101,7 +86,7 @@ namespace OpenQA.Selenium
             throw new NotImplementedException();
         }
 
-        public System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> FindElements(By by)
+        public ReadOnlyCollection<IWebElement> FindElements(By by)
         {
             throw new NotImplementedException();
         }

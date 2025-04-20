@@ -25,7 +25,7 @@ namespace OpenQA.Selenium
     {
         private static IJavaScriptExecutor GetExecutor(IWebDriver driver)
         {
-            return driver as IJavaScriptExecutor;
+            return (IJavaScriptExecutor)driver;
         }
 
         private static string GetUserAgent(IWebDriver driver)
@@ -106,13 +106,12 @@ namespace OpenQA.Selenium
 
         public static bool IsNativeEventsEnabled(IWebDriver driver)
         {
-            IHasCapabilities hasCaps = driver as IHasCapabilities;
-            if (hasCaps != null)
+            if (driver is IHasCapabilities hasCaps)
             {
-                object cap = hasCaps.Capabilities.GetCapability(OpenQA.Selenium.CapabilityType.HasNativeEvents);
-                if (cap != null && cap is bool)
+                object cap = hasCaps.Capabilities.GetCapability(CapabilityType.HasNativeEvents);
+                if (cap != null && cap is bool b)
                 {
-                    return (bool)cap;
+                    return b;
                 }
             }
 

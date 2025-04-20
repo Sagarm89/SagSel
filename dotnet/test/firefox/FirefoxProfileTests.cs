@@ -22,6 +22,7 @@ using System.Collections.Generic;
 
 namespace OpenQA.Selenium.Firefox
 {
+    [Ignore("")]
     [TestFixture]
     public class FirefoxProfileTests
     {
@@ -39,7 +40,7 @@ namespace OpenQA.Selenium.Firefox
             profile.Clean();
         }
 
-        //[Test]
+        [Test]
         public void ShouldQuoteStringsWhenSettingStringProperties()
         {
             profile.SetPreference("cheese", "brie");
@@ -57,7 +58,7 @@ namespace OpenQA.Selenium.Firefox
             Assert.That(seenCheese, Is.True);
         }
 
-        //[Test]
+        [Test]
         public void ShouldSetIntegerPreferences()
         {
             profile.SetPreference("cheese", 1234);
@@ -75,7 +76,7 @@ namespace OpenQA.Selenium.Firefox
             Assert.That(seenCheese, Is.True, "Did not see integer value being set correctly");
         }
 
-        //[Test]
+        [Test]
         public void testShouldSetBooleanPreferences()
         {
             profile.SetPreference("cheese", false);
