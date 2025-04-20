@@ -161,7 +161,7 @@ class Driver:
         self.kwargs = {}
         self.options = driver_class
         self.headless = driver_class
-        self.bidi = bool(request.config.option.bidi)
+        self.bidi = request.config.option.bidi
 
     @property
     def supported_drivers(self):
@@ -210,7 +210,7 @@ class Driver:
 
     @property
     def headless(self):
-        self._headless = bool(self._request.config.option.headless)
+        self._headless = self._request.config.option.headless
         if self._headless:
             return True
         return False
@@ -274,7 +274,7 @@ class Driver:
             return False
         if self.driver_class.lower() == "ie" and self.exe_platform != "Windows":
             return False
-        if "webkit" in self.driver_class.lower() and self.exe_platform != "Linux":
+        if "webkit" in self.driver_class.lower() and self.exe_platform == "Windows":
             return False
         return True
 
@@ -308,7 +308,7 @@ def driver(request):
 
     # skip tests if not available on the platform
     if not selenium_driver.is_platform_valid:
-        pytest.skip(f"{driver_class} tests can only run on {selenium_driver.exe_platform}") 
+        pytest.skip(f"{driver_class} tests can only run on {selenium_driver.exe_platform}")
 
     # skip tests for drivers that don't support BiDi when --bidi is enabled
     if selenium_driver.bidi:
