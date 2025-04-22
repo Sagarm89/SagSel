@@ -28,6 +28,8 @@ from urllib.request import urlopen
 import pytest
 
 from selenium import webdriver
+from test.selenium.webdriver.common.network import get_lan_ip
+from test.selenium.webdriver.common.webserver import SimpleWebServer
 
 drivers = (
     "chrome",
@@ -98,7 +100,7 @@ def pytest_ignore_collect(path, config):
 
 
 def get_driver_class(driver_option):
-    """Generate the driver class name from the lowercase driver option"""
+    """Generate the driver class name from the lowercase driver option."""
     if driver_option == "webkitgtk":
         driver_class = "WebKitGTK"
     elif driver_option == "wpewebkit":
@@ -333,7 +335,6 @@ def driver(request):
         driver_instance = selenium_driver.driver
 
     yield driver_instance
-
     # Close the browser after BiDi tests. Those make event subscriptions
     # and doesn't seems to be stable enough, causing the flakiness of the
     # subsequent tests.
