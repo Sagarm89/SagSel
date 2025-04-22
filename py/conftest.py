@@ -409,6 +409,11 @@ def server(request):
             "is using port {}, continuing...".format(_port)
         )
     except Exception:
+        remote_env = os.environ.copy()
+        if platform.system() == "Linux":
+            # There are issues with window size/position when running Firefox
+            # under Wayland, so we use XWayland instead.
+            remote_env["MOZ_ENABLE_WAYLAND"] = "0"
         print("Starting the Selenium server")
         process = subprocess.Popen(
             [
@@ -422,7 +427,8 @@ def server(request):
                 "true",
                 "--enable-managed-downloads",
                 "true",
-            ]
+            ],
+            env=remote_env,
         )
         print(f"Selenium server running as process: {process.pid}")
         assert wait_for_server(url, 10), f"Timed out waiting for Selenium server at {url}"
