@@ -28,8 +28,6 @@ from urllib.request import urlopen
 import pytest
 
 from selenium import webdriver
-from test.selenium.webdriver.common.network import get_lan_ip
-from test.selenium.webdriver.common.webserver import SimpleWebServer
 
 drivers = (
     "chrome",
