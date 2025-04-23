@@ -124,7 +124,7 @@ def driver(request):
     driver_class = get_driver_class(driver_option)
 
     # skip tests in the 'remote' directory if run with a local driver
-    if "remote" in request.node.fspath.parts and driver_class != "Remote":
+    if request.node.path.parts[-2] == "remote" and driver_class != "Remote":
         pytest.skip(f"Remote tests can't be run with driver '{driver_option}'")
 
     # skip tests that can't run on certain platforms
