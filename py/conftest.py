@@ -217,20 +217,22 @@ def get_options(driver_class, config):
     browser_args = config.option.args
     headless = config.option.headless
     bidi = config.option.bidi
+    options = None
 
-    options = getattr(webdriver, f"{driver_class}Options")()
-
-    if driver_class == "WebKitGTK":
-        options.overlay_scrollbars_enabled = False
-
-    if browser_path is not None:
-        options.binary_location = browser_path.strip("'")
-
-    if browser_args is not None:
-        for arg in browser_args.split():
-            options.add_argument(arg)
+    if browser_path or browser_args:
+        if not options:
+            options = getattr(webdriver, f"{driver_class}Options")()
+        if driver_class == "WebKitGTK":
+            options.overlay_scrollbars_enabled = False
+        if browser_path is not None:
+            options.binary_location = browser_path.strip("'")
+        if browser_args is not None:
+            for arg in browser_args.split():
+                options.add_argument(arg)
 
     if headless:
+        if not options:
+            options = getattr(webdriver, f"{driver_class}Options")()
         if driver_class == "Chrome" or driver_class == "Edge":
             options.add_argument("--headless=new")
         if driver_class == "Firefox":
