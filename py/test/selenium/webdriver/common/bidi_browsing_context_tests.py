@@ -303,7 +303,6 @@ def test_pass_user_text_to_prompt(driver, pages):
     driver.browsing_context.handle_user_prompt(context=context_id, user_text=user_text)
 
     # Check if the text was entered (this is browser-dependent)
-    # In a real test, you might need to check a DOM element that displays the entered text
 
 
 def test_capture_screenshot(driver, pages):
@@ -415,3 +414,114 @@ def test_navigate_forward_in_browser_history(driver, pages):
     # Go forward
     driver.browsing_context.traverse_history(context=context_id, delta=1)
     WebDriverWait(driver, 5).until(EC.title_is("We Arrive Here"))
+
+
+# Tests for locate nodes
+def test_locate_nodes(driver, pages):
+    """Test locating nodes with CSS selector."""
+    context_id = driver.current_window_handle
+
+    driver.get(pages.url("xhtmlTest.html"))
+
+    elements = driver.browsing_context.locate_nodes(context=context_id, locator={"type": "css", "value": "div"})
+
+    assert len(elements) > 0
+
+
+def test_locate_nodes_with_css_locator(driver, pages):
+    """Test locating nodes with specific CSS selector."""
+    context_id = driver.current_window_handle
+
+    driver.get(pages.url("xhtmlTest.html"))
+
+    elements = driver.browsing_context.locate_nodes(
+        context=context_id, locator={"type": "css", "value": "div.extraDiv, div.content"}, max_node_count=1
+    )
+
+    assert len(elements) >= 1
+
+    value = elements[0]
+    assert value["type"] == "node"
+    assert "value" in value
+    assert "localName" in value["value"]
+    assert value["value"]["localName"] == "div"
+    assert "attributes" in value["value"]
+    assert "class" in value["value"]["attributes"]
+    assert value["value"]["attributes"]["class"] == "content"
+
+
+def test_locate_nodes_with_xpath_locator(driver, pages):
+    """Test locating nodes with XPath selector."""
+    context_id = driver.current_window_handle
+
+    driver.get(pages.url("xhtmlTest.html"))
+
+    elements = driver.browsing_context.locate_nodes(
+        context=context_id, locator={"type": "xpath", "value": "/html/body/div[2]"}, max_node_count=1
+    )
+
+    assert len(elements) >= 1
+
+    value = elements[0]
+    assert value["type"] == "node"
+    assert "value" in value
+    assert "localName" in value["value"]
+    assert value["value"]["localName"] == "div"
+    assert "attributes" in value["value"]
+    assert "class" in value["value"]["attributes"]
+    assert value["value"]["attributes"]["class"] == "content"
+
+
+@pytest.mark.xfail_firefox
+def test_locate_nodes_with_inner_text(driver, pages):
+    """Test locating nodes with innerText selector."""
+    context_id = driver.current_window_handle
+
+    driver.get(pages.url("xhtmlTest.html"))
+
+    elements = driver.browsing_context.locate_nodes(
+        context=context_id, locator={"type": "innerText", "value": "Spaced out"}, max_node_count=1
+    )
+
+    assert len(elements) >= 1
+
+    value = elements[0]
+    assert value["type"] == "node"
+    assert "value" in value
+
+
+def test_locate_nodes_with_max_node_count(driver, pages):
+    """Test locating nodes with maximum node count."""
+    context_id = driver.current_window_handle
+
+    driver.get(pages.url("xhtmlTest.html"))
+
+    elements = driver.browsing_context.locate_nodes(
+        context=context_id, locator={"type": "css", "value": "div"}, max_node_count=4
+    )
+
+    assert len(elements) == 4
+
+
+def test_locate_nodes_given_start_nodes(driver, pages):
+    """Test locating nodes with start nodes."""
+    context_id = driver.current_window_handle
+
+    driver.get(pages.url("formPage.html"))
+
+    form_elements = driver.browsing_context.locate_nodes(
+        context=context_id, locator={"type": "css", "value": "form[name='login']"}
+    )
+
+    assert len(form_elements) == 1
+
+    form_shared_id = form_elements[0]["sharedId"]
+
+    elements = driver.browsing_context.locate_nodes(
+        context=context_id,
+        locator={"type": "css", "value": "input"},
+        start_nodes=[{"sharedId": form_shared_id}],
+        max_node_count=50,
+    )
+    # The login form should have 3 input elements (email, age, and submit button)
+    assert len(elements) == 3
