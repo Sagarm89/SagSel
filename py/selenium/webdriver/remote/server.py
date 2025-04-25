@@ -95,18 +95,23 @@ class Server:
                 time.sleep(0.2)
         return False
 
+    def download_if_needed(self, version=None):
+        """Download the server if it doesn't already exist.
+
+        Latest version is downloaded unless specified.
+        """
+        args = ["--grid"]
+        if version is not None:
+            args.append(version)
+        return SeleniumManager().binary_paths(args)["driver_path"]
+
     def start(self):
         """Start the server.
 
         Selenium Manager will detect the server location and download it if necessary,
         unless an existing server path was specified.
         """
-        if self.path is None:
-            selenium_manager = SeleniumManager()
-            args = ["--grid"]
-            if self.version:
-                args.append(self.version)
-            self.path = selenium_manager.binary_paths(args)["driver_path"]
+        path = self.download_if_needed(self.version) if self.path is None else self.path
 
         java_path = shutil.which("java")
         if java_path is None:
@@ -115,7 +120,7 @@ class Server:
         command = [
             java_path,
             "-jar",
-            self.path,
+            path,
             "standalone",
             "--port",
             str(self.port),
