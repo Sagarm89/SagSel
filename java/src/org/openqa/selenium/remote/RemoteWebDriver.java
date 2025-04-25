@@ -32,6 +32,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1248,12 +1249,9 @@ public class RemoteWebDriver
 
     @Override
     public void addCredential(Credential credential) {
-      execute(
-          DriverCommand.ADD_CREDENTIAL,
-          Stream.concat(
-                  credential.toMap().entrySet().stream(),
-                  Stream.of(Map.entry("authenticatorId", id)))
-              .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
+      Map<String, Object> map = new HashMap<>(credential.toMap());
+      map.put("authenticatorId", id);
+      execute(DriverCommand.ADD_CREDENTIAL, map);
     }
 
     @Override
