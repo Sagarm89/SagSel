@@ -117,10 +117,11 @@ class Server:
         if self.host is not None:
             command.extend(["--host", self.host])
 
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         host = self.host if self.host is not None else "localhost"
+
         try:
-            sock.connect((host, self.port))
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.connect((host, self.port))
             raise ConnectionError(f"Selenium server is already running, or something else is using port {self.port}")
         except ConnectionRefusedError:
             print(f"Starting Selenium server at: {self.path}")
