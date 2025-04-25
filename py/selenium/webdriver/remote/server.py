@@ -35,8 +35,8 @@ class Server:
     -----------
     host : str
         Hostname or IP address to bind to (determined automatically if not specified)
-    port : str
-        Port to listen on ('4444' if not specified)
+    port : int or str
+        Port to listen on (4444 if not specified)
     path : str
         Path/filename of existing server .jar file (Selenium Manager is used if not specified)
     version : str
@@ -45,12 +45,12 @@ class Server:
         Environment variables passed to server environment
     """
 
-    def __init__(self, host=None, port="4444", path=None, version=None, env=None):
+    def __init__(self, host=None, port=4444, path=None, version=None, env=None):
         if path and version:
             raise TypeError("Not allowed to specify a version when using an existing server path")
 
         self.host = host
-        self.port = port
+        self.port = self._validate_port(port)
         self.path = self._validate_path(path)
         self.version = self._validate_version(version)
         self.env = env
@@ -63,10 +63,19 @@ class Server:
             raise OSError(f"Can't find server .jar located at {path}")
         return path
 
+    def _validate_port(self, port):
+        try:
+            port = int(port)
+        except ValueError:
+            raise TypeError(f"{__class__.__name__}.__init__() got an invalid port: '{port}'")
+        if not (0 <= port <= 65535):
+            raise ValueError("port must be 0-65535")
+        return port
+
     def _validate_version(self, version):
         if version:
             if not re.match(r"^\d+\.\d+\.\d+$", str(version)):
-                raise TypeError(f"{__class__}.__init__() invalid version argument: '{version}'")
+                raise TypeError(f"{__class__.__name__}.__init__() got an invalid version: '{version}'")
         return version
 
     def _wait_for_server(self, timeout=10):
@@ -99,7 +108,7 @@ class Server:
             self.path,
             "standalone",
             "--port",
-            self.port,
+            str(self.port),
             "--selenium-manager",
             "true",
             "--enable-managed-downloads",
@@ -111,7 +120,7 @@ class Server:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         host = self.host if self.host is not None else "localhost"
         try:
-            sock.connect((host, int(self.port)))
+            sock.connect((host, self.port))
             raise ConnectionError(f"Selenium server is already running, or something else is using port {self.port}")
         except ConnectionRefusedError:
             print(f"Starting Selenium server at: {self.path}")

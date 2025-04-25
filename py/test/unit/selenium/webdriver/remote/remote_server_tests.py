@@ -1,0 +1,46 @@
+# Licensed to the Software Freedom Conservancy (SFC) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The SFC licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+import re
+
+import pytest
+
+from selenium.webdriver.remote.server import Server
+
+
+def test_server_with_bad_path():
+    path = "/path/to/nowhere"
+    msg = f"Can't find server .jar located at {path}"
+    with pytest.raises(OSError, match=re.escape(msg)):
+        Server(path=path)
+
+def test_server_with_invalid_version():
+    versions = ("0.0", "invalid")
+    for version in versions:
+        msg = f"Server.__init__() got an invalid version: '{version}'"
+        with pytest.raises(TypeError, match=re.escape(msg)):
+            Server(version=version)
+
+def test_server_with_invalid_port():
+    port = "invalid"
+    msg = f"Server.__init__() got an invalid port: '{port}'"
+    with pytest.raises(TypeError, match=re.escape(msg)):
+        Server(port=port)
+
+def test_server_with_port_out_of_range():
+    with pytest.raises(ValueError, match="port must be 0-65535"):
+        Server(port=99999)
