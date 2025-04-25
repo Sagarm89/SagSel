@@ -56,4 +56,3 @@ class Script:
                 handler(log_entry)
 
         return _handle_log_entry
-

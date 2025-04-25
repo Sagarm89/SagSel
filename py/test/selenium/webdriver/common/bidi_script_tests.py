@@ -93,6 +93,7 @@ def test_removes_console_message_handler(driver, pages):
     WebDriverWait(driver, 5).until(lambda _: len(log_entries2) == 2)
     assert len(log_entries1) == 1
 
+
 def test_javascript_error_messages(driver, pages):
     pages.load("bidi/logEntryAdded.html")
 
@@ -106,6 +107,7 @@ def test_javascript_error_messages(driver, pages):
     assert log_entry.text == "Error: Not working"
     assert log_entry.level == "error"
     assert log_entry.type_ == "javascript"
+
 
 def test_removes_javascript_message_handler(driver, pages):
     pages.load("bidi/logEntryAdded.html")
@@ -124,5 +126,3 @@ def test_removes_javascript_message_handler(driver, pages):
 
     WebDriverWait(driver, 5).until(lambda _: len(log_entries2) == 2)
     assert len(log_entries1) == 1
-
-
