@@ -127,7 +127,7 @@ class Server:
             self.process = subprocess.Popen(command, env=self.env)
             print(f"Selenium server running as process: {self.process.pid}")
             if not self._wait_for_server():
-                raise ConnectionError(f"Timed out waiting for Selenium server at {self.status_url}")
+                raise TimeoutError(f"Timed out waiting for Selenium server at {self.status_url}")
             print("Selenium server is ready")
         return self.process
 
