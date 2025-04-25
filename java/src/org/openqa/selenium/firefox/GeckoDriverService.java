@@ -222,13 +222,26 @@ public class GeckoDriverService extends FirefoxDriverService {
       List<String> args = new ArrayList<>();
       args.add(String.format(Locale.ROOT, "--port=%d", getPort()));
 
-      int wsPort = PortProber.findFreePort();
-      args.add(String.format("--websocket-port=%d", wsPort));
+      // Check if we're connecting to an existing Firefox instance
+      boolean connectExisting = false;
+      for (String arg : args) {
+        if (arg.contains("--connect-existing")) {
+          connectExisting = true;
+          break;
+        }
+      }
 
-      args.add("--allow-origins");
-      args.add(String.format("http://127.0.0.1:%d", wsPort));
-      args.add(String.format("http://localhost:%d", wsPort));
-      args.add(String.format("http://[::1]:%d", wsPort));
+      // Only allocate a free port for the websocket when not connecting to an existing instance
+      // This avoids conflicts when multiple Firefox instances are started
+      if (!connectExisting) {
+        int wsPort = PortProber.findFreePort();
+        args.add(String.format("--websocket-port=%d", wsPort));
+
+        args.add("--allow-origins");
+        args.add(String.format("http://127.0.0.1:%d", wsPort));
+        args.add(String.format("http://localhost:%d", wsPort));
+        args.add(String.format("http://[::1]:%d", wsPort));
+      }
 
       if (logLevel != null) {
         args.add("--log");
