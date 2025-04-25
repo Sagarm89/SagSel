@@ -28,6 +28,7 @@ def test_server_with_bad_path():
     with pytest.raises(OSError, match=re.escape(msg)):
         Server(path=path)
 
+
 def test_server_with_invalid_version():
     versions = ("0.0", "invalid")
     for version in versions:
@@ -35,15 +36,18 @@ def test_server_with_invalid_version():
         with pytest.raises(TypeError, match=re.escape(msg)):
             Server(version=version)
 
+
 def test_server_with_invalid_port():
     port = "invalid"
     msg = f"Server.__init__() got an invalid port: '{port}'"
     with pytest.raises(TypeError, match=re.escape(msg)):
         Server(port=port)
 
+
 def test_server_with_port_out_of_range():
     with pytest.raises(ValueError, match="port must be 0-65535"):
         Server(port=99999)
+
 
 def test_stopping_server_thats_not_running():
     server = Server()

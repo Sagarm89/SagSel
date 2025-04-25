@@ -27,9 +27,12 @@ from selenium.webdriver.common.selenium_manager import SeleniumManager
 
 
 class Server:
-    """Manage the Selenium Remote (Grid) Server.
+    """Manage a Selenium Grid (Remote) Server in standalone mode.
 
-    Selenium Manager will detect the server location and download it if necessary, unless an existing server path is specified.
+    This class contains functionality for downloading the server and starting/stopping it.
+
+    For more information on Selenium Grid, see:
+        - https://www.selenium.dev/documentation/grid/getting_started/
 
     Parameters:
     -----------
@@ -89,8 +92,11 @@ class Server:
         return False
 
     def start(self):
-        """Start the server."""
+        """Start the server.
 
+        Selenium Manager will detect the server location and download it if necessary,
+        unless an existing server path was specified.
+        """
         if self.path is None:
             selenium_manager = SeleniumManager()
             args = ["--grid"]
