@@ -29,21 +29,23 @@ from selenium.webdriver.common.selenium_manager import SeleniumManager
 class Server:
     """Manage the Selenium Remote (Grid) Server.
 
+    Selenium Manager will detect the server location and download it if necessary, unless an existing server path is specified.
+
     Parameters:
     -----------
     host : str
-        Hostname or IP address to bind to.
+        Hostname or IP address to bind to (determined automatically if not specified)
     port : str
-        Port to listen on.
+        Port to listen on ('4444' if not specified)
     path : str
-        Path/filename of existing server .jar file (if not specified, server will be downloaded).
+        Path/filename of existing server .jar file (Selenium Manager is used if not specified)
     version : str
-        Version of server to download (if not specified, latest will be downloaded).
+        Version of server to download (latest version if not specified)
     env: dict
-        Environment variables passed to server environment.
+        Environment variables passed to server environment
     """
 
-    def __init__(self, host="localhost", port="4444", path=None, version=None, env=None):
+    def __init__(self, host=None, port="4444", path=None, version=None, env=None):
         if path and version:
             raise TypeError("Not allowed to specify a version when using an existing server path")
 
@@ -79,38 +81,41 @@ class Server:
 
     def start(self):
         """Start the server."""
-        if not self.path:
+
+        if self.path is None:
             selenium_manager = SeleniumManager()
             args = ["--grid"]
             if self.version:
                 args.append(self.version)
             self.path = selenium_manager.binary_paths(args)["driver_path"]
-        java = shutil.which("java")
-        if java is None:
+
+        java_path = shutil.which("java")
+        if java_path is None:
             raise OSError("Can't find java on system PATH. JRE is required to run the Selenium server")
+
+        command = [
+            java_path,
+            "-jar",
+            self.path,
+            "standalone",
+            "--port",
+            self.port,
+            "--selenium-manager",
+            "true",
+            "--enable-managed-downloads",
+            "true",
+        ]
+        if self.host is not None:
+            command.extend(["--host", self.host])
+
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        host = self.host if self.host is not None else "localhost"
         try:
-            sock.connect((self.host, int(self.port)))
-            raise ConnectionError(
-                f"The remote driver server is already running or something else is using port {self.port}"
-            )
+            sock.connect((host, int(self.port)))
+            raise ConnectionError(f"Selenium server is already running, or something else is using port {self.port}")
         except ConnectionRefusedError:
-            print("Starting Selenium server")
-            self.process = subprocess.Popen(
-                [
-                    "java",
-                    "-jar",
-                    self.path,
-                    "standalone",
-                    "--port",
-                    self.port,
-                    "--selenium-manager",
-                    "true",
-                    "--enable-managed-downloads",
-                    "true",
-                ],
-                env=self.env,
-            )
+            print(f"Starting Selenium server at: {self.path}")
+            self.process = subprocess.Popen(command, env=self.env)
             print(f"Selenium server running as process: {self.process.pid}")
             if not self._wait_for_server():
                 f"Timed out waiting for Selenium server at {self.status_url}"
