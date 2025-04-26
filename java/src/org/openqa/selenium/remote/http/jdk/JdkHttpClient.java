@@ -80,6 +80,7 @@ public class JdkHttpClient implements HttpClient {
   private final ExecutorService executorService;
   private final Duration readTimeout;
   private final Duration connectTimeout;
+  private final ClientConfig config;
 
   JdkHttpClient(ClientConfig config) {
     Objects.requireNonNull(config, "Client config must be set");
@@ -108,6 +109,7 @@ public class JdkHttpClient implements HttpClient {
 
     Credentials credentials = config.credentials();
     String info = config.baseUri().getUserInfo();
+
     if (info != null && !info.trim().isEmpty()) {
       String[] parts = info.split(":", 2);
       String username = parts[0];
@@ -121,6 +123,22 @@ public class JdkHttpClient implements HttpClient {
             }
           };
       builder = builder.authenticator(authenticator);
+
+      // Remove credentials from URL
+      try {
+        config =
+            config.baseUri(
+                new URI(
+                    config.baseUri().getScheme(),
+                    null,
+                    config.baseUri().getHost(),
+                    config.baseUri().getPort(),
+                    config.baseUri().getPath(),
+                    config.baseUri().getQuery(),
+                    config.baseUri().getFragment()));
+      } catch (URISyntaxException e) {
+        LOG.log(Level.WARNING, "Could not strip credentials from URI", e);
+      }
     } else if (credentials != null) {
       if (!(credentials instanceof UsernameAndPassword)) {
         throw new IllegalArgumentException(
@@ -153,6 +171,7 @@ public class JdkHttpClient implements HttpClient {
       builder.version(Version.valueOf(version));
     }
 
+    this.config = config;
     this.client = builder.build();
   }
 
@@ -325,7 +344,7 @@ public class JdkHttpClient implements HttpClient {
                 throw new WebDriverException(cause);
               } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw new WebDriverException(e.getMessage());
+                throw new WebDriverException(e.getMessage(), e);
               } catch (java.util.concurrent.TimeoutException e) {
                 throw new TimeoutException(e);
               } finally {
@@ -507,6 +526,11 @@ public class JdkHttpClient implements HttpClient {
           "Ending request {0} in {1}ms",
           new Object[] {req, (System.currentTimeMillis() - start)});
     }
+  }
+
+  // Package-private method for testing
+  URI getBaseUri() {
+    return this.config.baseUri();
   }
 
   @Override
