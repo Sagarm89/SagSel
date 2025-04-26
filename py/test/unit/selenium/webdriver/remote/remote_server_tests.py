@@ -49,6 +49,17 @@ def test_server_with_port_out_of_range():
         Server(port=99999)
 
 
+def test_server_with_invalid_log_level():
+    msg = ", ".join(("SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST"))
+    with pytest.raises(TypeError, match=f"log_level must be one of: {msg}"):
+        Server(log_level="BAD")
+
+
+def test_server_with_invalid_env():
+    with pytest.raises(TypeError, match="env must be a dict"):
+        Server(env=[])
+
+
 def test_stopping_server_thats_not_running():
     server = Server()
     with pytest.raises(RuntimeError, match="Selenium server isn't running"):

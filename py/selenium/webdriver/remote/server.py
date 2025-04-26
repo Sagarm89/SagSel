@@ -44,11 +44,14 @@ class Server:
         Path/filename of existing server .jar file (Selenium Manager is used if not specified)
     version : str
         Version of server to download (latest version if not specified)
+    log_level : str
+        Logging level to control logging output ("INFO" if not specified)
+        Available levels: "SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST"
     env: dict
         Environment variables passed to server environment
     """
 
-    def __init__(self, host=None, port=4444, path=None, version=None, env=None):
+    def __init__(self, host=None, port=4444, path=None, version=None, log_level="INFO", env=None):
         if path and version:
             raise TypeError("Not allowed to specify a version when using an existing server path")
 
@@ -56,7 +59,8 @@ class Server:
         self.port = self._validate_port(port)
         self.path = self._validate_path(path)
         self.version = self._validate_version(version)
-        self.env = env
+        self.log_level = self._validate_log_level(log_level)
+        self.env = self._validate_env(env)
 
         self.process = None
         self.status_url = self._get_status_url()
@@ -84,6 +88,17 @@ class Server:
             if not re.match(r"^\d+\.\d+\.\d+$", str(version)):
                 raise TypeError(f"{__class__.__name__}.__init__() got an invalid version: '{version}'")
         return version
+
+    def _validate_log_level(self, log_level):
+        levels = ("SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST")
+        if log_level not in levels:
+            raise TypeError(f"log_level must be one of: {", ".join(levels)}")
+        return log_level
+
+    def _validate_env(self, env):
+        if env is not None or isinstance(env, dict):
+            raise TypeError("env must be a dict")
+        return env
 
     def _wait_for_server(self, timeout=10):
         start = time.time()
@@ -124,6 +139,8 @@ class Server:
             "standalone",
             "--port",
             str(self.port),
+            "--log-level",
+            self.log_level,
             "--selenium-manager",
             "true",
             "--enable-managed-downloads",
