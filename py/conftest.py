@@ -97,6 +97,11 @@ def pytest_ignore_collect(path, config):
     return len([d for d in _drivers if d.lower() in parts]) > 0
 
 
+def pytest_generate_tests(metafunc):
+    if "driver" in metafunc.fixturenames and metafunc.config.option.drivers:
+        metafunc.parametrize("driver", metafunc.config.option.drivers, indirect=True)
+
+
 def get_driver_class(driver_option):
     """Generate the driver class name from the lowercase driver option."""
     if driver_option == "webkitgtk":
@@ -483,3 +488,11 @@ def clean_driver(request):
 
     if request.node.get_closest_marker("no_driver_after_test"):
         driver_reference = None
+
+
+@pytest.fixture
+def firefox_options(request):
+    options = webdriver.FirefoxOptions()
+    if request.config.option.headless:
+        options.add_argument("-headless")
+    return options
