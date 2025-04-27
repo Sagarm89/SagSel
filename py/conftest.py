@@ -23,6 +23,7 @@ import time
 from urllib.request import urlopen
 
 import pytest
+from runfiles import Runfiles
 
 from selenium import webdriver
 from test.selenium.webdriver.common.network import get_lan_ip
@@ -218,6 +219,16 @@ def get_options(driver_class, config):
     bidi = config.option.bidi
     options = None
 
+    # Check to see if the `browser_path` exists
+    if browser_path:
+        if not os.path.exists(browser_path):
+            # Maybe it's hiding in the runfiles
+            r = Runfiles.Create()
+            rlocation_path = r.Rlocation(browser_path)
+            if not os.path.exists(rlocation_path):
+                raise Exception("Unable to find browser at " + browser_path)
+            browser_path = rlocation_path
+
     if browser_path or browser_args:
         if not options:
             options = getattr(webdriver, f"{driver_class}Options")()
@@ -250,6 +261,14 @@ def get_service(driver_class, executable):
     # Let the default behaviour be used if we don't set the driver executable
     if not executable:
         return None
+
+    # Make sure the executable exists
+    if not os.path.exists(executable):
+        r = Runfiles.Create()
+        rlocation_path = r.Rlocation(executable)
+        if not os.path.exists(rlocation_path):
+            raise Exception("Unable to find driver executable: " + executable)
+        executable = rlocation_path
 
     module = getattr(webdriver, driver_class.lower())
     service = module.service.Service(executable_path=executable)
