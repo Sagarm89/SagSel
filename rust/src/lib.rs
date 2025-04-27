@@ -37,7 +37,8 @@ use crate::metadata::{
 use crate::safari::{SafariManager, SAFARIDRIVER_NAME, SAFARI_NAME};
 use crate::safaritp::{SafariTPManager, SAFARITP_NAMES};
 use crate::shell::{
-    run_shell_command, run_shell_command_by_os, run_shell_command_with_log, Command,
+    run_powershell_command_with_log, run_shell_command, run_shell_command_by_os,
+    run_shell_command_with_log, Command,
 };
 use crate::stats::{send_stats_to_plausible, Props};
 use anyhow::anyhow;
@@ -75,8 +76,8 @@ pub const DEV: &str = "dev";
 pub const CANARY: &str = "canary";
 pub const NIGHTLY: &str = "nightly";
 pub const ESR: &str = "esr";
-pub const WMIC_COMMAND: &str = "wmic datafile where name='{}' get Version /value";
-pub const WMIC_COMMAND_OS: &str = "wmic os get osarchitecture";
+pub const PS_GET_VERSION_COMMAND: &str = r#"(Get-Item "{}").VersionInfo.ProductVersion"#;
+pub const PS_GET_OS_COMMAND: &str = "(Get-WmiObject Win32_OperatingSystem).OSArchitecture";
 pub const REG_VERSION_ARG: &str = "version";
 pub const REG_CURRENT_VERSION_ARG: &str = "CurrentVersion";
 pub const REG_PV_ARG: &str = "pv";
@@ -447,14 +448,16 @@ pub trait SeleniumManager {
         ));
         let mut browser_version: Option<String> = None;
         for driver_version_command in commands.into_iter() {
-            let output = match run_shell_command_with_log(
-                self.get_logger(),
-                self.get_os(),
-                driver_version_command,
-            ) {
-                Ok(out) => out,
-                Err(_e) => continue,
+            let command_result = if driver_version_command.display().starts_with("(Get-") {
+                run_powershell_command_with_log(self.get_logger(), driver_version_command)
+            } else {
+                run_shell_command_with_log(self.get_logger(), self.get_os(), driver_version_command)
             };
+            let output = match command_result {
+                Ok(out) => out,
+                Err(_) => continue,
+            };
+
             let full_browser_version = parse_version(output, self.get_logger()).unwrap_or_default();
             if full_browser_version.is_empty() {
                 continue;
@@ -1158,9 +1161,11 @@ pub trait SeleniumManager {
         let mut commands = Vec::new();
         if WINDOWS.is(self.get_os()) {
             if !escaped_browser_path.is_empty() {
-                let wmic_command =
-                    Command::new_single(format_one_arg(WMIC_COMMAND, &escaped_browser_path));
-                commands.push(wmic_command);
+                let get_version_command = Command::new_single(format_one_arg(
+                    PS_GET_VERSION_COMMAND,
+                    &escaped_browser_path,
+                ));
+                commands.push(get_version_command);
             }
             if !self.is_browser_version_unstable() {
                 let reg_command =
