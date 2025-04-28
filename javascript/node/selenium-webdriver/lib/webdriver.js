@@ -688,6 +688,9 @@ class WebDriver {
     /** @private {./virtual_authenticator}*/
     this.authenticatorId_ = null
 
+    /** @private {./auth/loginHandler.LoginHandler} */
+    this.loginHandler_ = null
+
     this.pinnedScripts_ = {}
   }
 
@@ -799,6 +802,19 @@ class WebDriver {
         this._bidiConnection.close()
       }
     })
+  }
+
+  /**
+   * Returns a LoginHandler that can be used to perform login operations.
+   *
+   * @return {!./auth/loginHandler.LoginHandler} A LoginHandler instance for this WebDriver.
+   */
+  getLoginHandler() {
+    if (!this.loginHandler_) {
+      const { LoginHandler } = require('./auth/loginHandler')
+      this.loginHandler_ = new LoginHandler(this)
+    }
+    return this.loginHandler_
   }
 
   /** @override */

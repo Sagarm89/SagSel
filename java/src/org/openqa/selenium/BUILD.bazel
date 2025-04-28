@@ -36,6 +36,7 @@ java_export(
     deps = [
         ":manifest",
         artifact("org.jspecify:jspecify"),
+        "//java/src/org/openqa/selenium/auth",
     ],
 )
 
