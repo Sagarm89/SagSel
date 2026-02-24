@@ -75,13 +75,13 @@ jobs:
                AGILE_AI_PR_URL=<the full PR URL>
 
             IMPORTANT: You must actually create the branch, commit, push, and open the PR using git and gh CLI commands. Do not just describe what you would do.
-          anthropic_api_key: ${{https://console.anthropic.com/}}
+          anthropic_api_key: ${{ secrets.https://console.anthropic.com }}
           claude_args: |
             --model claude-sonnet-4-5-20250929
             --max-turns 25
             --allowedTools Bash(git:*) Bash(gh:*) Bash(npm:*) Bash(npx:*) Bash(node:*) Bash(ls:*) Bash(cat:*) Bash(find:*) Bash(grep:*) Bash(head:*) Bash(tail:*) Bash(wc:*) Read Write Edit
         env:
-          GH_TOKEN: ${{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}}
+          GH_TOKEN: ${{ secrets.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 }}
 
       - name: Extract PR URL
         id: extract
@@ -100,12 +100,12 @@ jobs:
           echo "pr_title=$PR_TITLE" >> $GITHUB_OUTPUT
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
         env:
-          GH_TOKEN: ${{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}}
+          GH_TOKEN: ${{ secrets.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 }}
 
       - name: Notify Jira - Success
         if: success() && steps.extract.outputs.pr_url != ''
         run: |
-          curl -s -X POST "${{https://8901da4a-dcf8-4f35-9123-fdb8f370a697.hello.atlassian-dev.net/x1/PXk8QYyJ1O2pyBkTZjRldSOOisc}}" \
+          curl -s -X POST "${{ secrets.https://8901da4a-dcf8-4f35-9123-fdb8f370a697.hello.atlassian-dev.net/x1/PXk8QYyJ1O2pyBkTZjRldSOOisc }}" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
               --arg issueKey "${{ inputs.issue_key }}" \
@@ -119,7 +119,7 @@ jobs:
       - name: Notify Jira - Failure
         if: failure()
         run: |
-          curl -s -X POST "${{https://8901da4a-dcf8-4f35-9123-fdb8f370a697.hello.atlassian-dev.net/x1/PXk8QYyJ1O2pyBkTZjRldSOOisc }}" \
+          curl -s -X POST "${{ secrets.https://8901da4a-dcf8-4f35-9123-fdb8f370a697.hello.atlassian-dev.net/x1/PXk8QYyJ1O2pyBkTZjRldSOOisc }}" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
               --arg issueKey "${{ inputs.issue_key }}" \
