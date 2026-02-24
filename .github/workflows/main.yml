@@ -81,7 +81,7 @@ jobs:
             --max-turns 25
             --allowedTools Bash(git:*) Bash(gh:*) Bash(npm:*) Bash(npx:*) Bash(node:*) Bash(ls:*) Bash(cat:*) Bash(find:*) Bash(grep:*) Bash(head:*) Bash(tail:*) Bash(wc:*) Read Write Edit
         env:
-          GH_TOKEN: ${{ secrets.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 }}
+          GH_TOKEN: ${{ secrets.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 }}
 
       - name: Extract PR URL
         id: extract
@@ -100,7 +100,7 @@ jobs:
           echo "pr_title=$PR_TITLE" >> $GITHUB_OUTPUT
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
         env:
-          GH_TOKEN: ${{ secrets.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 }}
+          GH_TOKEN: ${{ secrets.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 }}
 
       - name: Notify Jira - Success
         if: success() && steps.extract.outputs.pr_url != ''
