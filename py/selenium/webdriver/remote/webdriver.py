@@ -239,6 +239,7 @@ class WebDriver(BaseWebDriver):
         self.session_id = None
         self.caps = {}
         self.pinned_scripts = {}
+        self._login_handler = None
         self.error_handler = ErrorHandler()
         self._switch_to = SwitchTo(self)
         self._mobile = Mobile(self)
@@ -577,6 +578,19 @@ class WebDriver(BaseWebDriver):
         >>> driver.close()
         """
         self.execute(Command.CLOSE)
+
+    @property
+    def login_handler(self):
+        """
+        Returns a LoginHandler that can be used to perform login operations.
+
+        Returns:
+            A LoginHandler instance for this WebDriver
+        """
+        from selenium.webdriver.common.auth import LoginHandler
+        if self._login_handler is None:
+            self._login_handler = LoginHandler(self)
+        return self._login_handler
 
     def quit(self) -> None:
         """Quits the driver and closes every associated window.
