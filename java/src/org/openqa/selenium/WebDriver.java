@@ -49,7 +49,7 @@ import org.openqa.selenium.logging.Logs;
  * WebDriver specification</a>
  */
 @NullMarked
-public interface WebDriver extends SearchContext {
+public interface WebDriver extends SearchContext, HasLogin {
   // Navigation
 
   /**

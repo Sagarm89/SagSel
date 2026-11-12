@@ -118,6 +118,7 @@ public class RemoteWebDriver
   private Level level = Level.FINE;
   private ErrorHandler errorHandler = new ErrorHandler();
   private CommandExecutor executor;
+  private org.openqa.selenium.auth.LoginHandler loginHandler;
   protected Capabilities capabilities;
   private SessionId sessionId;
   private FileDetector fileDetector = new UselessFileDetector();
@@ -487,6 +488,14 @@ public class RemoteWebDriver
   @Override
   public TargetLocator switchTo() {
     return new RemoteTargetLocator();
+  }
+
+  @Override
+  public org.openqa.selenium.auth.LoginHandler getLoginHandler() {
+    if (loginHandler == null) {
+      loginHandler = new org.openqa.selenium.auth.DefaultLoginHandler(this);
+    }
+    return loginHandler;
   }
 
   @Override
